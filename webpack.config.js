@@ -9,7 +9,7 @@ module.exports = {
         publicPath: "/",
     },
     resolve: {
-        extensions: [".js", ".jsx"],
+        extensions: [".js", ".jsx", ".css"],
     },
     devServer: {
         historyApiFallback: true,
@@ -18,6 +18,10 @@ module.exports = {
         rules: [{
             test: /\.jsx?/,
             loader: "babel-loader",
+        },
+        {
+            test: /\.css?/,
+            use: ["style-loader", "css-loader"],
         }],
     },
 };
