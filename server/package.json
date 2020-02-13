@@ -1,0 +1,35 @@
+{
+  "name": "FitProServer",
+  "version": "1.0.0",
+  "description": "Backend server for FitPro",
+  "main": "server.js",
+  "scripts": {
+    "server": "cross-env NODE_ENV=production babel-node",
+    "server-dev": "nodemon server --exec babel-node",
+    "start": "npm run server-dev"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1"
+  },
+  "engines": {
+    "node": "9.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.4",
+    "@babel/node": "^7.8.4",
+    "@babel/preset-env": "^7.8.4",
+    "@babel/preset-react": "^7.8.3",
+    "@babel/register": "^7.8.3",
+    "babel-loader": "^8.0.6",
+    "cross-env": "^7.0.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-node": "^11.0.0",
+    "nodemon": "^2.0.2",
+    "webpack": "^4.41.6"
+  }
+}
