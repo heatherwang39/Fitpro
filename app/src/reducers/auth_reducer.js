@@ -2,6 +2,7 @@ import { LOGIN_USER, LOGOUT_USER, REGISTER_USER, LOGIN_SUCCESS, LOGIN_FAILURE } 
 
 const initialState = {
     loggedIN: false,
+    loggingIn: false,
 }
 
 export default (state = initialState, action) => {
@@ -14,18 +15,20 @@ export default (state = initialState, action) => {
             }
         case LOGOUT_USER:
             return {
-                ...state, 
-                user: action.payload,
-                loggingOut: true
+                loggedIN: false,
+                loggingIn: false
             }
         case LOGIN_SUCCESS:
             return {
                 ...state,
+                loggingIn: false,
+                user: action.payload, 
                 loggedIn: true
             }
         case LOGIN_FAILURE:
             return {
-                loggedIN: false,
+                loggingIn: false,
+                loggedIN: false
             }
         default:
             return state
