@@ -6,7 +6,10 @@
   "scripts": {
     "server": "cross-env NODE_ENV=production babel-node",
     "server-dev": "nodemon server --exec babel-node",
-    "start": "npm run server-dev"
+    "start": "npm run server-dev",
+    "test": "echo TODO add test for server",
+    "build": "echo TODO add build for server",
+    "lint": "eslint \"./**/*.js\""
   },
   "author": "",
   "license": "ISC",
