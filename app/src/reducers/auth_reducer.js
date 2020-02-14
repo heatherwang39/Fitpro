@@ -3,6 +3,7 @@ import { LOGIN_USER, LOGOUT_USER, REGISTER_USER, LOGIN_SUCCESS, LOGIN_FAILURE } 
 const initialState = {
     loggedIN: false,
     loggingIn: false,
+    user: {}
 }
 
 export default (state = initialState, action) => {
