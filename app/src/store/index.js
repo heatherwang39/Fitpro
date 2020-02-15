@@ -1,8 +1,6 @@
 import { createStore } from "redux";
+import reducers from "../reducers";
 
-// TODO use a real reducer
-const reducer = (state) => state;
-
-export const store = createStore(reducer);
+export const store = createStore(reducers);
 
 export default store;
