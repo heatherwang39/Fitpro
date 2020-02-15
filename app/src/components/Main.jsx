@@ -3,8 +3,8 @@ import { Route, Router } from "react-router-dom";
 import { Provider } from "react-redux";
 
 import { Navigation } from "./Navigation";
-import Home from "./HomeContainer/";
-import LoginContainer from './LoginContainer';
+import Home from "./HomeContainer";
+import LoginContainer from "./LoginContainer";
 
 import { history } from "../store/history";
 import { store } from "../store";
