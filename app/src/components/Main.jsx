@@ -12,18 +12,16 @@ import { store } from "../store";
 export const Main = () => (
     <Router history={history}>
         <Provider store={store}>
-            <div className="container mt-3">
-                <Navigation />
-                <Route
-                    exact
-                    path="/"
-                    component={Home}
-                />
-                <Route
-                    path="/login"
-                    component={LoginContainer}
-                />
-            </div>
+            <Navigation />
+            <Route
+                exact
+                path="/"
+                component={Home}
+            />
+            <Route
+                path="/login"
+                component={LoginContainer}
+            />
         </Provider>
     </Router>
 );
