@@ -66,9 +66,6 @@
         ],
         "no-underscore-dangle": [
             "off"
-        ],
-        "react/prop-types": [
-            0
         ]
     }
 }

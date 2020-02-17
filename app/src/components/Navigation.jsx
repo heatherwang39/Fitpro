@@ -6,6 +6,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
+import { PropTypes } from "prop-types";
 import {
     AppBar, IconButton, Menu, MenuItem, Toolbar, Typography,
 } from "@material-ui/core";
@@ -13,12 +14,13 @@ import {
     AccountCircle, DirectionsRun, Home, People, Today,
 } from "@material-ui/icons";
 
+import { User } from "../types";
+
 function _Navigation({ user }) {
     const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);
     const isOpen = Boolean(userMenuAnchorEl);
     const menuOpen = (event) => setUserMenuAnchorEl(event.currentTarget);
     const menuClose = () => setUserMenuAnchorEl(null);
-
     return (
         <AppBar position="static" className="navbar-container">
             <Toolbar>
@@ -49,7 +51,7 @@ function _Navigation({ user }) {
                             </IconButton>
                         </Link>
                     </div>
-                    {user.isTrainer
+                    {user != null && user.isTrainer
                         && (
                             <div className="navbar-trainer">
                                 <Link to="/clients" className="navbar-link">
@@ -62,7 +64,7 @@ function _Navigation({ user }) {
                                 </Link>
                             </div>
                         )}
-                    {!user.isTrainer
+                    {user != null && !user.isTrainer
                         && (
                             <div className="navbar-client">
                                 <Link to="/trainers" className="navbar-link">
@@ -91,9 +93,9 @@ function _Navigation({ user }) {
 
                 <div className="navbar-right">
                     {user == null && (
-                        <Link to="/register" className="navbar-link">
+                        <Link to="/login" className="navbar-link">
                             <div className="navbar-logged-out">
-                                <Typography>Sign Up</Typography>
+                                <Typography>Log In</Typography>
                             </div>
                         </Link>
                     )}
@@ -136,7 +138,15 @@ function _Navigation({ user }) {
     );
 }
 
-const mapStateToProps = (state) => ({ user: state.user });
+_Navigation.propTypes = {
+    user: PropTypes.instanceOf(User),
+};
+
+_Navigation.defaultProps = {
+    user: null,
+};
+
+const mapStateToProps = (state) => ({ user: state.userReducer });
 
 export const Navigation = connect(mapStateToProps)(_Navigation);
 export default Navigation;
