@@ -6,12 +6,12 @@ import { gotUserInfo } from "../../actions/user_actions";
 
 import { User } from "../../types";
 
-const fakeAuth = async (username, password) => (
+const fakeAuth = async (username) => (
     new User(1, username, "firstname", "lastname", "email@mail.com",
         "5555555555", "Toronto", "6'0", "200lb", false, false, "goalType", 3.5)
 );
 
-const checkLoginSuccess = (response) => true;
+const checkLoginSuccess = (response) => true || response;
 
 const LoginContainer = (props) => {
     // TODO validate username/password
@@ -20,7 +20,7 @@ const LoginContainer = (props) => {
     const login = () => {
         const info = userInfo();
         props.loginUser(info);
-        fakeAuth(info.username, info.password).then(
+        fakeAuth(info.username).then(
             (response) => {
                 const success = checkLoginSuccess(response);
                 if (success) {
