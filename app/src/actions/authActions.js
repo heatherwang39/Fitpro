@@ -1,4 +1,4 @@
-import { LOGIN_USER, LOGIN_SUCCESS, LOGIN_FAILURE } from "./action_types";
+import { LOGIN_USER, LOGIN_SUCCESS, LOGIN_FAILURE } from "./actionTypes";
 
 /*
 User = { username: STRING, password: STRING }

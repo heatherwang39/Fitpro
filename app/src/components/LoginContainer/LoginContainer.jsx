@@ -1,7 +1,7 @@
 import { connect } from "react-redux";
 import React from "react";
 import PropTypes from "prop-types";
-import { loginUser, loginSuccess } from "../../actions/auth_actions";
+import { loginUser, loginSuccess } from "../../actions/authActions";
 import { gotUserInfo } from "../../actions/user_actions";
 
 import { User } from "../../types";

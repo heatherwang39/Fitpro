@@ -1,6 +1,6 @@
 import {
     GOT_USER_INFO,
-} from "../actions/action_types";
+} from "../actions/actionTypes";
 
 export default (state = null, action) => {
     switch (action.type) {
