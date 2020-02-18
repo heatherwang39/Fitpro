@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import { Navigation } from "./Navigation";
 import Home from "./HomeContainer";
 import LoginContainer from "./LoginContainer";
+import Profile from "./ProfileContainer";
 
 import { history } from "../store/history";
 import { store } from "../store";
@@ -21,6 +22,10 @@ export const Main = () => (
             <Route
                 path="/login"
                 component={LoginContainer}
+            />
+            <Route
+                path="/user/:id(\d+)"
+                component={Profile}
             />
         </Provider>
     </Router>
