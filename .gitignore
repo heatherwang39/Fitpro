@@ -1,7 +1,12 @@
 node_modules/
 dist/
 package-lock.json
-
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
 # Created by https://www.gitignore.io/api/osx,vim,node,react,rider,linux,macos,emacs,windows,jetbrains,notepadpp,sublime
 # Edit at https://www.gitignore.io/?templates=osx,vim,node,react,rider,linux,macos,emacs,windows,jetbrains,notepadpp,sublime
 

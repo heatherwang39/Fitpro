@@ -1,6 +1,6 @@
 import {
     LOGIN_USER, LOGOUT_USER, LOGIN_SUCCESS, LOGIN_FAILURE,
-} from "../actions/action_types";
+} from "../actions/actionTypes";
 
 const initialState = {
     loggingIn: false,
