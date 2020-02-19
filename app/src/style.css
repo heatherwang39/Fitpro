@@ -70,3 +70,7 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
+
+.profile {
+    padding: 16px;
+}

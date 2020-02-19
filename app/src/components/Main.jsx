@@ -3,9 +3,9 @@ import { Route, Router } from "react-router-dom";
 import { Provider } from "react-redux";
 
 import { Navigation } from "./Navigation";
-import Home from "./HomeContainer";
+import Home from "./Home";
 import LoginContainer from "./LoginContainer";
-import Profile from "./ProfileContainer";
+import Profile from "./Profile";
 
 import { history } from "../store/history";
 import { store } from "../store";
