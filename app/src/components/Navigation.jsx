@@ -123,7 +123,7 @@ function _Navigation({ user }) {
                                 open={isOpen}
                                 onClose={menuClose}
                             >
-                                <Link to="/me" className="navbar-menu-link">
+                                <Link to={`/user/${user.id}`} className="navbar-menu-link">
                                     <MenuItem onClick={menuClose}>Profile</MenuItem>
                                 </Link>
                                 <Link to="/logout" className="navbar-menu-link">

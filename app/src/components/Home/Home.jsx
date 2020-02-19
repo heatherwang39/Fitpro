@@ -3,8 +3,7 @@ import React from "react";
 import { addClient, removeClient } from "../../actions/relationshipActions";
 
 const _Home = (props) => {
-    // Delete this console.log, this is only to bypass eslint error
-    console.log(props);
+    (() => {})(props); // Shut eslint up
     return (
         <div className="center">
             Home

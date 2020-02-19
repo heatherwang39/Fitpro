@@ -2,25 +2,33 @@ import { connect } from "react-redux";
 import React from "react";
 import PropTypes from "prop-types";
 import { loginUser, loginSuccess } from "../../actions/authActions";
-import { gotUserInfo } from "../../actions/user_actions";
+import { gotUserInfo } from "../../actions/userActions";
 
-import { User } from "../../types";
+import { clientUser, trainerUser } from "../../data";
 
-const fakeAuth = async (username) => (
-    new User(1, username, "firstname", "lastname", "email@mail.com",
-        "5555555555", "Toronto", "6'0", "200lb", false, false, "goalType", 3.5)
-);
+const fakeAuth = async (username, password) => {
+    switch (username) {
+    case "user":
+        if (password !== "user") return { status: "Invalid password" };
+        return clientUser;
+    case "user2":
+        if (password !== "user2") return { status: "Invalid password" };
+        return trainerUser;
+    default:
+        return { status: "Invalid user" };
+    }
+};
 
 const checkLoginSuccess = (response) => true || response;
 
 const LoginContainer = (props) => {
-    // TODO validate username/password
+    // TODO get this from a TextField instead of using a constant
     const userInfo = () => ({ username: "user", password: "user" });
 
     const login = () => {
         const info = userInfo();
         props.loginUser(info);
-        fakeAuth(info.username).then(
+        fakeAuth(info.username, info.password).then(
             (response) => {
                 const success = checkLoginSuccess(response);
                 if (success) {
