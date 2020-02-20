@@ -12,3 +12,5 @@ export const REMOVE_CLIENT = "REMOVE_CLIENT";
 export const GOT_USER_INFO = "GOT_USER_INFO";
 export const GET_PROFILE = "GET_PROFLE";
 export const GOT_PROFILE = "GOT_PROFILE";
+export const GET_USER_CALENDAR = "GET_USER_CALENDAR";
+export const GOT_USER_CALENDAR = "GOT_USER_CALENDAR";

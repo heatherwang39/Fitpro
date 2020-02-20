@@ -4,20 +4,7 @@ import PropTypes from "prop-types";
 import { loginUser, loginSuccess } from "../../actions/authActions";
 import { gotUserInfo } from "../../actions/userActions";
 
-import { clientUser, trainerUser } from "../../data";
-
-const fakeAuth = async (username, password) => {
-    switch (username) {
-    case "user":
-        if (password !== "user") return { status: "Invalid password" };
-        return clientUser;
-    case "user2":
-        if (password !== "user2") return { status: "Invalid password" };
-        return trainerUser;
-    default:
-        return { status: "Invalid user" };
-    }
-};
+import API from "../../api";
 
 const checkLoginSuccess = (response) => true || response;
 
@@ -28,7 +15,7 @@ const LoginContainer = (props) => {
     const login = () => {
         const info = userInfo();
         props.loginUser(info);
-        fakeAuth(info.username, info.password).then(
+        API.login(info.username, info.password).then(
             (response) => {
                 const success = checkLoginSuccess(response);
                 if (success) {

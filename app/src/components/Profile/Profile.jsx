@@ -10,23 +10,10 @@ import {
 import { Rating } from "@material-ui/lab";
 import { PropTypes } from "prop-types";
 import { getProfile as getProfileAction, gotProfile as gotProfileAction } from "../../actions/profileActions";
-import { User } from "../../types";
+import { User } from "../../types/user";
 
-import { clientUser, trainerUser } from "../../data";
+import API from "../../api";
 
-
-// TODO replace this with a server call in Phase 2
-const getProfileFromServer = async (id) => {
-    switch (id) {
-    case 1:
-        return clientUser;
-    case 2:
-        return trainerUser;
-    default:
-        console.log(`INVALID ID ${id}`);
-        return {};
-    }
-};
 
 /*
  * Check that response is a valid profile
@@ -46,7 +33,7 @@ const _Profile = ({
         error = "Invalid user id";
     } else if (profile.user == null && !profile.gettingProfile) {
         getProfile(id); // Just an action, doesn't actually get the profile
-        getProfileFromServer(id).then( // Actually get the profile from the server
+        API.getProfile(id).then( // Actually get the profile from the server
             (response) => {
                 error = checkGetProfileError(response);
                 gotProfile(response);

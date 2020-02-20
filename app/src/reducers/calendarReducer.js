@@ -1,16 +1,27 @@
-import { UPDATE_CALENDAR } from "../actions/actionTypes";
+import { GET_USER_CALENDAR, GOT_USER_CALENDAR, UPDATE_CALENDAR } from "../actions/actionTypes";
 
-const initialState = {
-    events: [],
-    availability: [],
+const defaultState = {
+    calendar: null,
+    gettingCalendar: false,
+    updatingCalendar: false,
 };
 
-export default (state = initialState, action) => {
+export default (state = defaultState, action) => {
     switch (action.type) {
+    case GET_USER_CALENDAR:
+        return {
+            ...state,
+            gettingCalendar: true,
+        };
+    case GOT_USER_CALENDAR:
+        return {
+            calendar: action.payload,
+            gettingCalendar: false,
+        };
     case UPDATE_CALENDAR:
         return {
-            events: action.payload.events,
-            availability: action.payload.availability,
+            ...state,
+            updatingCalendar: true,
         };
     default:
         return state;
