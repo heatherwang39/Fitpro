@@ -13,10 +13,10 @@ const fakeAuth = async (username, password) => {
     switch (username) {
     case "user":
         if (password !== "user") return { status: "Invalid password" };
-        return clientUser;
+        return { status: "success", user: clientUser };
     case "user2":
         if (password !== "user2") return { status: "Invalid password" };
-        return trainerUser;
+        return { status: "success", user: trainerUser };
     default:
         return { status: "Invalid user" };
     }
@@ -66,7 +66,7 @@ const LoginContainer = (props) => {
         props.loginUser(info);
         // Authenticate the user against local test data
         // switch to authenticate against API in phase 2
-        fakeAuth(info).then(
+        fakeAuth(username, password).then(
             (response) => {
                 const success = checkLoginSuccess(response);
                 if (success) {
