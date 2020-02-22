@@ -21,5 +21,3 @@ const clientEvents = [
 
 export const clientCalendar = new Calendar(clientEvents, [], false);
 export const trainerCalendar = new Calendar(clientEvents, [], false);
-
-export default clientUser;

@@ -14,7 +14,8 @@ import {
     AccountCircle, DirectionsRun, Home, People, Today,
 } from "@material-ui/icons";
 
-import { User } from "../types/user";
+import { User } from "../../types/user";
+import "./style.css";
 
 function _Navigation({ user }) {
     const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);

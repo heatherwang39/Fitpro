@@ -1,3 +1,3 @@
-import { FakeAPI as API } from "./fake_api";
+import { TestAPI as API } from "./test_api";
 
 export default API;

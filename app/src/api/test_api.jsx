@@ -2,9 +2,9 @@
 
 import {
     clientUser, trainerUser, clientCalendar, trainerCalendar,
-} from "./data";
+} from "./test_data";
 
-export const FakeAPI = {
+export const TestAPI = {
     getProfile: async (id) => {
         switch (id) {
         case 1:
@@ -44,4 +44,4 @@ export const FakeAPI = {
 
 };
 
-export default FakeAPI;
+export default TestAPI;

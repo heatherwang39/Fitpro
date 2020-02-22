@@ -13,6 +13,7 @@ import { PropTypes } from "prop-types";
 import { getProfile as getProfileAction, gotProfile as gotProfileAction } from "../../actions/profileActions";
 import { User } from "../../types/user";
 import API from "../../api";
+import "./style.css";
 
 /*
  * Check that response is a valid profile

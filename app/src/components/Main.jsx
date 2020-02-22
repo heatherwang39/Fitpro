@@ -2,7 +2,7 @@ import React from "react";
 import { Route, Router } from "react-router-dom";
 import { Provider } from "react-redux";
 
-import { Navigation } from "./Navigation";
+import Navigation from "./Navigation";
 import Home from "./Home";
 import LoginContainer from "./LoginContainer";
 import Profile from "./Profile";
