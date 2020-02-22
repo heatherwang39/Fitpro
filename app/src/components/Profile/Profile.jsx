@@ -9,11 +9,10 @@ import {
 } from "@material-ui/icons";
 import { Rating } from "@material-ui/lab";
 import { PropTypes } from "prop-types";
+
 import { getProfile as getProfileAction, gotProfile as gotProfileAction } from "../../actions/profileActions";
 import { User } from "../../types/user";
-
 import API from "../../api";
-
 
 /*
  * Check that response is a valid profile

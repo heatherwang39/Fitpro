@@ -21,10 +21,10 @@ export const FakeAPI = {
         switch (username) {
         case "user":
             if (password !== "user") return { status: "Invalid password" };
-            return clientUser;
+            return { status: "success", user: clientUser };
         case "user2":
             if (password !== "user2") return { status: "Invalid password" };
-            return trainerUser;
+            return { status: "success", user: trainerUser };
         default:
             return { status: "Invalid user" };
         }
