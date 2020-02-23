@@ -5,22 +5,10 @@ import { withStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 import React, { useState } from "react";
 import PropTypes from "prop-types";
+
+import API from "../../api";
 import { loginUser, loginSuccess, loginFailure } from "../../actions/authActions";
 import { gotUserInfo } from "../../actions/userActions";
-import { clientUser, trainerUser } from "../../data";
-
-const fakeAuth = async (username, password) => {
-    switch (username) {
-    case "user":
-        if (password !== "user") return { status: "Invalid password" };
-        return { status: "success", user: clientUser };
-    case "user2":
-        if (password !== "user2") return { status: "Invalid password" };
-        return { status: "success", user: trainerUser };
-    default:
-        return { status: "Invalid user" };
-    }
-};
 
 const checkLoginSuccess = (response) => response.status === "success";
 
@@ -64,9 +52,7 @@ const LoginContainer = (props) => {
         const info = userInfo(username, password);
         // Begin action to login the user
         props.loginUser(info);
-        // Authenticate the user against local test data
-        // switch to authenticate against API in phase 2
-        fakeAuth(username, password).then(
+        API.login(info.username, info.password).then(
             (response) => {
                 const success = checkLoginSuccess(response);
                 if (success) {

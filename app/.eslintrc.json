@@ -61,10 +61,10 @@
             "error",
             "consistent"
         ],
-        "prefer-destructuring": [
+        "no-underscore-dangle": [
             "off"
         ],
-        "no-underscore-dangle": [
+        "no-nested-ternary": [
             "off"
         ]
     }

@@ -2,10 +2,11 @@ import React from "react";
 import { Route, Router } from "react-router-dom";
 import { Provider } from "react-redux";
 
-import { Navigation } from "./Navigation";
+import Navigation from "./Navigation";
 import Home from "./Home";
 import LoginContainer from "./LoginContainer";
 import Profile from "./Profile";
+import Calendar from "./Calendar";
 
 import { history } from "../store/history";
 import { store } from "../store";
@@ -26,6 +27,10 @@ export const Main = () => (
             <Route
                 path="/user/:id(\d+)"
                 component={Profile}
+            />
+            <Route
+                path="/calendar"
+                component={Calendar}
             />
         </Provider>
     </Router>

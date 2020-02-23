@@ -5,7 +5,6 @@ import relationshipReducer from "./relationshipReducer";
 import userReducer from "./userReducer";
 import profileReducer from "./profileReducer";
 
-
 /* Combine all of the reducers here  */
 export default combineReducers({
     authReducer,
