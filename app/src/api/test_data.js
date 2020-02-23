@@ -12,6 +12,10 @@ const Event = (title, start, end) => ({
     end,
 });
 
+const Availability = (start, end, repeat) => ({
+    start, end, repeat,
+});
+
 const clientEvents = [
     Event("Tues Night", new Date("February 18, 2020 21:00:00"), new Date("February 18, 2020 22:00:00")),
     Event("Wed Afternoon", new Date("February 19, 2020 15:00:00"), new Date("February 19, 2020 15:00:00")),
@@ -19,5 +23,13 @@ const clientEvents = [
     Event("Sat evening", new Date("February 22, 2020 18:00:00"), new Date("February 22, 2020 20:00:00")),
 ];
 
-export const clientCalendar = new Calendar(clientEvents, [], false);
-export const trainerCalendar = new Calendar(clientEvents, [], false);
+const trainerEvents = [
+    Event("Personal Event", new Date("February 22, 2020 21:00:00"), new Date("February 22, 2020 23:00:00")),
+];
+
+const trainerAvailability = [
+    Availability(new Date("February 22, 2020 21:00:00"), new Date("February 22, 2020 23:00:00"), "weekly"),
+];
+
+export const clientCalendar = new Calendar(clientEvents, [], 1);
+export const trainerCalendar = new Calendar(trainerEvents, trainerAvailability, 2);

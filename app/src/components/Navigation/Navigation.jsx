@@ -54,7 +54,7 @@ function _Navigation({ user }) {
                     </div>
                     {user != null && user.isTrainer
                         && (
-                            <div className="navbar-trainer">
+                            <div className="navbar-client">
                                 <Link to="/clients" className="navbar-link">
                                     <IconButton>
                                         <People />

@@ -1,8 +1,8 @@
 export class Calendar {
-    constructor(events, availability, user) {
+    constructor(events, availability, userId) {
         this.events = events; // TODO sort
         this.availability = availability;
-        this.user = user;
+        this.userId = userId;
     }
 }
 

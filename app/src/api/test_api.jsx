@@ -45,6 +45,20 @@ export const TestAPI = {
     rmUserCalendarEvent: async (user, event) => ({ success: true, event, user }),
     addUserCalendarEvent: async (user, event) => ({ success: true, event, user }),
 
+    getTrainerCalendars: async (id) => {
+        if (id !== 2) {
+            console.log("Currently only getting trainer calendar for id 2 is supported");
+            return { success: false };
+        }
+        return {
+            success: true,
+            userCalendar: trainerCalendar,
+            clientCalendars: [{
+                id: 1, firstname: "ClientFirst", lastname: "ClientLast", calendar: clientCalendar,
+            }],
+        };
+    },
+
 };
 
 export default TestAPI;
