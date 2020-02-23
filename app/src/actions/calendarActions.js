@@ -1,10 +1,8 @@
-import { GET_USER_CALENDAR, GOT_USER_CALENDAR, UPDATE_CALENDAR } from "./actionTypes";
+import {
+    GET_USER_CALENDAR, GOT_USER_CALENDAR, UPDATED_USER_CALENDAR, ADD_USER_CALENDAR_EVENT, RM_USER_CALENDAR_EVENT,
+} from "./actionTypes";
 
-
-export const updateCalendar = (calendar) => ({
-    type: UPDATE_CALENDAR,
-    payload: calendar,
-});
+/* Fetching calendar */
 
 export const getUserCalendar = (calendar) => ({
     type: GET_USER_CALENDAR,
@@ -16,4 +14,20 @@ export const gotUserCalendar = (calendar) => ({
     payload: calendar,
 });
 
-export default updateCalendar;
+
+/* Updating calendar */
+
+export const addUserCalendarEvent = (event) => ({
+    type: ADD_USER_CALENDAR_EVENT,
+    payload: event,
+});
+
+export const rmUserCalendarEvent = (event) => ({
+    type: RM_USER_CALENDAR_EVENT,
+    payload: event,
+});
+
+export const updatedUserCalendar = (event) => ({
+    type: UPDATED_USER_CALENDAR,
+    payload: event,
+});

@@ -4,7 +4,7 @@ import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import { PropTypes } from "prop-types";
 import {
-    Button, Grid, Modal, Paper, Typography,
+    Button, Grid, Modal, Paper, TextField, Typography,
 } from "@material-ui/core";
 import {
     KeyboardDateTimePicker,
@@ -17,6 +17,9 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import {
     getUserCalendar as getUserCalendarAction,
     gotUserCalendar as gotUserCalendarAction,
+    addUserCalendarEvent as addUserCalendarEventAction,
+    rmUserCalendarEvent as rmUserCalendarEventAction,
+    updatedUserCalendar as updatedUserCalendarAction,
 } from "../../actions/calendarActions";
 import { Calendar as CalendarType } from "../../types/calendar";
 import API from "../../api";
@@ -24,13 +27,18 @@ import "./style.css";
 
 const localizer = momentLocalizer(moment);
 
-const _Calendar = ({ getUserCalendar, gotUserCalendar, calendar }) => {
+const _Calendar = ({
+    calendar, getUserCalendar, gotUserCalendar, addUserCalendarEvent, rmUserCalendarEvent, updatedUserCalendar,
+}) => {
+    // TODO get user id instead of using constant 1
+    const calUserId = 1;
+
     // Load Calendar from server
     if (calendar.calendar == null) {
         if (!calendar.gettingCalendar) {
-            getUserCalendar(1);
-            API.getUserCalendar(1).then((response) => {
-                // TODO validate response
+            getUserCalendar(calUserId);
+            API.getUserCalendar(calUserId).then((response) => {
+                // TODO handle failure
                 gotUserCalendar(response);
             });
         }
@@ -39,26 +47,53 @@ const _Calendar = ({ getUserCalendar, gotUserCalendar, calendar }) => {
 
     // Local state
     const [currentEvent, setCurrentEvent] = React.useState(null);
-    (() => {})(currentEvent); // Shut up eslint, TODO remove this
     const [addOpen, setAddOpen] = React.useState(false);
     const [editOpen, setEditOpen] = React.useState(false);
+    // Properties of new event that is currently being added
+    const [title, setTitle] = React.useState("");
     const [startDate, setStartDate] = React.useState(new Date());
+    const [endDate, setEndDate] = React.useState(new Date());
 
     // Toggles the Add Event modal
     const toggleAddOpen = (event) => {
         setCurrentEvent(event);
         setStartDate(event.start);
-        // TODO
-        console.log("toggle add", event);
+        // Populate end date selection with start date + 1 hour
+        setEndDate(moment(event.start).add(1, "h"));
         setAddOpen(!addOpen);
     };
 
     // Toggles the Edit Event modal
     const toggleEditOpen = (event) => {
         setCurrentEvent(event);
-        // TODO
-        console.log("toggle edit", event);
         setEditOpen(!editOpen);
+    };
+
+    const createEvent = () => {
+        // TODO validate title, startDate, endDate
+        const newEvent = { title, start: startDate, end: endDate };
+        addUserCalendarEvent(newEvent);
+        API.addUserCalendarEvent(calUserId, newEvent).then(
+            (response) => {
+                // TODO handle failure
+                updatedUserCalendar(response);
+                setCurrentEvent(null);
+                setAddOpen(false);
+            },
+        );
+    };
+
+    const deleteCurrentEvent = () => {
+        // TODO validate currentEvent
+        rmUserCalendarEvent(currentEvent);
+        API.rmUserCalendarEvent(currentEvent).then(
+            (response) => {
+                // TODO handle failure
+                updatedUserCalendar(response);
+                setCurrentEvent(null);
+                setEditOpen(false);
+            },
+        );
     };
 
     // Modal for adding a new event
@@ -69,24 +104,30 @@ const _Calendar = ({ getUserCalendar, gotUserCalendar, calendar }) => {
                 <Paper>
                     <Grid container direction="column" justify="center" alignItems="center" spacing={2}>
                         <Grid item>
+                            <TextField label="Title" value={title} onChange={(event) => setTitle(event.target.value)} />
+                        </Grid>
+                        <Grid item>
                             <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils}>
                                 <KeyboardDateTimePicker
                                     disableToolbar
-                                    variant="inline"
                                     format="DD-MM-YYYY hh:mm"
-                                    margin="normal"
-                                    label="Start Date"
+                                    label="Start"
                                     value={startDate}
                                     onChange={(date) => setStartDate(date)}
                                     autoOk
                                 />
+                                <KeyboardDateTimePicker
+                                    disableToolbar
+                                    format="DD-MM-YYYY hh:mm"
+                                    label="End"
+                                    value={endDate}
+                                    onChange={(date) => setEndDate(date)}
+                                    autoOk
+                                />
                             </MuiPickersUtilsProvider>
                         </Grid>
-                        {
-                            // TODO
-                        }
                         <Grid item>
-                            <Button>Create</Button>
+                            <Button onClick={createEvent}>Create</Button>
                         </Grid>
                     </Grid>
                 </Paper>
@@ -101,11 +142,8 @@ const _Calendar = ({ getUserCalendar, gotUserCalendar, calendar }) => {
                 <h2 className="event-modal-title"><Typography>Edit</Typography></h2>
                 <Paper>
                     <Grid container direction="column" justify="center" alignItems="center" spacing={2}>
-                        {
-                            // TODO
-                        }
                         <Grid item>
-                            <Button>
+                            <Button onClick={deleteCurrentEvent}>
                                 <Delete />
                                 Delete
                             </Button>
@@ -118,6 +156,7 @@ const _Calendar = ({ getUserCalendar, gotUserCalendar, calendar }) => {
 
     return (
         <div className="page">
+            <h4 className="center">Click an event for more info or click a blank day to add an event</h4>
             <BigCalendar
                 localizer={localizer}
                 events={calendar.calendar.events}
@@ -142,6 +181,9 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
     getUserCalendar: (id) => dispatch(getUserCalendarAction(id)),
     gotUserCalendar: (calendar) => dispatch(gotUserCalendarAction(calendar)),
+    updatedUserCalendar: (event) => dispatch(updatedUserCalendarAction(event)),
+    addUserCalendarEvent: (event) => dispatch(addUserCalendarEventAction(event)),
+    rmUserCalendarEvent: (event) => dispatch(rmUserCalendarEventAction(event)),
 });
 
 _Calendar.propTypes = {
@@ -150,8 +192,10 @@ _Calendar.propTypes = {
     ).isRequired,
     getUserCalendar: PropTypes.func.isRequired,
     gotUserCalendar: PropTypes.func.isRequired,
+    updatedUserCalendar: PropTypes.func.isRequired,
+    addUserCalendarEvent: PropTypes.func.isRequired,
+    rmUserCalendarEvent: PropTypes.func.isRequired,
 };
-
 
 export const Calendar = connect(mapStateToProps, mapDispatchToProps)(_Calendar);
 

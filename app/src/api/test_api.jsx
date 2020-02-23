@@ -42,6 +42,9 @@ export const TestAPI = {
         }
     },
 
+    rmUserCalendarEvent: async (user, event) => ({ success: true, event, user }),
+    addUserCalendarEvent: async (user, event) => ({ success: true, event, user }),
+
 };
 
 export default TestAPI;
