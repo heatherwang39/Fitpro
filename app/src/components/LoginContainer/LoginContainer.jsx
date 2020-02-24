@@ -5,7 +5,9 @@ import { withStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-
+import {
+    useHistory,
+} from "react-router-dom";
 import API from "../../api";
 import { loginUser, loginSuccess, loginFailure } from "../../actions/authActions";
 import { gotUserInfo } from "../../actions/userActions";
@@ -47,6 +49,7 @@ const LoginContainer = (props) => {
     const userInfo = (username, password) => ({ username, password });
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const history = useHistory();
     // Login the user
     const login = () => {
         const info = userInfo(username, password);
@@ -58,6 +61,7 @@ const LoginContainer = (props) => {
                 if (success) {
                     props.loginSuccess(response.user);
                     props.gotUserInfo(response.user);
+                    history.push("/");
                 } else {
                     props.loginFailure();
                 }
