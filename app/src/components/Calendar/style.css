@@ -17,8 +17,16 @@
     margin-right: auto;
 }
 
-.user-selection {
+.calendar-type-select-container {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.calendar-type-select-form-label {
+    display: inline;
+}
+
+.client-select-container {
+    width: 300px;
 }

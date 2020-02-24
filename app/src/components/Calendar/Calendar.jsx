@@ -4,8 +4,9 @@ import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import { PropTypes } from "prop-types";
 import {
-    Button, Grid, MenuItem, Modal, Paper, Select, TextField, Typography,
+    Button, FormControl, FormControlLabel, Grid, Modal, Paper, RadioGroup, Radio, TextField, Typography,
 } from "@material-ui/core";
+import { Autocomplete } from "@material-ui/lab";
 import {
     KeyboardDateTimePicker,
     MuiPickersUtilsProvider,
@@ -66,8 +67,9 @@ const _Calendar = ({
     const [currentEvent, setCurrentEvent] = React.useState(null);
     const [addOpen, setAddOpen] = React.useState(false);
     const [editOpen, setEditOpen] = React.useState(false);
-    const [selectedClient, setSelectedClient] = React.useState(user.id);
+    const [selectedClient, setSelectedClient] = React.useState("");
     const [visibleEvents, setVisibleEvents] = React.useState(calendar.userCalendar.events);
+    const [calendarType, setCalendarTypeState] = React.useState("overview");
     // Properties of new event that is currently being added
     const [title, setTitle] = React.useState("");
     const [startDate, setStartDate] = React.useState(new Date());
@@ -173,39 +175,107 @@ const _Calendar = ({
         </Modal>
     );
 
-    const selectClient = (id) => {
-        setSelectedClient(id);
-        for (let i = 0; i < calendar.clientCalendars.length; i++) {
-            if (calendar.clientCalendars[i].id === id) {
-                setVisibleEvents(calendar.clientCalendars[i].calendar.events);
-                return;
-            }
+    const clientSelectDisabled = () => calendarType !== "client";
+
+    const setCalendarType = (type) => {
+        setCalendarTypeState(type);
+        switch (type) {
+        case "overview":
+            // TODO setVisibleEvents(Calendar.union(calendar.clientCalendars))
+            setVisibleEvents([]);
+            break;
+        case "me":
+            setVisibleEvents(calendar.userCalendar.events);
+            break;
+        case "availability":
+            setVisibleEvents(calendar.userCalendar.availability);
+            break;
+        case "client":
+            break;
+        default:
         }
-        console.log(`No client calendar exists for id ${id}`);
     };
 
     return (
         <div className="page">
             <h4 className="center">Click an event for more info or click a blank day to add an event</h4>
             {
-                // Dropdown for which client to manage
+                // Trainer Calendar type selection
                 user.isTrainer
                 && (
-                    <div className="user-selection">
-                        <Select
-                            value={selectedClient}
-                            onChange={(event) => selectClient(event.target.value)}
-                            label="User"
-                        >
-                            <MenuItem value={user.id} key={user.id}>
-                                Me
-                            </MenuItem>
-                            {
-                                calendar.clientCalendars.map(
-                                    (x) => (<MenuItem value={x.id} key={x.id}>{x.firstname}</MenuItem>),
-                                )
-                            }
-                        </Select>
+                    <div className="calendar-type-select-container">
+                        <Paper>
+                            <FormControl component="fieldset" variant="outlined">
+                                <RadioGroup
+                                    value={calendarType}
+                                    onChange={(event) => event != null && setCalendarType(event.target.value)}
+                                >
+                                    <Grid container direction="row" justify="center" alignItems="center" spacing={2}>
+                                        <Grid item>
+                                            <FormControlLabel
+                                                className="calendar-type-select-form-label"
+                                                value="overview"
+                                                control={<Radio />}
+                                                label="Overview"
+                                                labelPlacement="start"
+                                            />
+                                        </Grid>
+                                        <Grid item>
+                                            <FormControlLabel
+                                                className="calendar-type-select-form-label"
+                                                value="me"
+                                                control={<Radio />}
+                                                label="My Calendar"
+                                                labelPlacement="start"
+                                            />
+                                        </Grid>
+                                        <Grid item>
+                                            <FormControlLabel
+                                                className="calendar-type-select-form-label"
+                                                value="availability"
+                                                control={<Radio />}
+                                                label="Availability"
+                                                labelPlacement="start"
+                                            />
+                                        </Grid>
+                                        <Grid item>
+                                            <FormControlLabel
+                                                className="calendar-type-select-form-label"
+                                                value="client"
+                                                control={(
+                                                    <Radio />
+                                                )}
+                                                label="Client"
+                                                labelPlacement="start"
+                                            />
+                                        </Grid>
+                                        <Grid item>
+                                            <Autocomplete
+                                                value={selectedClient}
+                                                onChange={
+                                                    (_, newValue) => {
+                                                        setSelectedClient(newValue);
+                                                        setVisibleEvents(newValue.calendar.events);
+                                                    }
+                                                }
+                                                options={calendar.clientCalendars}
+                                                getOptionLabel={(option) => (option === "" ? "" : option.firstname)}
+                                                disabled={clientSelectDisabled()}
+                                                renderInput={(items) => (
+                                                    <TextField
+                                                        {...items}
+                                                        label="Client"
+                                                        variant="outlined"
+                                                    />
+                                                )}
+                                                autoSelect
+                                                clearOnEscape
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                </RadioGroup>
+                            </FormControl>
+                        </Paper>
                     </div>
                 )
             }
