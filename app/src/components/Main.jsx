@@ -7,6 +7,7 @@ import Home from "./Home";
 import LoginContainer from "./LoginContainer";
 import Profile from "./Profile";
 import Calendar from "./Calendar";
+import SearchTrainer from "./SearchTrainer";
 
 import { history } from "../store/history";
 import { store } from "../store";
@@ -31,6 +32,10 @@ export const Main = () => (
             <Route
                 path="/calendar"
                 component={Calendar}
+            />
+            <Route
+                path="/trainers"
+                component={SearchTrainer}
             />
         </Provider>
     </Router>
