@@ -8,7 +8,7 @@ import LoginContainer from "./LoginContainer";
 import Profile from "./Profile";
 import MailContainer from "./MailContainer";
 import Calendar from "./Calendar";
-
+import RegisterContainer from "./RegisterContainer";
 import { history } from "../store/history";
 import { store } from "../store";
 
@@ -35,6 +35,7 @@ export const Main = () => (
                 path="/calendar"
                 component={Calendar}
             />
+
             <ProtectedRoute
                 path="/mail"
                 component={MailContainer}
