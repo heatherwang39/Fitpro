@@ -1,4 +1,3 @@
-/* eslint no-use-before-define: 0 */ // --> OFF
 import React from "react";
 import {
     Route,
@@ -30,7 +29,7 @@ const mapStateToProps = (state) => ({
 });
 
 ProtectedRoute.propTypes = {
-    component: PropTypes.instanceOf(React.Component).isRequired,
+    component: PropTypes.func.isRequired,
 };
 
 export default connect(mapStateToProps)(ProtectedRoute);
