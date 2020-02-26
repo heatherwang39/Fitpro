@@ -1,6 +1,6 @@
 export class User {
     constructor(id, username, firstname, lastname, email, phone, location, height,
-        weight, isTrainer, isAdmin, goalType, rating) {
+        weight, isTrainer, isAdmin, goalType, rating, trainers) {
         this.id = id;
         this.username = username;
         this.firstname = firstname;
@@ -14,6 +14,7 @@ export class User {
         this.goalType = goalType;
         this.rating = rating;
         this.location = location;
+        this.trainers = trainers;
     }
 }
 

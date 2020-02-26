@@ -6,11 +6,14 @@ import Navigation from "./Navigation";
 import Home from "./Home";
 import LoginContainer from "./LoginContainer";
 import Profile from "./Profile";
+import MailContainer from "./MailContainer";
 import Calendar from "./Calendar";
 import SearchTrainer from "./SearchTrainer";
 
 import { history } from "../store/history";
 import { store } from "../store";
+
+import ProtectedRoute from "./ProtectedRoute";
 
 export const Main = () => (
     <Router history={history}>
@@ -36,6 +39,10 @@ export const Main = () => (
             <Route
                 path="/trainers"
                 component={SearchTrainer}
+
+            <ProtectedRoute
+                path="/mail"
+                component={MailContainer}
             />
         </Provider>
     </Router>

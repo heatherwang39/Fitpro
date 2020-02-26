@@ -1,7 +1,7 @@
 // Simulated API calls that read static data from data.js
 
 import {
-    clientUser, trainerUser, clientCalendar, trainerCalendar,
+    clientUser, client2User, trainerUser, clientCalendar, client2Calendar, trainerCalendar,
 } from "./test_data";
 
 export const TestAPI = {
@@ -11,6 +11,8 @@ export const TestAPI = {
             return clientUser;
         case 2:
             return trainerUser;
+        case 3:
+            return client2User;
         default:
             console.log(`INVALID ID ${id}`);
             return {};
@@ -36,6 +38,8 @@ export const TestAPI = {
             return clientCalendar;
         case 2:
             return trainerCalendar;
+        case 3:
+            return client2Calendar;
         default:
             console.log(`User ID ${id} HAS NO CALENDAR`);
             return null;
@@ -44,6 +48,41 @@ export const TestAPI = {
 
     rmUserCalendarEvent: async (user, event) => ({ success: true, event, user }),
     addUserCalendarEvent: async (user, event) => ({ success: true, event, user }),
+
+    getTrainerCalendars: async (id) => {
+        if (id !== 2) {
+            console.log("Currently only getting trainer calendar for id 2 is supported");
+            return { success: false };
+        }
+        return {
+            success: true,
+            userCalendar: trainerCalendar,
+            clientCalendars: [
+                {
+                    id: 1,
+                    firstname: "ClientFirst",
+                    lastname: "ClientLast",
+                    calendar: clientCalendar,
+                },
+                {
+                    id: 3,
+                    firstname: "Client2First",
+                    lastname: "Client2Last",
+                    calendar: client2Calendar,
+                },
+            ],
+        };
+    },
+    registerUser: async (userInfo) => {
+        switch (userInfo.accountType) {
+        case "Client":
+            return { success: true, user: clientUser };
+        case "Trainer":
+            return { success: true, user: trainerUser };
+        default:
+            return { success: true, user: clientUser };
+        }
+    },
 
 };
 

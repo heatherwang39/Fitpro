@@ -14,6 +14,11 @@ const styles = {
     PasswordInput: {
         width: 300,
         height: 20,
+        marginTop: 100,
+    },
+    Header: {
+        width: 300,
+        margin: "30px 0 10px 0",
     },
 };
 
@@ -21,7 +26,7 @@ const PasswordInput = (props) => {
     const { classes, onChange, onKeyDown } = props;
     return (
         <div className={classes.PasswordInputContainer}>
-            <div> Choose a password </div>
+            <div className={classes.Header}> Choose a password </div>
             <TextField
                 className={classes.PasswordInput}
                 id="outlined-basic"

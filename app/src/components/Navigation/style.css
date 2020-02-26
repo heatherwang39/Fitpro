@@ -19,14 +19,6 @@
     display: inline;
 }
 
-.nabar-trainer {
-    display: inline;
-}
-
-.navbar-client {
-    display: inline;
-}
-
 .navbar-always {
     display: inline;
 }
@@ -37,6 +29,7 @@
 
 .navbar-container {
     text-align: center;
+    flex: none;
 }
 
 .navbar-link {

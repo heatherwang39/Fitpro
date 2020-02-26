@@ -11,7 +11,7 @@ import {
     AppBar, IconButton, Menu, MenuItem, Toolbar, Typography,
 } from "@material-ui/core";
 import {
-    AccountCircle, DirectionsRun, Home, People, Today,
+    AccountCircle, DirectionsRun, Home, MoreHoriz, People, Today,
 } from "@material-ui/icons";
 
 import { User } from "../../types/user";
@@ -22,6 +22,11 @@ function _Navigation({ user }) {
     const isOpen = Boolean(userMenuAnchorEl);
     const menuOpen = (event) => setUserMenuAnchorEl(event.currentTarget);
     const menuClose = () => setUserMenuAnchorEl(null);
+    const [moreMenuAnchorEl, setMoreMenuAnchorEl] = React.useState(null);
+    const moreIsOpen = Boolean(moreMenuAnchorEl);
+    const moreMenuOpen = (event) => setMoreMenuAnchorEl(event.currentTarget);
+    const moreMenuClose = () => setMoreMenuAnchorEl(null);
+
     return (
         <AppBar position="static" className="navbar-container">
             <Toolbar>
@@ -43,41 +48,7 @@ function _Navigation({ user }) {
                                 </Typography>
                             </IconButton>
                         </Link>
-                        <Link to="/exercises" className="navbar-link">
-                            <IconButton>
-                                <DirectionsRun />
-                                <Typography className="navbar-label">
-                                    Exercises
-                                </Typography>
-                            </IconButton>
-                        </Link>
                     </div>
-                    {user != null && user.isTrainer
-                        && (
-                            <div className="navbar-trainer">
-                                <Link to="/clients" className="navbar-link">
-                                    <IconButton>
-                                        <People />
-                                        <Typography className="navbar-label">
-                                            Clients
-                                        </Typography>
-                                    </IconButton>
-                                </Link>
-                            </div>
-                        )}
-                    {user != null && !user.isTrainer
-                        && (
-                            <div className="navbar-client">
-                                <Link to="/trainers" className="navbar-link">
-                                    <IconButton>
-                                        <People />
-                                        <Typography className="navbar-label">
-                                            Trainers
-                                        </Typography>
-                                    </IconButton>
-                                </Link>
-                            </div>
-                        )}
                     {user != null && (
                         <div className="navbar-logged-in">
                             <Link to="/calendar" className="navbar-link">
@@ -90,8 +61,74 @@ function _Navigation({ user }) {
                             </Link>
                         </div>
                     )}
+                    {user != null && (
+                        <div className="navbar-logged-in">
+                            <Link to="/mail" className="navbar-link">
+                                <IconButton>
+                                    <Today />
+                                    <Typography className="navbar-label">
+                                        Mail
+                                    </Typography>
+                                </IconButton>
+                            </Link>
+                        </div>
+                    )}
+                    <div className="navbar-always">
+                        <IconButton aria-controls="navbar-more-menu" aria-haspopup="true" onClick={moreMenuOpen}>
+                            <MoreHoriz />
+                            <Typography className="navbar-label">
+                                More
+                            </Typography>
+                        </IconButton>
+                        <Menu
+                            id="navbar-more-menu"
+                            anchorEl={moreMenuAnchorEl}
+                            getContentAnchorEl={null} // Vertical positioning doesn't work without this
+                            anchorOrigin={{
+                                vertical: "bottom",
+                                horizontal: "center",
+                            }}
+                            keepMounted
+                            transformOrigin={{
+                                vertical: "top",
+                                horizontal: "center",
+                            }}
+                            open={moreIsOpen}
+                            onClose={moreMenuClose}
+                        >
+                            <Link to="/exercises" className="navbar-menu-link">
+                                <MenuItem>
+                                    <DirectionsRun />
+                                    <Typography className="navbar-label">
+                                        Exercises
+                                    </Typography>
+                                </MenuItem>
+                            </Link>
+                            {user != null && user.isTrainer
+                            && (
+                                <Link to="/clients" className="navbar-menu-link">
+                                    <MenuItem>
+                                        <People />
+                                        <Typography className="navbar-label">
+                                            Clients
+                                        </Typography>
+                                    </MenuItem>
+                                </Link>
+                            )}
+                            {user != null && !user.isTrainer
+                        && (
+                            <Link to="/trainers" className="navbar-menu-link">
+                                <MenuItem>
+                                    <People />
+                                    <Typography className="navbar-label">
+                                        Trainers
+                                    </Typography>
+                                </MenuItem>
+                            </Link>
+                        )}
+                        </Menu>
+                    </div>
                 </div>
-
                 <div className="navbar-right">
                     {user == null && (
                         <Link to="/login" className="navbar-link">

@@ -1,52 +1,22 @@
-import {
-    TextField, Button,
-} from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-
+import {
+    useHistory,
+} from "react-router-dom";
 import API from "../../api";
 import { loginUser, loginSuccess, loginFailure } from "../../actions/authActions";
 import { gotUserInfo } from "../../actions/userActions";
+import LoginComponent from "./LoginComponent";
 
 const checkLoginSuccess = (response) => response.status === "success";
 
-const styles = {
-    textField: {
-        marginTop: "20px",
-        width: 300,
-    },
-    button: {
-        backgroundColor: "#4786FF",
-        color: "white",
-        marginTop: "20px",
-        float: "right",
-    },
-    loginContainer: {
-        width: 750,
-        height: 550,
-        margin: "auto",
-        paddingTop: "87px",
-    },
-    registerButton: {
-        color: "#5D8FFC",
-        marginTop: 20,
-        fontSize: 11,
-    },
-    loginForm: {
-        width: 300,
-        height: 229,
-        marginLeft: 131,
-    },
-};
-
 const LoginContainer = (props) => {
     // TODO validate username/password
-    const { classes } = props;
     const userInfo = (username, password) => ({ username, password });
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const history = useHistory();
     // Login the user
     const login = () => {
         const info = userInfo(username, password);
@@ -58,6 +28,7 @@ const LoginContainer = (props) => {
                 if (success) {
                     props.loginSuccess(response.user);
                     props.gotUserInfo(response.user);
+                    history.push("/");
                 } else {
                     props.loginFailure();
                 }
@@ -80,27 +51,12 @@ const LoginContainer = (props) => {
     };
 
     return (
-        <div className={classes.loginContainer}>
-            <form className={classes.loginForm}>
-                <TextField
-                    id="outlined-basic"
-                    label="Username"
-                    variant="outlined"
-                    className={classes.textField}
-                    onChange={updateUsername}
-                />
-                <TextField
-                    id="outlined-password-input"
-                    type="password"
-                    label="Password"
-                    variant="outlined"
-                    className={classes.textField}
-                    onChange={updatePassword}
-                />
-                <Button className={classes.registerButton}>Register</Button>
-                <Button variant="contained" onClick={login} className={classes.button}>Login</Button>
-            </form>
-        </div>
+        <LoginComponent
+            loginUser={login}
+            updateUsername={updateUsername}
+            updatePassword={updatePassword}
+            linkToRegister={() => { history.push("/register"); }}
+        />
     );
 };
 
@@ -121,7 +77,6 @@ LoginContainer.propTypes = {
     loginSuccess: PropTypes.func.isRequired,
     gotUserInfo: PropTypes.func.isRequired,
     loginFailure: PropTypes.func.isRequired,
-    classes: PropTypes.objectOf(PropTypes.string).isRequired,
 };
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(LoginContainer));
+export default connect(mapStateToProps, mapDispatchToProps)(LoginContainer);
