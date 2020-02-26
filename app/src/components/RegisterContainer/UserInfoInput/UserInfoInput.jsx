@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
     MenuItem, TextField, InputAdornment, withStyles,
 } from "@material-ui/core";
@@ -17,60 +17,59 @@ const styles = {
 };
 
 const UserInfoInput = (props) => {
-    const { classes, onKeyDown } = props;
-
-    const initialInfo = {
-        goalType: 0,
-        accountType: "client",
-    };
-
-    const [userInfo, setUserInfo] = useState(initialInfo);
+    const {
+        classes, register, onChange, userInfo,
+    } = props;
 
     const updateUserInfo = (attribute) => (e) => {
-        console.log(userInfo);
-        setUserInfo({
+        onChange({
             [attribute]: e.target.value,
         });
     };
-    console.log(userInfo.accountType);
+
+    const onKeyDown = (e) => {
+        if (e.keyCode === 13) {
+            register();
+        }
+    };
+
     return (
         <div className={classes.container}>
             <TextField
                 className={classes.input}
-                id="outlined-basic"
                 label="First Name"
                 variant="outlined"
                 onKeyDown={onKeyDown}
                 size="small"
                 autoFocus
+                onChange={updateUserInfo("firstName")}
             />
             <TextField
                 className={classes.input}
-                id="outlined-basic"
                 label="Last Name"
                 variant="outlined"
                 onKeyDown={onKeyDown}
                 size="small"
+                onChange={updateUserInfo("lastName")}
             />
             <TextField
                 className={classes.input}
-                id="outlined-basic"
                 label="Email"
                 variant="outlined"
                 onKeyDown={onKeyDown}
                 size="small"
+                onChange={updateUserInfo("email")}
             />
             <TextField
                 className={classes.input}
-                id="outlined-basic"
                 label="Phone"
                 variant="outlined"
                 onKeyDown={onKeyDown}
                 size="small"
+                onChange={updateUserInfo("phone")}
             />
             <TextField
                 className={classes.input}
-                id="outlined-basic"
                 label="Height"
                 variant="outlined"
                 onKeyDown={onKeyDown}
@@ -78,10 +77,10 @@ const UserInfoInput = (props) => {
                 InputProps={{
                     startAdornment: <InputAdornment position="start">cm</InputAdornment>,
                 }}
+                onChange={updateUserInfo("height")}
             />
             <TextField
                 className={classes.input}
-                id="outlined-basic"
                 label="Weight"
                 variant="outlined"
                 onKeyDown={onKeyDown}
@@ -89,18 +88,18 @@ const UserInfoInput = (props) => {
                 InputProps={{
                     startAdornment: <InputAdornment position="start">Kg</InputAdornment>,
                 }}
+                onChange={updateUserInfo("weight")}
             />
             <TextField
                 className={classes.input}
-                id="outlined-basic"
                 label="Goal type"
                 variant="outlined"
                 onKeyDown={onKeyDown}
                 size="small"
+                onChange={updateUserInfo("goalType")}
             />
             <TextField
                 className={classes.input}
-                id="outlined-basic"
                 label="Who are you?"
                 variant="outlined"
                 value={userInfo.accountType}
@@ -121,7 +120,9 @@ const UserInfoInput = (props) => {
 
 UserInfoInput.propTypes = {
     classes: PropTypes.objectOf(PropTypes.string).isRequired,
-    onKeyDown: PropTypes.func.isRequired,
+    register: PropTypes.func.isRequired,
+    onChange: PropTypes.func.isRequired,
+    userInfo: PropTypes.objectOf(PropTypes.string).isRequired,
 };
 
 export default withStyles(styles)(UserInfoInput);

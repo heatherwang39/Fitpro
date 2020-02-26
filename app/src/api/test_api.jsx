@@ -73,6 +73,16 @@ export const TestAPI = {
             ],
         };
     },
+    registerUser: async (userInfo) => {
+        switch (userInfo.accountType) {
+        case "Client":
+            return { success: true, user: clientUser };
+        case "Trainer":
+            return { success: true, user: trainerUser };
+        default:
+            return { success: true, user: clientUser };
+        }
+    },
 
 };
 

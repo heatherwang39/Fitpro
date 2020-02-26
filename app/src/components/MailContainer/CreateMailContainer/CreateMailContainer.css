@@ -1,0 +1,30 @@
+.create-mail-wrapper {
+    position: fixed;
+    width: 600px;
+    height: 600px;
+    right: 100px;
+    bottom: 0px;
+    border-radius: 8px 8px 0px 0px;
+    box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.2);
+}
+
+.create-mail-wrapper header {
+    border-radius: 8px 8px 0px 0px;
+    background-color: grey;
+    height: 30px;
+    color: white;
+    padding: 5px 0px 5px 16px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.create-mail-body {
+    height: 500px;
+    padding: 0 16px 0 16px;
+}
+
+.create-mail-footer {
+    padding: 0 16px 0 16px;
+    display: flex;
+    justify-content: space-between;
+}

@@ -29,6 +29,7 @@
 
 .navbar-container {
     text-align: center;
+    flex: none;
 }
 
 .navbar-link {

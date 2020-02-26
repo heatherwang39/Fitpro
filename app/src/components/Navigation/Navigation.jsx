@@ -61,6 +61,18 @@ function _Navigation({ user }) {
                             </Link>
                         </div>
                     )}
+                    {user != null && (
+                        <div className="navbar-logged-in">
+                            <Link to="/mail" className="navbar-link">
+                                <IconButton>
+                                    <Today />
+                                    <Typography className="navbar-label">
+                                        Mail
+                                    </Typography>
+                                </IconButton>
+                            </Link>
+                        </div>
+                    )}
                     <div className="navbar-always">
                         <IconButton aria-controls="navbar-more-menu" aria-haspopup="true" onClick={moreMenuOpen}>
                             <MoreHoriz />
