@@ -66,6 +66,16 @@
         ],
         "no-nested-ternary": [
             "off"
+        ],
+        "react/jsx-props-no-spreading": [
+            "off"
+        ],
+        "no-unused-vars": [
+            "error",
+            {
+                "vars": "all",
+                "args": "after-used"
+            }
         ]
     }
 }

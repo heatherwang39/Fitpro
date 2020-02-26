@@ -15,10 +15,10 @@ const ProtectedRoute = ({ component: Component, ...rest }) => {
     }
     return (
         <Route
-            { ...rest }
+            {...rest}
             render={(props) => (
                 isAuth
-                    ? <Component { ...props } />
+                    ? <Component {...props} />
                     : <Redirect to="/login" />
             )}
         />
@@ -28,5 +28,9 @@ const ProtectedRoute = ({ component: Component, ...rest }) => {
 const mapStateToProps = (state) => ({
     user: state.userReducer,
 });
+
+ProtectedRoute.propTypes = {
+    component: PropTypes.instanceOf(React.Component).isRequired,
+};
 
 export default connect(mapStateToProps)(ProtectedRoute);
