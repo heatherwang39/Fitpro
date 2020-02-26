@@ -119,16 +119,20 @@ const _Profile = ({
                                 <Rating value={profile.user.rating} precision={0.5} readOnly />
                             </Grid>
                         </Grid>
-                        {profile.user.isTrainer && (user == null || user.isTrainer)
-                && (
-                    <Grid item>
-                        <Link to={`/book/${profile.user.id}`}>
-                            <Button variant="contained">
-                                Book with this trainer
-                            </Button>
-                        </Link>
-                    </Grid>
-                )}
+                        {
+                            user != null && profile.user.trainers.includes(user.id)
+                        && (
+                            <Grid item>
+                                <Grid container direction="row" alignItems="center">
+                                    <Link to={{ pathname: "/calendar", state: { userId: profile.user.id } }}>
+                                        <Button variant="contained">
+                                            Calendar
+                                        </Button>
+                                    </Link>
+                                </Grid>
+                            </Grid>
+                        )
+                        }
                     </Grid>
                 </div>
             </Paper>

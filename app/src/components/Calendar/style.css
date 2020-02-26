@@ -30,3 +30,15 @@
 .client-select-container {
     width: 300px;
 }
+
+.event-default {
+}
+
+.event-availability {
+    background-color: green;
+}
+
+.test {
+    width: 50%;
+    height: 50%;
+}

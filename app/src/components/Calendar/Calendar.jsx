@@ -29,10 +29,35 @@ import { Calendar as CalendarType } from "../../types/calendar";
 import API from "../../api";
 import "./style.css";
 
+// These are used in reverse order (last element is used for first client)
+const ALL_EVENT_COLOURS = [
+    "lightgreen",
+    "orange",
+    "orangered",
+    "violet",
+    "green",
+    "red",
+    "purple",
+    "blue",
+];
+
 const localizer = momentLocalizer(moment);
 
+const combineClientEvents = (clientCalendars) => {
+    const events = [];
+    for (let i = 0; i < clientCalendars.length; i++) {
+        for (let j = 0; j < clientCalendars[i].calendar.events.length; j++) {
+            events.push({
+                ...clientCalendars[i].calendar.events[j],
+                title: `${clientCalendars[i].firstname} - ${clientCalendars[i].calendar.events[j].title}`,
+            });
+        }
+    }
+    return events;
+};
+
 const _Calendar = ({
-    calendar, user,
+    location, calendar, user,
     getTrainerCalendars, gotTrainerCalendars, getUserCalendar, gotUserCalendar,
     addUserCalendarEvent, rmUserCalendarEvent, updatedUserCalendar,
 }) => {
@@ -69,11 +94,56 @@ const _Calendar = ({
     const [editOpen, setEditOpen] = React.useState(false);
     const [selectedClient, setSelectedClient] = React.useState("");
     const [visibleEvents, setVisibleEvents] = React.useState(calendar.userCalendar.events);
-    const [calendarType, setCalendarTypeState] = React.useState("overview");
+    const [calendarType, setCalendarTypeState] = React.useState("default");
+    const [availableColours, setAvailableColours] = React.useState(ALL_EVENT_COLOURS);
+    const [uidColours, setUidColours] = React.useState(new Map());
+
     // Properties of new event that is currently being added
     const [title, setTitle] = React.useState("");
     const [startDate, setStartDate] = React.useState(new Date());
     const [endDate, setEndDate] = React.useState(new Date());
+
+
+    const setCalendarType = (type) => {
+        setCalendarTypeState(type);
+        switch (type) {
+        case "overview":
+            setVisibleEvents(combineClientEvents(calendar.clientCalendars));
+            break;
+        case "me":
+            setVisibleEvents(calendar.userCalendar.events);
+            break;
+        case "availability":
+            setVisibleEvents(calendar.userCalendar.availability);
+            break;
+        case "client":
+            if (selectedClient === "") {
+                setVisibleEvents([]);
+            } else {
+                setVisibleEvents(selectedClient.calendar.events);
+            }
+            break;
+        default:
+        }
+    };
+
+    // Select the client that was passed with location if they are a client of this trainer
+    if (location != null && user.isTrainer && typeof location.state !== "undefined" && selectedClient === "") {
+        let found = false;
+        for (let i = 0; i < calendar.clientCalendars.length; i++) {
+            if (calendar.clientCalendars[i].id === location.state.userId) {
+                setSelectedClient(calendar.clientCalendars[i]);
+                // TODO setCalendarType doesn't work here, I think because selectedClient hasn't been updated?
+                // todo fix this so Client mode is automatically selected
+                setCalendarType("client");
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            console.log(`Invalid client calendar id ${location.state.userId}`);
+        }
+    }
 
     // Toggles the Add Event modal
     const toggleAddOpen = (event) => {
@@ -160,9 +230,12 @@ const _Calendar = ({
     const editModal = () => (
         <Modal open={editOpen} onClose={() => setEditOpen(false)} className="event-modal">
             <Paper>
-                <h2 className="event-modal-title"><Typography>Edit</Typography></h2>
+                <h2 className="event-modal-title"><Typography>{currentEvent.title}</Typography></h2>
                 <Paper>
                     <Grid container direction="column" justify="center" alignItems="center" spacing={2}>
+                        <Grid item>
+                            <Typography>{`${currentEvent.start} to ${currentEvent.end}`}</Typography>
+                        </Grid>
                         <Grid item>
                             <Button onClick={deleteCurrentEvent}>
                                 <Delete />
@@ -177,24 +250,26 @@ const _Calendar = ({
 
     const clientSelectDisabled = () => calendarType !== "client";
 
-    const setCalendarType = (type) => {
-        setCalendarTypeState(type);
-        switch (type) {
-        case "overview":
-            // TODO setVisibleEvents(Calendar.union(calendar.clientCalendars))
-            setVisibleEvents([]);
-            break;
-        case "me":
-            setVisibleEvents(calendar.userCalendar.events);
-            break;
-        case "availability":
-            setVisibleEvents(calendar.userCalendar.availability);
-            break;
-        case "client":
-            break;
-        default:
-        }
+    const getNewColour = () => {
+        // TODO handle running out of colours
+        const colour = availableColours.pop();
+        setAvailableColours(availableColours);
+        return colour;
     };
+
+    const eventColorByUserId = (id) => {
+        if (uidColours.has(id)) {
+            return uidColours.get(id);
+        }
+        const colour = getNewColour();
+        uidColours.set(id, colour);
+        setUidColours(uidColours);
+        return colour;
+    };
+
+    if (user.isTrainer && calendarType === "default") {
+        setCalendarType("overview");
+    }
 
     return (
         <div className="page">
@@ -251,11 +326,12 @@ const _Calendar = ({
                                         </Grid>
                                         <Grid item>
                                             <Autocomplete
+                                                id="clientSelector"
                                                 value={selectedClient}
                                                 onChange={
                                                     (_, newValue) => {
                                                         setSelectedClient(newValue);
-                                                        setVisibleEvents(newValue.calendar.events);
+                                                        setCalendarType("client");
                                                     }
                                                 }
                                                 options={calendar.clientCalendars}
@@ -283,12 +359,30 @@ const _Calendar = ({
                 <BigCalendar
                     localizer={localizer}
                     events={visibleEvents}
-                    selectable
                     onSelectSlot={toggleAddOpen}
                     onSelectEvent={toggleEditOpen}
                     startAccessor="start"
                     endAccessor="end"
-                    style={{ height: 500 }}
+                    style={{ height: 500 }} // TODO move this to css
+                    selectable
+                    views={["month", "week", "day"]}
+                    popup
+                    eventPropGetter={
+                        (event) => {
+                            if (calendarType === "availability") {
+                                return {
+                                    className: "event-availability",
+                                };
+                            }
+
+                            return {
+                                className: "event-default",
+                                style: {
+                                    backgroundColor: eventColorByUserId(event.userId),
+                                },
+                            };
+                        }
+                    }
                 />
             </div>
             <div className="event-modal-container">
@@ -314,6 +408,13 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 _Calendar.propTypes = {
+    location: PropTypes.shape(
+        {
+            state: PropTypes.shape(
+                { userId: PropTypes.number },
+            ),
+        },
+    ),
     calendar: PropTypes.shape(
         {
             userCalendar: PropTypes.instanceOf(CalendarType),
@@ -340,6 +441,7 @@ _Calendar.propTypes = {
 
 _Calendar.defaultProps = {
     user: null,
+    location: null,
 };
 
 export const Calendar = connect(mapStateToProps, mapDispatchToProps)(_Calendar);
