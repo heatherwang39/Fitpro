@@ -3,6 +3,11 @@ body {
     padding: 0;
 }
 
+html, body {
+    height: 100%;
+    margin: 0px;
+}
+
 .center {
     margin-left: auto;
     margin-right: auto;
@@ -11,4 +16,14 @@ body {
 
 .page {
     margin-top: 16px;
+}
+
+html, body{
+    height: 100%;
+}
+
+#app {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }

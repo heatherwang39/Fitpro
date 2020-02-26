@@ -90,6 +90,18 @@ function _Navigation({ user }) {
                             </Link>
                         </div>
                     )}
+                    {user != null && (
+                        <div className="navbar-logged-in">
+                            <Link to="/mail" className="navbar-link">
+                                <IconButton>
+                                    <Today />
+                                    <Typography className="navbar-label">
+                                        Mail
+                                    </Typography>
+                                </IconButton>
+                            </Link>
+                        </div>
+                    )}
                 </div>
 
                 <div className="navbar-right">
