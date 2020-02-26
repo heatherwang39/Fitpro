@@ -14,6 +14,11 @@ const styles = {
     UsernameInput: {
         width: 300,
         height: 20,
+        marginTop: 100,
+    },
+    Header: {
+        width: 300,
+        margin: "30px 0 10px 0",
     },
 };
 
@@ -21,7 +26,7 @@ const UsernameInput = (props) => {
     const { classes, onChange, onKeyDown } = props;
     return (
         <div className={classes.UsernameInputContainer}>
-            <div> This is how other members will see you.</div>
+            <div className={classes.Header}> This is how other members will see you.</div>
             <TextField
                 className={classes.UsernameInput}
                 id="outlined-basic"

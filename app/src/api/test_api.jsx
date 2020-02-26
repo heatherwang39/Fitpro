@@ -45,6 +45,17 @@ export const TestAPI = {
     rmUserCalendarEvent: async (user, event) => ({ success: true, event, user }),
     addUserCalendarEvent: async (user, event) => ({ success: true, event, user }),
 
+    registerUser: async (userInfo) => {
+        switch (userInfo.accountType) {
+        case "Client":
+            return { success: true, user: clientUser };
+        case "Trainer":
+            return { success: true, user: trainerUser };
+        default:
+            return { success: true, user: clientUser };
+        }
+    },
+
 };
 
 export default TestAPI;

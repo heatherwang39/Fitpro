@@ -83,6 +83,10 @@ const LoginContainer = (props) => {
         setPassword(newPassword);
     };
 
+    const register = () => {
+        history.push("/register");
+    };
+
     return (
         <div className={classes.loginContainer}>
             <form className={classes.loginForm}>
@@ -101,7 +105,7 @@ const LoginContainer = (props) => {
                     className={classes.textField}
                     onChange={updatePassword}
                 />
-                <Button className={classes.registerButton}>Register</Button>
+                <Button className={classes.registerButton} onClick={register}>Register</Button>
                 <Button variant="contained" onClick={login} className={classes.button}>Login</Button>
             </form>
         </div>
