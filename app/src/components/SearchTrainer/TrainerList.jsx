@@ -1,48 +1,62 @@
 import React,{Component} from 'react';
 import {connect} from 'react-redux';
-import {trainerActions} from '../../actions/trainerActions';// why need actionTypes?
-//import {selectTrainer} from '../actions';
-import Box from "@material-ui/core/Box";
-
-
-
-const trainerlist=[
-    {name:'Jamie',price:'30'},
-    {name:'Mika',price:'45'},
-    {name:'Andy',price:'20'},
-    {name:'Ivy',price:'15'}
-];
+import {gotTrainerInfo} from '../../actions/trainerActions';
+import {Card} from "@material-ui/core";
+import faker from "faker";
 
 class TrainerList extends Component{
     renderList(){
-        return trainerlist.map((trainer)=>{
-            return(
+        return (
+            this.props.trainerList.map((trainer)=>{
                 <div key={trainer.name}>
+                    <img alt='fake_avatar' src={faker.image.avatar()} />
                     <div>
                         <strong>name:</strong> {trainer.name} <strong>price:</strong>{trainer.price}
-                        <button>
-                            Select
+                        <button onClick={()=>this.props.gotTrainerInfo(trainer)}>
+                        Select
                         </button>
                     </div>
-                </div>
+                </div>}
+                )
+        )
+        
+        /*if(this.props.trainerSearch===null){
+            return (
+                this.props.trainerList.map((trainer)=>{
+                    <div key={trainer.name}>
+                        <img alt='fake_avatar' src={faker.image.avatar()} />
+                        <div>
+                            <strong>name:</strong> {trainer.name} <strong>price:</strong>{trainer.price}
+                            <button onClick={()=>this.props.gotTrainerInfo(trainer)}>
+                            Select
+                            </button>
+                        </div>
+                    </div>}
+                    )
             )
-        })
+        }else{
+            this.props.trainerList.map((trainer)=>{
+                return <div>This is Jamie</div>
+            })
+        }*/
     }
     render(){
+        console.log(this.props)
         return (
-        <Box color="primary.main">{this.renderList()}</Box>         
+        <Card color="primary.main">{this.renderList()}</Card>         
         )
     }
 }
 
-
-export default connect()(TrainerList);
-/***
 const mapStateToProps=(state)=>{
-    return {trainerlist:state.trainerlist};
+    return {
+        trainerList:state.trainersReducer.trainerList,
+        trainerSearch:state.trainersReducer.trainerSearch
+    };
 }
 
- */
+export default connect(mapStateToProps,{gotTrainerInfo:gotTrainerInfo})(TrainerList);
+
 
 
 

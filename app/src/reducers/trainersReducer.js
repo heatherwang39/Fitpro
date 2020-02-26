@@ -1,37 +1,32 @@
 import {
-    TRAINER_SELECTED,
+    TRAINER_SELECTED,TRAINER_SEARCH
 } from "../actions/actionTypes";
 
-export default (state = null, action) => {
-    switch (action.type) {
-    case TRAINER_SELECTED:
-        return action.payload;
-    default:
-        return state;
-    }
-};
-/**
-
-import {combineReducers} from 'redux';
-const trainerReducer =()=>{
-    return[
+const trainerlist =[
         {name:'Jamie',price:'30'},
         {name:'Mika',price:'45'},
         {name:'Andy',price:'20'},
         {name:'Ivy',price:'15'}
-    ];
-};
+    ]
+const initialState = {
+    trainerSearch:null, 
+    trainerList: trainerlist,
+    trainerSelected: null,
+    };
 
-
-const selectedTrainerReducer=(selectedTrainer=null,action)=>{
-    if(action.type==='TRAINER_SELECTED'){
-        return action.payload;
+export default (state = initialState, action) => {
+    switch (action.type) {
+    case TRAINER_SEARCH:
+        return {
+            ...state,
+            trainerSearch: action.payload,
+        };
+    case TRAINER_SELECTED:
+        return {
+            ...state,
+            trainerSelected: action.payload,
+        };
+    default:
+        return state;
     }
-    return selectedTrainer;
-}
-
-export default combineReducers({
-    trainerlist:trainerReducer,
-    selectedTrainer:selectedTrainerReducer
-})
- */
+};    
