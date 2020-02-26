@@ -6,9 +6,12 @@ import faker from "faker";
 
 class TrainerList extends Component{
     renderList(){
-        return (
+        const nameList=this.props.trainerList.map(trainer=>trainer.name)
+        
+        if(!this.props.trainerSearch){
+            return (
             this.props.trainerList.map((trainer)=>{
-                <div key={trainer.name}>
+                return(<div key={trainer.name}>
                     <img alt='fake_avatar' src={faker.image.avatar()} />
                     <div>
                         <strong>name:</strong> {trainer.name} <strong>price:</strong>{trainer.price}
@@ -16,11 +19,19 @@ class TrainerList extends Component{
                         Select
                         </button>
                     </div>
-                </div>}
+                </div>)}
                 )
-        )
-        
-        /*if(this.props.trainerSearch===null){
+        )}else if(nameList.indexOf(this.props.trainerSearch)>-1){
+            return(
+            <div>
+                <img alt='fake_avatar' src={faker.image.avatar()} />
+                <strong>name:</strong> {this.props.trainerSearch}
+                        
+            </div>
+                
+            )}
+         else {return <div>No results</div>}
+        /*if(this.props.trainerSearch){
             return (
                 this.props.trainerList.map((trainer)=>{
                     <div key={trainer.name}>
