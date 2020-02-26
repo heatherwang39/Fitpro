@@ -97,6 +97,7 @@ const _Calendar = ({
     const [calendarType, setCalendarTypeState] = React.useState("default");
     const [availableColours, setAvailableColours] = React.useState(ALL_EVENT_COLOURS);
     const [uidColours, setUidColours] = React.useState(new Map());
+    const [changeToClient, setChangeToClient] = React.useState(false);
 
     // Properties of new event that is currently being added
     const [title, setTitle] = React.useState("");
@@ -133,10 +134,8 @@ const _Calendar = ({
         for (let i = 0; i < calendar.clientCalendars.length; i++) {
             if (calendar.clientCalendars[i].id === location.state.userId) {
                 setSelectedClient(calendar.clientCalendars[i]);
-                // TODO setCalendarType doesn't work here, I think because selectedClient hasn't been updated?
-                // todo fix this so Client mode is automatically selected
-                setCalendarType("client");
                 found = true;
+                setChangeToClient(true);
                 break;
             }
         }
@@ -144,6 +143,12 @@ const _Calendar = ({
             console.log(`Invalid client calendar id ${location.state.userId}`);
         }
     }
+    React.useEffect(() => {
+        if (changeToClient) {
+            setCalendarType("client");
+            setChangeToClient(false);
+        }
+    });
 
     // Toggles the Add Event modal
     const toggleAddOpen = (event) => {
@@ -251,7 +256,9 @@ const _Calendar = ({
     const clientSelectDisabled = () => calendarType !== "client";
 
     const getNewColour = () => {
-        // TODO handle running out of colours
+        if (availableColours.length === 0) {
+            setAvailableColours(ALL_EVENT_COLOURS);
+        }
         const colour = availableColours.pop();
         setAvailableColours(availableColours);
         return colour;
