@@ -6,4 +6,6 @@ export class Calendar {
     }
 }
 
+Calendar.fromJSON = (obj) => new Calendar(obj.events, obj.availability, obj.userId);
+
 export default Calendar;

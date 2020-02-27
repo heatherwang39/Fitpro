@@ -11,13 +11,14 @@ import {
     AppBar, IconButton, Menu, MenuItem, Toolbar, Typography,
 } from "@material-ui/core";
 import {
-    AccountCircle, DirectionsRun, Home, MoreHoriz, People, Today,
+    AccountCircle, DirectionsRun, Home, Mail, MoreHoriz, People, Today,
 } from "@material-ui/icons";
 
 import { User } from "../../types/user";
+import { loggedOut as loggedOutAction } from "../../actions/userActions";
 import "./style.css";
 
-function _Navigation({ user }) {
+function _Navigation({ user, loggedOut }) {
     const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);
     const isOpen = Boolean(userMenuAnchorEl);
     const menuOpen = (event) => setUserMenuAnchorEl(event.currentTarget);
@@ -26,6 +27,11 @@ function _Navigation({ user }) {
     const moreIsOpen = Boolean(moreMenuAnchorEl);
     const moreMenuOpen = (event) => setMoreMenuAnchorEl(event.currentTarget);
     const moreMenuClose = () => setMoreMenuAnchorEl(null);
+
+    const logout = () => {
+        // TODO actually log out (reset token, etc.)
+        loggedOut(user);
+    };
 
     return (
         <AppBar position="static" className="navbar-container">
@@ -65,7 +71,7 @@ function _Navigation({ user }) {
                         <div className="navbar-logged-in">
                             <Link to="/mail" className="navbar-link">
                                 <IconButton>
-                                    <Today />
+                                    <Mail />
                                     <Typography className="navbar-label">
                                         Mail
                                     </Typography>
@@ -164,9 +170,9 @@ function _Navigation({ user }) {
                                 <Link to={`/user/${user.id}`} className="navbar-menu-link">
                                     <MenuItem onClick={menuClose}>Profile</MenuItem>
                                 </Link>
-                                <Link to="/logout" className="navbar-menu-link">
-                                    <MenuItem onClick={menuClose}>Sign Out</MenuItem>
-                                </Link>
+                                <div className="navbar-menu-link">
+                                    <MenuItem onClick={logout}>Sign Out</MenuItem>
+                                </div>
                             </Menu>
                         </div>
                     )}
@@ -178,6 +184,7 @@ function _Navigation({ user }) {
 
 _Navigation.propTypes = {
     user: PropTypes.instanceOf(User),
+    loggedOut: PropTypes.func.isRequired,
 };
 
 _Navigation.defaultProps = {
@@ -186,5 +193,9 @@ _Navigation.defaultProps = {
 
 const mapStateToProps = (state) => ({ user: state.userReducer });
 
-export const Navigation = connect(mapStateToProps)(_Navigation);
+const mapDispatchToProps = (dispatch) => ({
+    loggedOut: (user) => dispatch(loggedOutAction(user)),
+});
+
+export const Navigation = connect(mapStateToProps, mapDispatchToProps)(_Navigation);
 export default Navigation;

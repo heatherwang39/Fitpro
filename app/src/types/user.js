@@ -18,4 +18,8 @@ export class User {
     }
 }
 
+User.fromJSON = (obj) => new User(obj.id, obj.username, obj.firstname,
+    obj.lastname, obj.email, obj.phone, obj.location, obj.height, obj.weight,
+    obj.isTrainer, obj.isAdmin, obj.goalType, obj.rating, obj.trainers);
+
 export default User;
