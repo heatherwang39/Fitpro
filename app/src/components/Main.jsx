@@ -39,7 +39,7 @@ export const Main = () => (
             <Route
                 path="/trainers"
                 component={SearchTrainer}
-
+            />
             <ProtectedRoute
                 path="/mail"
                 component={MailContainer}
