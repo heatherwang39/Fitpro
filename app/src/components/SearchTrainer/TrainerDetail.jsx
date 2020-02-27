@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 
 const TrainerDetail=({selectedTrainer})=>{
     if(!selectedTrainer){
-        return<div>select a Trainer</div>
+        return<div>What more information about our trainer? Click SELECT to see details!</div>
     }
     return (
         <div>

@@ -11,13 +11,24 @@ class TrainerList extends Component{
         if(!this.props.trainerSearch){
             return (
             this.props.trainerList.map((trainer)=>{
-                return(<div key={trainer.name}>
-                    <img alt='fake_avatar' src={faker.image.avatar()} />
-                    <div>
-                        <strong>name:</strong> {trainer.name} <strong>price:</strong>{trainer.price}
-                        <button onClick={()=>this.props.gotTrainerInfo(trainer)}>
-                        Select
-                        </button>
+                return(
+                <div key={trainer.name} className="item">
+                    <div className="ui small image">
+                        <img alt='fake_avatar' src={faker.image.avatar()} />
+                    </div>
+                    <div className="content">
+                        <a className="header">Name: {trainer.name}</a>
+                        <div className="meta"><span>Price:</span>{trainer.price}</div>
+                        <div className="description">
+                            <p>{trainer.mail},{trainer.tel}
+                            <br/>
+                            {trainer.location}</p>
+                        </div>
+                        <div className="extra">
+                            <button onClick={()=>this.props.gotTrainerInfo(trainer)} className="ui primary right floated button">
+                            Select
+                            </button>
+                        </div>
                     </div>
                 </div>)}
                 )
@@ -26,35 +37,17 @@ class TrainerList extends Component{
             <div>
                 <img alt='fake_avatar' src={faker.image.avatar()} />
                 <strong>name:</strong> {this.props.trainerSearch}
-                        
+                      
             </div>
                 
             )}
          else {return <div>No results</div>}
-        /*if(this.props.trainerSearch){
-            return (
-                this.props.trainerList.map((trainer)=>{
-                    <div key={trainer.name}>
-                        <img alt='fake_avatar' src={faker.image.avatar()} />
-                        <div>
-                            <strong>name:</strong> {trainer.name} <strong>price:</strong>{trainer.price}
-                            <button onClick={()=>this.props.gotTrainerInfo(trainer)}>
-                            Select
-                            </button>
-                        </div>
-                    </div>}
-                    )
-            )
-        }else{
-            this.props.trainerList.map((trainer)=>{
-                return <div>This is Jamie</div>
-            })
-        }*/
+        
     }
     render(){
         console.log(this.props)
         return (
-        <Card color="primary.main">{this.renderList()}</Card>         
+        <div className="ui divided items">{this.renderList()}</div>         
         )
     }
 }
