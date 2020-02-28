@@ -8,6 +8,9 @@ import LoginContainer from "./LoginContainer";
 import Profile from "./Profile";
 import MailContainer from "./MailContainer";
 import Calendar from "./Calendar";
+import SearchTrainer from "./SearchTrainer";
+import SearchExercise from "./SearchExercise";
+
 import { history } from "../store/history";
 import { store } from "../store";
 import RegisterContainer from "./RegisterContainer";
@@ -35,10 +38,17 @@ export const Main = () => (
                 component={Calendar}
             />
             <Route
+                path="/trainers"
+                component={SearchTrainer}
+            />
+            <Route
+                path="/exercises"
+                component={SearchExercise}
+            />
+            <Route
                 path="/register"
                 component={RegisterContainer}
             />
-
             <ProtectedRoute
                 path="/mail"
                 component={MailContainer}
