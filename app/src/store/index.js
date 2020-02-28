@@ -8,23 +8,25 @@ const savedUser = () => {
     return User.fromJSON(JSON.parse(unparsed));
 };
 
-const user = savedUser();
+let user = savedUser();
 let createdStore = null;
 
-if (user !== null) {
-    createdStore = createStore(reducers, { userReducer: savedUser() });
-} else {
+if (user === null) {
     createdStore = createStore(reducers);
+} else {
+    createdStore = createStore(reducers, { userReducer: savedUser() });
 }
 
 export const store = createdStore;
 
 store.subscribe(() => {
     const { userReducer } = store.getState();
+    if (user === userReducer) return;
     if (userReducer === null) {
         localStorage.removeItem("savedUser");
     } else {
         localStorage.setItem("savedUser", JSON.stringify(userReducer));
+        user = User.fromJSON(userReducer);
     }
 });
 

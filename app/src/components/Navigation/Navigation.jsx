@@ -18,18 +18,22 @@ import { User } from "../../types/user";
 import { loggedOut as loggedOutAction } from "../../actions/userActions";
 import "./style.css";
 
-function _Navigation({ user, loggedOut }) {
+function _Navigation({ auth, user, loggedOut }) {
     const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);
-    const isOpen = Boolean(userMenuAnchorEl);
-    const menuOpen = (event) => setUserMenuAnchorEl(event.currentTarget);
-    const menuClose = () => setUserMenuAnchorEl(null);
+    const openUserMenu = (event) => {
+        if (userMenuAnchorEl !== event.currentTarget) setUserMenuAnchorEl(event.currentTarget);
+    };
+    const closeUserMenu = () => setUserMenuAnchorEl(null);
     const [moreMenuAnchorEl, setMoreMenuAnchorEl] = React.useState(null);
-    const moreIsOpen = Boolean(moreMenuAnchorEl);
-    const moreMenuOpen = (event) => setMoreMenuAnchorEl(event.currentTarget);
-    const moreMenuClose = () => setMoreMenuAnchorEl(null);
+    const openMoreMenu = (event) => {
+        if (moreMenuAnchorEl !== event.currentTarget) setMoreMenuAnchorEl(event.currentTarget);
+    };
+    const closeMoreMenu = () => setMoreMenuAnchorEl(null);
 
     const logout = () => {
         // TODO actually log out (reset token, etc.)
+        closeUserMenu();
+        closeMoreMenu();
         loggedOut(user);
     };
 
@@ -65,10 +69,6 @@ function _Navigation({ user, loggedOut }) {
                                     </Typography>
                                 </IconButton>
                             </Link>
-                        </div>
-                    )}
-                    {user != null && (
-                        <div className="navbar-logged-in">
                             <Link to="/mail" className="navbar-link">
                                 <IconButton>
                                     <Mail />
@@ -78,9 +78,14 @@ function _Navigation({ user, loggedOut }) {
                                 </IconButton>
                             </Link>
                         </div>
-                    )}
+                        )}
                     <div className="navbar-always">
-                        <IconButton aria-controls="navbar-more-menu" aria-haspopup="true" onClick={moreMenuOpen}>
+                        <IconButton
+                            aria-owns={moreMenuAnchorEl ? "navbar-more-menu" : undefined}
+                            aria-haspopup="true"
+                            onMouseEnter={openMoreMenu}
+                            onClick={openMoreMenu}
+                        >
                             <MoreHoriz />
                             <Typography className="navbar-label">
                                 More
@@ -99,8 +104,9 @@ function _Navigation({ user, loggedOut }) {
                                 vertical: "top",
                                 horizontal: "center",
                             }}
-                            open={moreIsOpen}
-                            onClose={moreMenuClose}
+                            open={Boolean(moreMenuAnchorEl)}
+                            onClose={closeMoreMenu}
+                            MenuListProps={{ onMouseLeave: closeMoreMenu }}
                         >
                             <Link to="/exercises" className="navbar-menu-link">
                                 <MenuItem>
@@ -145,11 +151,16 @@ function _Navigation({ user, loggedOut }) {
                     )}
                     {user != null && (
                         <div className="navbar-logged-in">
-                            <IconButton aria-controls="navbar-user-menu" aria-haspopup="true" onClick={menuOpen}>
-                                <AccountCircle />
-                                <Typography className="navbar-label">
-                                    {user.firstname}
-                                </Typography>
+                            <IconButton 
+                                aria-owns={userMenuAnchorEl ? "navbar-user-menu" : undefined}
+                                aria-haspopup="true"
+                                onMouseEnter={openUserMenu}
+                                onClick={openUserMenu}
+                            >
+                                    <AccountCircle />
+                                    <Typography className="navbar-label">
+                                        {user.firstname}
+                                    </Typography>
                             </IconButton>
                             <Menu
                                 id="navbar-user-menu"
@@ -164,11 +175,12 @@ function _Navigation({ user, loggedOut }) {
                                     vertical: "top",
                                     horizontal: "center",
                                 }}
-                                open={isOpen}
-                                onClose={menuClose}
+                                open={Boolean(userMenuAnchorEl)}
+                                onClose={closeUserMenu}
+                                MenuListProps={{ onMouseLeave: closeUserMenu }}
                             >
                                 <Link to={`/user/${user.id}`} className="navbar-menu-link">
-                                    <MenuItem onClick={menuClose}>Profile</MenuItem>
+                                    <MenuItem onClick={closeUserMenu}>Profile</MenuItem>
                                 </Link>
                                 <div className="navbar-menu-link">
                                     <MenuItem onClick={logout}>Sign Out</MenuItem>
@@ -191,7 +203,7 @@ _Navigation.defaultProps = {
     user: null,
 };
 
-const mapStateToProps = (state) => ({ user: state.userReducer });
+const mapStateToProps = (state) => ({ auth: state.authReducer, user: state.userReducer });
 
 const mapDispatchToProps = (dispatch) => ({
     loggedOut: (user) => dispatch(loggedOutAction(user)),

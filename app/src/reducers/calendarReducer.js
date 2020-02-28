@@ -1,7 +1,7 @@
 import {
-    ADD_USER_CALENDAR_EVENT, GET_TRAINER_CALENDARS, GET_USER_CALENDAR,
-    GOT_TRAINER_CALENDARS, GOT_USER_CALENDAR, RM_USER_CALENDAR_EVENT,
-    UPDATED_USER_CALENDAR,
+    ADD_CALENDAR_EVENT, GET_TRAINER_CALENDARS, GET_USER_CALENDAR,
+    GOT_TRAINER_CALENDARS, GOT_USER_CALENDAR, RM_CALENDAR_EVENT,
+    UPDATED_CALENDAR,
 } from "../actions/actionTypes";
 
 const defaultState = {
@@ -44,19 +44,19 @@ export default (state = defaultState, action) => {
             userCalendar: action.payload,
             gettingCalendar: false,
         };
-    case ADD_USER_CALENDAR_EVENT:
+    case ADD_CALENDAR_EVENT:
         return {
             ...state,
             userCalendar: calendarWithNewEvent(state.userCalendar, action.payload),
             updatingCalendar: true,
         };
-    case RM_USER_CALENDAR_EVENT:
+    case RM_CALENDAR_EVENT:
         return {
             ...state,
             userCalendar: calendarWithoutEvent(state.userCalendar, action.payload),
             updatingCalendar: true,
         };
-    case UPDATED_USER_CALENDAR:
+    case UPDATED_CALENDAR:
         return {
             ...state,
             updatingCalendar: false,
