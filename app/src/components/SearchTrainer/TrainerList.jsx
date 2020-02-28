@@ -1,49 +1,53 @@
 import React,{Component} from 'react';
 import {connect} from 'react-redux';
-import {gotTrainerInfo} from '../../actions/trainerActions';
-import {Card} from "@material-ui/core";
+import {selectedTrainerInfo,searchedTrainer} from '../../actions/trainerActions';
 import faker from "faker";
+import API from "../../api";
 
 class TrainerList extends Component{
     renderList(){
-        const nameList=this.props.trainerList.map(trainer=>trainer.name)
-        
-        if(!this.props.trainerSearch){
+        const trainerList=this.props.trainerList
+        const searchedTrainerName=this.props.searchedTrainerName
+        console.log(searchedTrainerName)
+
+        //if user don't search anything,just show list of all trainers
+        if(!searchedTrainerName){
             return (
-            this.props.trainerList.map((trainer)=>{
+                trainerList.map((trainer)=>{
                 return(
-                <div key={trainer.name} className="item">
+                <div key={trainer.firstname} className="item">
                     <div className="ui small image">
                         <img alt='fake_avatar' src={faker.image.avatar()} />
                     </div>
                     <div className="content">
-                        <a className="header">Name: {trainer.name}</a>
-                        <div className="meta"><span>Price:</span>{trainer.price}</div>
+                        <a className="header">Name: {trainer.firstname} {trainer.lastname}</a>
+                        <div className="meta"><span>Price:</span>$30 per hour</div>
                         <div className="description">
-                            <p>{trainer.mail},{trainer.tel}
+                            <p>
+                            Height:{trainer.height} {' '} Weight:{trainer.weight}
                             <br/>
-                            {trainer.location}</p>
+                            Rating:{trainer.rating}
+                            </p>
                         </div>
                         <div className="extra">
-                            <button onClick={()=>this.props.gotTrainerInfo(trainer)} className="ui primary right floated button">
+                            <button onClick={()=>this.props.selectedTrainerInfo(trainer)} className="ui primary right floated button">
                             Select
                             </button>
                         </div>
                     </div>
                 </div>)}
                 )
-        )}else if(nameList.indexOf(this.props.trainerSearch)>-1){
-            return(
-            <div>
-                <img alt='fake_avatar' src={faker.image.avatar()} />
-                <strong>name:</strong> {this.props.trainerSearch}
-                      
-            </div>
-                
-            )}
-         else {return <div>No results</div>}
-        
+        )}
+        //if user search an unexisted trainer
+        else {
+            API.searchTrainer(searchedTrainerName).then((response)=>{
+                console.log(response)
+            }
+            )                           
+            }
     }
+
+
     render(){
         console.log(this.props)
         return (
@@ -55,11 +59,11 @@ class TrainerList extends Component{
 const mapStateToProps=(state)=>{
     return {
         trainerList:state.trainersReducer.trainerList,
-        trainerSearch:state.trainersReducer.trainerSearch
+        searchedTrainerName:state.trainersReducer.searchedTrainerName
     };
 }
 
-export default connect(mapStateToProps,{gotTrainerInfo:gotTrainerInfo})(TrainerList);
+export default connect(mapStateToProps,{selectedTrainerInfo:selectedTrainerInfo,searchedTrainer:searchedTrainer})(TrainerList);
 
 
 

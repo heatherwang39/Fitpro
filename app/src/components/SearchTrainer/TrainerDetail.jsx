@@ -9,9 +9,15 @@ const TrainerDetail=({selectedTrainer})=>{
         <div>
             <h3>Details for:</h3>
             <p>
-                Name:{selectedTrainer.name}
+                Name:{selectedTrainer.firstname} {selectedTrainer.lastname}
                 <br/>
-                Price:{selectedTrainer.price}
+                Price:$30 per hour
+                <br/>
+                Email:{selectedTrainer.email}
+                <br/>
+                Tel:{selectedTrainer.phone}
+                <br/>
+                Location:{selectedTrainer.location}                
             </p>
             
         </div>

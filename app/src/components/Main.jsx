@@ -9,6 +9,7 @@ import Profile from "./Profile";
 import MailContainer from "./MailContainer";
 import Calendar from "./Calendar";
 import SearchTrainer from "./SearchTrainer";
+import SearchExercise from "./SearchExercise";
 
 import { history } from "../store/history";
 import { store } from "../store";
@@ -39,6 +40,10 @@ export const Main = () => (
             <Route
                 path="/trainers"
                 component={SearchTrainer}
+            />
+            <Route
+                path="/exercises"
+                component={SearchExercise}
             />
             <ProtectedRoute
                 path="/mail"

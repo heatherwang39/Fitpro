@@ -5,6 +5,7 @@ import relationshipReducer from "./relationshipReducer";
 import userReducer from "./userReducer";
 import profileReducer from "./profileReducer";
 import trainersReducer from "./trainersReducer";
+import exerciseReducer from "./exerciseReducer";
 
 
 
@@ -15,5 +16,6 @@ export default combineReducers({
     relationshipReducer,
     userReducer,
     profileReducer,
-    trainersReducer
+    trainersReducer,
+    exerciseReducer
 });

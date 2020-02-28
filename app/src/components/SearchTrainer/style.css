@@ -1,6 +1,10 @@
 .wrapper{
-    margin-top: 20px;
+    top: 20px;
+    position: relative;
 }
+
+
+
 /*
 .filterContainer{
     width:20%;

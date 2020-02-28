@@ -1,20 +1,19 @@
 import React,{Component} from 'react';
 import {connect} from 'react-redux';
 
-import TrainerList from './TrainerList';
-import TrainerDetail from './TrainerDetail';
+import ExerciseList from './ExerciseList';
+//import TrainerDetail from './TrainerDetail';
 import Filter from './Filter';
-import {searchedTrainerName} from '../../actions/trainerActions';
-import "./style.css";
+import {searchedExercise} from '../../actions/exerciseActions';
 
 
 
 
-class SearchTrainer extends Component{
+class SearchExercise extends Component{
     
     onFormSubmit(e) {
         e.preventDefault();
-        this.props.searchedTrainerName(e.target.children[0].children[1].value);
+        this.props.searchedExercise(e.target.children[0].children[1].value);
     }
     
     render(){
@@ -27,19 +26,19 @@ class SearchTrainer extends Component{
                 <div className="searchBarContainer nine wide column">
                     <form onSubmit={e=>{this.onFormSubmit(e)}} className="ui form">
                         <div className="field">
-                            <h3>Search Trainers</h3> 
-                            <input type='text' placeholder='please enter name...' onChange={e=>{console.log(e.target.value)}} /> 
+                            <h3>Search Exercise</h3> 
+                            <input type='text' placeholder='please enter...' onChange={e=>{console.log(e.target.value)}} /> 
                         </div>
                     </form>               
                     <br/>              
-                    <TrainerList/>
+                    <ExerciseList/>
                 </div>
 
-                <div className="detailsContainer three wide column"><TrainerDetail/></div>
+                <div className="detailsContainer three wide column">don't know what to show yet</div>
             </div>
             )
         }
     }
 
     
-export default connect(null,{searchedTrainerName:searchedTrainerName})(SearchTrainer);
+export default connect(null,{searchedExercise:searchedExercise})(SearchExercise);

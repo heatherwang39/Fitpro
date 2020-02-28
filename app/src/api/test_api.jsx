@@ -2,9 +2,26 @@
 
 import {
     clientUser, client2User, trainerUser, clientCalendar, client2Calendar, trainerCalendar,
+    trainerUser1,trainerUser2,trainerUser3,trainerUser4
 } from "./test_data";
 
 export const TestAPI = {
+    searchTrainer: async (firstname) => {
+        switch (firstname) {
+        case "Jamie":
+            return trainerUser1;
+        case "Mika":
+            return trainerUser2;
+        case "Andy":
+            return trainerUser3;
+        case "Ivy":
+            return trainerUser4;
+        default:
+            console.log(`INVALID FIRSTNAME ${name}`);
+            return {};
+        }
+    },
+    
     getProfile: async (id) => {
         switch (id) {
         case 1:

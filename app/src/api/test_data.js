@@ -8,6 +8,16 @@ export const trainerUser = new User(2, "user2", "TrainerFirst", "TrainerLast", "
 export const client2User = new User(1, "user3", "Client2First", "Client2Last", "client2@mail.com",
     "555-555-4321", "Toronto", "6'1", "190lb", false, false, "goalType", 3.5, [2]);
 
+export const trainerUser1 = new User(11, "user11", "Jamie", "Doe", "trainer11@mail.com",
+    "555-123-4544", "Toronto", "6'3", "230lb", true, false, "goalType", 4.5, []);
+export const trainerUser2 = new User(12, "user12", "Mika", "Doe", "trainer12@mail.com",
+    "555-123-4555", "Toronto", "6'2", "220lb", true, false, "goalType", 4.0, []);
+export const trainerUser3 = new User(13, "user13", "Andy", "Doe", "trainer13@mail.com",
+    "555-123-4566", "Toronto", "6'1", "210lb", true, false, "goalType", 3.5, []);
+export const trainerUser4 = new User(14, "user14", "Ivy", "Doe", "trainer14@mail.com",
+    "555-123-4577", "Toronto", "6'0", "200lb", true, false, "goalType", 3.0, []);
+
+
 const Event = (title, start, end, userId) => ({
     title,
     start,
