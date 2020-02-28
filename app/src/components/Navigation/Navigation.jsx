@@ -18,7 +18,7 @@ import { User } from "../../types/user";
 import { loggedOut as loggedOutAction } from "../../actions/userActions";
 import "./style.css";
 
-function _Navigation({ user, loggedOut }) {
+function _Navigation({ auth, user, loggedOut }) {
     const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);
     const openUserMenu = (event) => {
         if (userMenuAnchorEl !== event.currentTarget) setUserMenuAnchorEl(event.currentTarget);
@@ -203,7 +203,7 @@ _Navigation.defaultProps = {
     user: null,
 };
 
-const mapStateToProps = (state) => ({ user: state.userReducer });
+const mapStateToProps = (state) => ({ auth: state.authReducer, user: state.userReducer });
 
 const mapDispatchToProps = (dispatch) => ({
     loggedOut: (user) => dispatch(loggedOutAction(user)),

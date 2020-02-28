@@ -4,25 +4,31 @@ import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import { PropTypes } from "prop-types";
 import {
-    Button, FormControl, FormControlLabel, Grid, Modal, Paper, RadioGroup, Radio, TextField, Typography,
+    Button,
+    FormControl,
+    FormControlLabel,
+    Grid,
+    Modal,
+    Paper,
+    Radio,
+    RadioGroup,
+    TextField,
+    Typography,
 } from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
-import {
-    KeyboardDateTimePicker,
-    MuiPickersUtilsProvider,
-} from "@material-ui/pickers";
+import { KeyboardDateTimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
 import { Delete } from "@material-ui/icons";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 import {
+    addCalendarEvent as addCalendarEventAction,
     getTrainerCalendars as getTrainerCalendarsAction,
     getUserCalendar as getUserCalendarAction,
     gotTrainerCalendars as gotTrainerCalendarsAction,
     gotUserCalendar as gotUserCalendarAction,
-    addUserCalendarEvent as addUserCalendarEventAction,
-    rmUserCalendarEvent as rmUserCalendarEventAction,
-    updatedUserCalendar as updatedUserCalendarAction,
+    rmCalendarEvent as rmCalendarEventAction,
+    updatedCalendar as updatedCalendarAction,
 } from "../../actions/calendarActions";
 import { User } from "../../types/user";
 import { Calendar as CalendarType } from "../../types/calendar";
@@ -57,9 +63,10 @@ const combineClientEvents = (clientCalendars) => {
 };
 
 const _Calendar = ({
+    auth,
     location, calendar, user,
     getTrainerCalendars, gotTrainerCalendars, getUserCalendar, gotUserCalendar,
-    addUserCalendarEvent, rmUserCalendarEvent, updatedUserCalendar,
+    addCalendarEvent, rmCalendarEvent, updatedCalendar,
 }) => {
     if (user == null) {
         return (<div className="center">Log in to view your calendar</div>);
@@ -70,7 +77,7 @@ const _Calendar = ({
         if (!calendar.gettingCalendar) {
             if (user.isTrainer) {
                 getTrainerCalendars(user.id);
-                API.getTrainerCalendars(user.id).then((response) => {
+                API.getTrainerCalendars(user.id, auth.token).then((response) => {
                     // TODO handle failure
                     if (!response.success) {
                         console.log("ERROR");
@@ -79,7 +86,7 @@ const _Calendar = ({
                 });
             } else {
                 getUserCalendar(user.id);
-                API.getUserCalendar(user.id).then((response) => {
+                API.getUserCalendar(user.id, auth.token).then((response) => {
                     // TODO handle failure
                     gotUserCalendar(response);
                 });
@@ -100,10 +107,12 @@ const _Calendar = ({
     const [changeToClient, setChangeToClient] = React.useState(false);
 
     // Properties of new event that is currently being added
-    const [title, setTitle] = React.useState("");
-    const [startDate, setStartDate] = React.useState(new Date());
-    const [endDate, setEndDate] = React.useState(new Date());
-
+    const [newEvent, setNewEvent] = React.useState({
+        title: "",
+        startDate: new Date(),
+        endDate: new Date(),
+        user,
+    });
 
     const setCalendarType = (type) => {
         setCalendarTypeState(type);
@@ -153,9 +162,7 @@ const _Calendar = ({
     // Toggles the Add Event modal
     const toggleAddOpen = (event) => {
         setCurrentEvent(event);
-        setStartDate(event.start);
-        // Populate end date selection with start date + 1 hour
-        setEndDate(moment(event.start).add(1, "h"));
+        setNewEvent({ ...newEvent, startDate: event.start, endDate: moment(event.start).add(1, "h") });
         setAddOpen(!addOpen);
     };
 
@@ -166,26 +173,24 @@ const _Calendar = ({
     };
 
     const createEvent = () => {
-        // TODO validate title, startDate, endDate
-        const newEvent = { title, start: startDate, end: endDate };
-        addUserCalendarEvent(newEvent);
-        API.addUserCalendarEvent(user.id, newEvent).then(
+        // TODO validate event locally before API call
+        API.createCalendarEvent(newEvent, auth.token).then(
             (response) => {
                 // TODO handle failure
-                updatedUserCalendar(response);
+                updatedCalendar(response);
                 setCurrentEvent(null);
                 setAddOpen(false);
             },
         );
     };
 
-    const deleteCurrentEvent = () => {
+    const rmCurrentEvent = () => {
         // TODO validate currentEvent
-        rmUserCalendarEvent(currentEvent);
-        API.rmUserCalendarEvent(currentEvent).then(
+        rmCalendarEvent(currentEvent);
+        API.deleteCalendarEvent(currentEvent, auth.token).then(
             (response) => {
                 // TODO handle failure
-                updatedUserCalendar(response);
+                updatedCalendar(response);
                 setCurrentEvent(null);
                 setEditOpen(false);
             },
@@ -200,7 +205,11 @@ const _Calendar = ({
                 <Paper>
                     <Grid container direction="column" justify="center" alignItems="center" spacing={2}>
                         <Grid item>
-                            <TextField label="Title" value={title} onChange={(event) => setTitle(event.target.value)} />
+                            <TextField
+                                label="Title"
+                                value={newEvent.title}
+                                onChange={(event) => setNewEvent({ ...newEvent, title: event.target.value })}
+                            />
                         </Grid>
                         <Grid item>
                             <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils}>
@@ -208,16 +217,16 @@ const _Calendar = ({
                                     disableToolbar
                                     format="DD-MM-YYYY hh:mm"
                                     label="Start"
-                                    value={startDate}
-                                    onChange={(date) => setStartDate(date)}
+                                    value={newEvent.startDate}
+                                    onChange={(date) => setNewEvent({ ...newEvent, startDate: date })}
                                     autoOk
                                 />
                                 <KeyboardDateTimePicker
                                     disableToolbar
                                     format="DD-MM-YYYY hh:mm"
                                     label="End"
-                                    value={endDate}
-                                    onChange={(date) => setEndDate(date)}
+                                    value={newEvent.endDate}
+                                    onChange={(date) => setNewEvent({ ...newEvent, endDate: date })}
                                     autoOk
                                 />
                             </MuiPickersUtilsProvider>
@@ -242,7 +251,7 @@ const _Calendar = ({
                             <Typography>{`${currentEvent.start} to ${currentEvent.end}`}</Typography>
                         </Grid>
                         <Grid item>
-                            <Button onClick={deleteCurrentEvent}>
+                            <Button onClick={rmCurrentEvent}>
                                 <Delete />
                                 Delete
                             </Button>
@@ -362,6 +371,7 @@ const _Calendar = ({
                     </div>
                 )
             }
+
             <div className="calendar-container">
                 <BigCalendar
                     localizer={localizer}
@@ -402,6 +412,7 @@ const _Calendar = ({
 const mapStateToProps = (state) => ({
     calendar: state.calendarReducer,
     user: state.userReducer,
+    auth: state.authReducer,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -409,9 +420,9 @@ const mapDispatchToProps = (dispatch) => ({
     getUserCalendar: (id) => dispatch(getUserCalendarAction(id)),
     gotTrainerCalendars: (id) => dispatch(gotTrainerCalendarsAction(id)),
     gotUserCalendar: (calendar) => dispatch(gotUserCalendarAction(calendar)),
-    updatedUserCalendar: (event) => dispatch(updatedUserCalendarAction(event)),
-    addUserCalendarEvent: (event) => dispatch(addUserCalendarEventAction(event)),
-    rmUserCalendarEvent: (event) => dispatch(rmUserCalendarEventAction(event)),
+    updatedCalendar: (event) => dispatch(updatedCalendarAction(event)),
+    addCalendarEvent: (event) => dispatch(addCalendarEventAction(event)),
+    rmCalendarEvent: (event) => dispatch(rmCalendarEventAction(event)),
 });
 
 _Calendar.propTypes = {
@@ -437,13 +448,18 @@ _Calendar.propTypes = {
         },
     ).isRequired,
     user: PropTypes.instanceOf(User),
+    auth: PropTypes.shape(
+        {
+            token: PropTypes.string,
+        },
+    ).isRequired,
     getTrainerCalendars: PropTypes.func.isRequired,
     gotTrainerCalendars: PropTypes.func.isRequired,
     getUserCalendar: PropTypes.func.isRequired,
     gotUserCalendar: PropTypes.func.isRequired,
-    updatedUserCalendar: PropTypes.func.isRequired,
-    addUserCalendarEvent: PropTypes.func.isRequired,
-    rmUserCalendarEvent: PropTypes.func.isRequired,
+    updatedCalendar: PropTypes.func.isRequired,
+    addCalendarEvent: PropTypes.func.isRequired,
+    rmCalendarEvent: PropTypes.func.isRequired,
 };
 
 _Calendar.defaultProps = {
