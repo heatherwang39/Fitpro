@@ -18,7 +18,6 @@ const styles = {
         width: 750,
         height: 550,
         margin: "auto",
-        backgroundColor: "red",
         position: "relative",
         marginTop: 10,
     },

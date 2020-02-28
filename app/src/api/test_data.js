@@ -42,11 +42,18 @@ const Availability = (start, end, userId, repeat) => ({
     start, end, userId, repeat,
 });
 
+const today = (new Date()).getTime();
+
 const clientEvents = [
     Event("Tues Night", new Date("February 18, 2020 21:00:00"), new Date("February 18, 2020 22:00:00"), 1),
     Event("Wed Afternoon", new Date("February 19, 2020 15:00:00"), new Date("February 19, 2020 15:00:00"), 1),
     Event("Thurs Morning", new Date("February 20, 2020 09:00:00"), new Date("February 20, 2020 11:00:00"), 1),
     Event("Sat evening", new Date("February 22, 2020 18:00:00"), new Date("February 22, 2020 20:00:00"), 1),
+    Event("Client 1", new Date(today + 3600000), new Date(today + 3600000 * 2), 1),
+    Event("Client 2", new Date(today + 3600000 * 3), new Date(today + 3600000 * 4), 1),
+    Event("Client 3", new Date(today + 3600000 * 6), new Date(today + 3600000 * 7), 1),
+    Event("Client 4", new Date(today + 3600000 * 8), new Date(today + 3600000 * 10), 1),
+    Event("Sat evening", new Date("March 4, 2020 18:00:00"), new Date("February 22, 2020 20:00:00"), 1),
 ];
 
 const client2Events = [
@@ -57,6 +64,10 @@ const client2Events = [
 
 const trainerEvents = [
     Event("Personal Event", new Date("February 22, 2020 21:00:00"), new Date("February 22, 2020 23:00:00"), 2),
+    Event("Client 1", new Date(today + 3600000), new Date(today + 3600000 * 2), 2),
+    Event("Client 2", new Date(today + 3600000 * 3), new Date(today + 3600000 * 4), 2),
+    Event("Client 3", new Date(today + 3600000 * 6), new Date(today + 3600000 * 7), 2),
+    Event("Client 4", new Date(today + 3600000 * 8), new Date(today + 3600000 * 10), 2),
 ];
 
 const trainerAvailability = [

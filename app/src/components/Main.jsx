@@ -13,7 +13,7 @@ import SearchExercise from "./SearchExercise";
 
 import { history } from "../store/history";
 import { store } from "../store";
-
+import RegisterContainer from "./RegisterContainer";
 import ProtectedRoute from "./ProtectedRoute";
 
 export const Main = () => (
@@ -44,6 +44,10 @@ export const Main = () => (
             <Route
                 path="/exercises"
                 component={SearchExercise}
+            />
+            <Route
+                path="/register"
+                component={RegisterContainer}
             />
             <ProtectedRoute
                 path="/mail"
