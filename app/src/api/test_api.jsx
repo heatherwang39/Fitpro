@@ -2,10 +2,27 @@
 
 import {
     clientUser, client2User, trainerUser, clientCalendar, client2Calendar, trainerCalendar,
-    trainerUser1,trainerUser2,trainerUser3,trainerUser4
+    trainerUser1,trainerUser2,trainerUser3,trainerUser4, exercise1, exercise2, exercise3,
+    exercise4
 } from "./test_data";
 
 export const TestAPI = {
+    searchExercise: async (exerciseName) => {
+        switch (exerciseName) {
+            case "Barbell Bench Press":
+                return exercise1;
+            case "Barbell Squat":
+                return exercise2;
+            case "Barbell Bent Over Row":
+                return exercise3;
+            case "Barbell Deaflit":
+                return exercise4;
+            default:
+                console.log("INVALID EXERCISE NAME");
+                return {};
+        }
+
+    },
     searchTrainer: async (firstname) => {
         switch (firstname) {
         case "Jamie":
