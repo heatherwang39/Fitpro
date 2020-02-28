@@ -41,6 +41,10 @@ const client2Events = [
 
 const trainerEvents = [
     Event("Personal Event", new Date("February 22, 2020 21:00:00"), new Date("February 22, 2020 23:00:00"), 2),
+    Event("Client 1", new Date(today + 3600000), new Date(today + 3600000 * 2), 2),
+    Event("Client 2", new Date(today + 3600000 * 3), new Date(today + 3600000 * 4), 2),
+    Event("Client 3", new Date(today + 3600000 * 6), new Date(today + 3600000 * 7), 2),
+    Event("Client 4", new Date(today + 3600000 * 8), new Date(today + 3600000 * 10), 2),
 ];
 
 const trainerAvailability = [

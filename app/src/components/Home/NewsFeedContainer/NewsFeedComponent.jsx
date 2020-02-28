@@ -10,7 +10,7 @@ const NewsFeedComponent = (props) => {
                 {
                     feed.map((entry) => (
                         <div key={entry}>
-                            d
+                            Placeholder timeline
                         </div>
                     ))
                 }
