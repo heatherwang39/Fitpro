@@ -1,6 +1,5 @@
 import {
-    ADD_CALENDAR_EVENT, GET_TRAINER_CALENDARS, GET_USER_CALENDAR,
-    GOT_TRAINER_CALENDARS, GOT_USER_CALENDAR, RM_CALENDAR_EVENT,
+    ADD_CALENDAR_EVENT, GET_USER_CALENDAR, GOT_USER_CALENDAR, RM_CALENDAR_EVENT,
     UPDATED_CALENDAR,
 } from "../actions/actionTypes";
 
@@ -8,6 +7,7 @@ const defaultState = {
     userCalendar: null,
     gettingCalendar: false,
     updatingCalendar: false,
+    clientCalendars: null,
 };
 
 const calendarWithoutEvent = (calendar, event) => {
@@ -26,20 +26,20 @@ const calendarWithNewEvent = (calendar, event) => {
 
 export default (state = defaultState, action) => {
     switch (action.type) {
-    case GET_TRAINER_CALENDARS:
     case GET_USER_CALENDAR:
         return {
             ...state,
             gettingCalendar: true,
         };
-    case GOT_TRAINER_CALENDARS:
-        return {
-            ...state,
-            gettingCalendar: false,
-            userCalendar: action.payload.userCalendar,
-            clientCalendars: action.payload.clientCalendars,
-        };
     case GOT_USER_CALENDAR:
+        if (action.payload.clientCalendars) {
+            return {
+                ...state,
+                gettingCalendar: false,
+                userCalendar: action.payload.userCalendar,
+                clientCalendars: action.payload.clientCalendars,
+            };
+        }
         return {
             userCalendar: action.payload,
             gettingCalendar: false,

@@ -18,7 +18,7 @@ import { User } from "../../types/user";
 import { loggedOut as loggedOutAction } from "../../actions/userActions";
 import "./style.css";
 
-function _Navigation({ auth, user, loggedOut }) {
+function _Navigation({ user, loggedOut }) {
     const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState(null);
     const openUserMenu = (event) => {
         if (userMenuAnchorEl !== event.currentTarget) setUserMenuAnchorEl(event.currentTarget);
@@ -78,7 +78,7 @@ function _Navigation({ auth, user, loggedOut }) {
                                 </IconButton>
                             </Link>
                         </div>
-                        )}
+                    )}
                     <div className="navbar-always">
                         <IconButton
                             aria-owns={moreMenuAnchorEl ? "navbar-more-menu" : undefined}
@@ -151,16 +151,16 @@ function _Navigation({ auth, user, loggedOut }) {
                     )}
                     {user != null && (
                         <div className="navbar-logged-in">
-                            <IconButton 
+                            <IconButton
                                 aria-owns={userMenuAnchorEl ? "navbar-user-menu" : undefined}
                                 aria-haspopup="true"
                                 onMouseEnter={openUserMenu}
                                 onClick={openUserMenu}
                             >
-                                    <AccountCircle />
-                                    <Typography className="navbar-label">
-                                        {user.firstname}
-                                    </Typography>
+                                <AccountCircle />
+                                <Typography className="navbar-label">
+                                    {user.firstname}
+                                </Typography>
                             </IconButton>
                             <Menu
                                 id="navbar-user-menu"
@@ -203,7 +203,7 @@ _Navigation.defaultProps = {
     user: null,
 };
 
-const mapStateToProps = (state) => ({ auth: state.authReducer, user: state.userReducer });
+const mapStateToProps = (state) => ({ user: state.userReducer });
 
 const mapDispatchToProps = (dispatch) => ({
     loggedOut: (user) => dispatch(loggedOutAction(user)),

@@ -7,11 +7,13 @@ import {
     getUserCalendar as getUserCalendarAction,
     gotUserCalendar as gotUserCalendarAction,
 } from "../../../actions/calendarActions";
+import { User } from "../../../types";
 import API from "../../../api";
 
-const CalendarStripContainer = (props) => {
-    const calUserId = 1;
-    const { calendar, getUserCalendar, gotUserCalendar } = props;
+const CalendarStripContainer = ({
+    user, calendar, getUserCalendar, gotUserCalendar,
+}) => {
+    const calUserId = user.id;
     const [filteredCalendar, setFilteredCalendar] = useState(null);
 
     const formatEventsListToObject = (events) => {
@@ -40,9 +42,10 @@ const CalendarStripContainer = (props) => {
         if (!calendar.gettingCalendar) {
             getUserCalendar(calUserId);
             API.getUserCalendar(calUserId).then((response) => {
+                console.log("response", response);
                 // TODO handle failure
                 gotUserCalendar(response);
-                setFilteredCalendar(formatEventsListToObject(response.events));
+                setFilteredCalendar(formatEventsListToObject(response.userCalendar.events));
             });
         }
     }, []);
@@ -55,6 +58,7 @@ const CalendarStripContainer = (props) => {
 
 const mapStateToProps = (state) => ({
     calendar: state.calendarReducer,
+    user: state.userReducer,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -68,6 +72,8 @@ CalendarStripContainer.propTypes = {
     ).isRequired,
     getUserCalendar: PropTypes.func.isRequired,
     gotUserCalendar: PropTypes.func.isRequired,
+    user: PropTypes.instanceOf(User).isRequired,
 };
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(CalendarStripContainer);

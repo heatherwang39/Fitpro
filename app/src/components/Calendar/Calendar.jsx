@@ -23,9 +23,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 
 import {
     addCalendarEvent as addCalendarEventAction,
-    getTrainerCalendars as getTrainerCalendarsAction,
     getUserCalendar as getUserCalendarAction,
-    gotTrainerCalendars as gotTrainerCalendarsAction,
     gotUserCalendar as gotUserCalendarAction,
     rmCalendarEvent as rmCalendarEventAction,
     updatedCalendar as updatedCalendarAction,
@@ -65,32 +63,25 @@ const combineClientEvents = (clientCalendars) => {
 const _Calendar = ({
     auth,
     location, calendar, user,
-    getTrainerCalendars, gotTrainerCalendars, getUserCalendar, gotUserCalendar,
+    getUserCalendar, gotUserCalendar,
     addCalendarEvent, rmCalendarEvent, updatedCalendar,
 }) => {
+    (() => {})(addCalendarEvent);
     if (user == null) {
         return (<div className="center">Log in to view your calendar</div>);
     }
-
     // Load Calendar from server
     if (calendar.userCalendar == null) {
         if (!calendar.gettingCalendar) {
-            if (user.isTrainer) {
-                getTrainerCalendars(user.id);
-                API.getTrainerCalendars(user.id, auth.token).then((response) => {
-                    // TODO handle failure
-                    if (!response.success) {
-                        console.log("ERROR");
-                    }
-                    gotTrainerCalendars(response);
-                });
-            } else {
-                getUserCalendar(user.id);
-                API.getUserCalendar(user.id, auth.token).then((response) => {
-                    // TODO handle failure
-                    gotUserCalendar(response);
-                });
-            }
+            getUserCalendar(user.id);
+            API.getUserCalendar(user.id, auth.token).then((response) => {
+                // TODO handle failure
+                if (!response.success) {
+                    console.log("ERROR");
+                }
+                gotUserCalendar(response);
+                console.log(response);
+            });
         }
         return (<div className="center">Loading</div>);
     }
@@ -121,7 +112,12 @@ const _Calendar = ({
             setVisibleEvents(combineClientEvents(calendar.clientCalendars));
             break;
         case "me":
-            setVisibleEvents(calendar.userCalendar.events);
+            // TODO
+            if (typeof calendar.userCalendar.events === "undefined") {
+                setVisibleEvents(calendar.userCalendar.userCalendar.events);
+            } else {
+                setVisibleEvents(calendar.userCalendar.events);
+            }
             break;
         case "availability":
             setVisibleEvents(calendar.userCalendar.availability);
@@ -153,7 +149,7 @@ const _Calendar = ({
         }
     }
     React.useEffect(() => {
-        if (changeToClient) {
+        if (changeToClient && user.isTrainer) {
             setCalendarType("client");
             setChangeToClient(false);
         }
@@ -283,8 +279,12 @@ const _Calendar = ({
         return colour;
     };
 
-    if (user.isTrainer && calendarType === "default") {
-        setCalendarType("overview");
+    if (user.isTrainer) {
+        if (calendarType === "default") {
+            setCalendarType("overview");
+        }
+    } else if (calendarType !== "me") {
+        setCalendarType("me");
     }
 
     return (
@@ -416,9 +416,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    getTrainerCalendars: (id) => dispatch(getTrainerCalendarsAction(id)),
     getUserCalendar: (id) => dispatch(getUserCalendarAction(id)),
-    gotTrainerCalendars: (id) => dispatch(gotTrainerCalendarsAction(id)),
     gotUserCalendar: (calendar) => dispatch(gotUserCalendarAction(calendar)),
     updatedCalendar: (event) => dispatch(updatedCalendarAction(event)),
     addCalendarEvent: (event) => dispatch(addCalendarEventAction(event)),
@@ -453,8 +451,6 @@ _Calendar.propTypes = {
             token: PropTypes.string,
         },
     ).isRequired,
-    getTrainerCalendars: PropTypes.func.isRequired,
-    gotTrainerCalendars: PropTypes.func.isRequired,
     getUserCalendar: PropTypes.func.isRequired,
     gotUserCalendar: PropTypes.func.isRequired,
     updatedCalendar: PropTypes.func.isRequired,
