@@ -42,3 +42,8 @@
     width: 50%;
     height: 50%;
 }
+
+.caltype-label {
+    padding-left: 0;
+    padding-right: 4em;
+}

@@ -3,24 +3,12 @@ import React from "react";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import { PropTypes } from "prop-types";
-import {
-    Button,
-    FormControl,
-    FormControlLabel,
-    Grid,
-    Modal,
-    Paper,
-    Radio,
-    RadioGroup,
-    TextField,
-    Typography,
-} from "@material-ui/core";
-import { Autocomplete } from "@material-ui/lab";
 import { KeyboardDateTimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
-import { Delete } from "@material-ui/icons";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-
+import {
+    Button, Dropdown, Form, Input, Modal, Radio, Segment,
+} from "semantic-ui-react";
 import {
     addCalendarEvent as addCalendarEventAction,
     getUserCalendar as getUserCalendarAction,
@@ -46,6 +34,13 @@ const ALL_EVENT_COLOURS = [
 ];
 
 const localizer = momentLocalizer(moment);
+
+const repeatOptions = [
+    { key: 1, text: "Never", value: "never" },
+    { key: 2, text: "Daily", value: "daily" },
+    { key: 3, text: "Weekly", value: "weekly" },
+    { key: 4, text: "Monthly", value: "Monthly" },
+];
 
 const combineClientEvents = (clientCalendars) => {
     const events = [];
@@ -103,6 +98,9 @@ const _Calendar = ({
         startDate: new Date(),
         endDate: new Date(),
         user,
+        duration: "60",
+        repeat: "never",
+        client: calendar.clientCalendars.length > 0 ? calendar.clientCalendars[0].id : 0,
     });
 
     const setCalendarType = (type) => {
@@ -195,70 +193,94 @@ const _Calendar = ({
 
     // Modal for adding a new event
     const addModal = () => (
-        <Modal open={addOpen} onClose={() => setAddOpen(false)} className="event-modal">
-            <Paper>
-                <h2 className="event-modal-title"><Typography>Add</Typography></h2>
-                <Paper>
-                    <Grid container direction="column" justify="center" alignItems="center" spacing={2}>
-                        <Grid item>
-                            <TextField
-                                label="Title"
-                                value={newEvent.title}
-                                onChange={(event) => setNewEvent({ ...newEvent, title: event.target.value })}
+        <Modal
+            open={addOpen}
+            onClose={() => setAddOpen(false)}
+            closeIcon
+        >
+            <Modal.Header>
+                Add Event
+            </Modal.Header>
+            <Modal.Content>
+                <Form>
+                    <Form.Field>
+                        <Input
+                            label="Title"
+                            value={newEvent.title}
+                            onChange={(_, v) => setNewEvent({ ...newEvent, title: v.value })}
+                        />
+                    </Form.Field>
+                    <Form.Field>
+                        <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils}>
+                            <KeyboardDateTimePicker
+                                disableToolbar
+                                format="DD-MM-YYYY hh:mm"
+                                label="Date"
+                                value={newEvent.startDate}
+                                onChange={(date) => setNewEvent({ ...newEvent, startDate: date })}
+                                autoOk
                             />
-                        </Grid>
-                        <Grid item>
-                            <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils}>
-                                <KeyboardDateTimePicker
-                                    disableToolbar
-                                    format="DD-MM-YYYY hh:mm"
-                                    label="Start"
-                                    value={newEvent.startDate}
-                                    onChange={(date) => setNewEvent({ ...newEvent, startDate: date })}
-                                    autoOk
-                                />
-                                <KeyboardDateTimePicker
-                                    disableToolbar
-                                    format="DD-MM-YYYY hh:mm"
-                                    label="End"
-                                    value={newEvent.endDate}
-                                    onChange={(date) => setNewEvent({ ...newEvent, endDate: date })}
-                                    autoOk
-                                />
-                            </MuiPickersUtilsProvider>
-                        </Grid>
-                        <Grid item>
-                            <Button onClick={createEvent}>Create</Button>
-                        </Grid>
-                    </Grid>
-                </Paper>
-            </Paper>
+                        </MuiPickersUtilsProvider>
+                    </Form.Field>
+                    <Form.Field>
+                        <Input
+                            label="Duration"
+                            value={newEvent.duration}
+                            onChange={(_, v) => setNewEvent({ ...newEvent, duration: v.value })}
+                        />
+                    </Form.Field>
+                    <Form.Field>
+                        <Dropdown
+                            text="Repeat"
+                            labeled
+                            selection
+                            options={repeatOptions}
+                            value={newEvent.repeat}
+                            onChange={(_, v) => setNewEvent({ ...newEvent, repeat: v.value })}
+                        />
+                    </Form.Field>
+                    {calendar.clientCalendars.length > 0 && (
+                        <Form.Field>
+                            <Dropdown
+                                selection
+                                options={calendar.clientCalendars.map(
+                                    (cal) => ({
+                                        key: cal.id,
+                                        text: `${cal.firstname} ${cal.lastname}`,
+                                        value: cal.id,
+                                    }),
+                                )}
+                                value={newEvent.client}
+                                onChange={(_, v) => setNewEvent({ ...newEvent, client: v.value })}
+                            />
+                        </Form.Field>
+                    )}
+                </Form>
+            </Modal.Content>
+            <Modal.Actions>
+                <Button onClick={() => { createEvent(); setAddOpen(false); }}>Create</Button>
+            </Modal.Actions>
         </Modal>
     );
 
     // Modal for editing existing event
     const editModal = () => (
-        <Modal open={editOpen} onClose={() => setEditOpen(false)} className="event-modal">
-            <Paper>
-                <h2 className="event-modal-title"><Typography>{currentEvent.title}</Typography></h2>
-                <Paper>
-                    <Grid container direction="column" justify="center" alignItems="center" spacing={2}>
-                        <Grid item>
-                            <Typography>{`${currentEvent.start} to ${currentEvent.end}`}</Typography>
-                        </Grid>
-                        <Grid item>
-                            <Button onClick={rmCurrentEvent}>
-                                <Delete />
-                                Delete
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </Paper>
-            </Paper>
+        <Modal
+            open={editOpen}
+            onClose={() => setEditOpen(false)}
+            closeIcon
+        >
+            <Modal.Header>
+                Edit Event
+            </Modal.Header>
+            <Modal.Content>
+                TODO
+            </Modal.Content>
+            <Modal.Actions>
+                <Button negative onClick={() => { rmCurrentEvent(); setEditOpen(false); }}>Delete</Button>
+            </Modal.Actions>
         </Modal>
     );
-
-    const clientSelectDisabled = () => calendarType !== "client";
 
     const getNewColour = () => {
         if (availableColours.length === 0) {
@@ -294,81 +316,50 @@ const _Calendar = ({
                 // Trainer Calendar type selection
                 user.isTrainer
                 && (
-                    <div className="calendar-type-select-container">
-                        <Paper>
-                            <FormControl component="fieldset" variant="outlined">
-                                <RadioGroup
-                                    value={calendarType}
-                                    onChange={(event) => event != null && setCalendarType(event.target.value)}
-                                >
-                                    <Grid container direction="row" justify="center" alignItems="center" spacing={2}>
-                                        <Grid item>
-                                            <FormControlLabel
-                                                className="calendar-type-select-form-label"
-                                                value="overview"
-                                                control={<Radio />}
-                                                label="Overview"
-                                                labelPlacement="start"
-                                            />
-                                        </Grid>
-                                        <Grid item>
-                                            <FormControlLabel
-                                                className="calendar-type-select-form-label"
-                                                value="me"
-                                                control={<Radio />}
-                                                label="My Calendar"
-                                                labelPlacement="start"
-                                            />
-                                        </Grid>
-                                        <Grid item>
-                                            <FormControlLabel
-                                                className="calendar-type-select-form-label"
-                                                value="availability"
-                                                control={<Radio />}
-                                                label="Availability"
-                                                labelPlacement="start"
-                                            />
-                                        </Grid>
-                                        <Grid item>
-                                            <FormControlLabel
-                                                className="calendar-type-select-form-label"
-                                                value="client"
-                                                control={(
-                                                    <Radio />
-                                                )}
-                                                label="Client"
-                                                labelPlacement="start"
-                                            />
-                                        </Grid>
-                                        <Grid item>
-                                            <Autocomplete
-                                                id="clientSelector"
-                                                value={selectedClient}
-                                                onChange={
-                                                    (_, newValue) => {
-                                                        setSelectedClient(newValue);
-                                                        setCalendarType("client");
-                                                    }
-                                                }
-                                                options={calendar.clientCalendars}
-                                                getOptionLabel={(option) => (option === "" ? "" : option.firstname)}
-                                                disabled={clientSelectDisabled()}
-                                                renderInput={(items) => (
-                                                    <TextField
-                                                        {...items}
-                                                        label="Client"
-                                                        variant="outlined"
-                                                    />
-                                                )}
-                                                autoSelect
-                                                clearOnEscape
-                                            />
-                                        </Grid>
-                                    </Grid>
-                                </RadioGroup>
-                            </FormControl>
-                        </Paper>
-                    </div>
+                    <Segment className="calendar-type-select-container">
+                        <Form>
+                            <Form.Group inline>
+                                <Form.Field
+                                    control={Radio}
+                                    checked={calendarType === "overview"}
+                                    label="Overview"
+                                    onChange={() => setCalendarType("overview")}
+                                />
+                                <Form.Field
+                                    control={Radio}
+                                    checked={calendarType === "me"}
+                                    label="My Calendar"
+                                    onChange={() => setCalendarType("me")}
+                                />
+                                <Form.Field
+                                    control={Radio}
+                                    checked={calendarType === "availability"}
+                                    label="Availability"
+                                    onChange={() => setCalendarType("availability")}
+                                />
+                                <Form.Field>
+                                    <Radio
+                                        checked={calendarType === "client"}
+                                        label="Client"
+                                        onChange={() => setCalendarType("client")}
+                                    />
+                                    <Dropdown
+                                        search
+                                        selection
+                                        options={calendar.clientCalendars.map(
+                                            (cal) => ({
+                                                key: cal.id,
+                                                text: `${cal.firstname} ${cal.lastname}`,
+                                                value: cal,
+                                            }),
+                                        )}
+                                        value={selectedClient}
+                                        onChange={(_, v) => { setSelectedClient(v.value); setCalendarType("client"); }}
+                                    />
+                                </Form.Field>
+                            </Form.Group>
+                        </Form>
+                    </Segment>
                 )
             }
 
