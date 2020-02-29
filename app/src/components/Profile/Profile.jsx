@@ -1,13 +1,6 @@
 import { connect } from "react-redux";
 import React from "react";
 import { Link } from "react-router-dom";
-import {
-    Avatar, Button, CircularProgress, Grid, Paper, Typography,
-} from "@material-ui/core";
-import {
-    Email, Equalizer, LocationOn, Phone,
-} from "@material-ui/icons";
-import { Rating } from "@material-ui/lab";
 import { PropTypes } from "prop-types";
 
 import { getProfile as getProfileAction, gotProfile as gotProfileAction } from "../../actions/profileActions";
@@ -45,10 +38,8 @@ const _Profile = ({
     if (error != null) {
         return (
             <div className="center">
-                <Typography>
-                    Unable to load profile:
-                    {error}
-                </Typography>
+                Unable to load profile:
+                {error}
             </div>
         );
     }
@@ -57,85 +48,55 @@ const _Profile = ({
     if (profile.user == null || profile.gettingProfile) {
         return (
             <div className="center">
-                <CircularProgress />
+                Loading...
             </div>
         );
     }
 
     // Already got profile from server
     return (
-        <div className="page">
-            <Paper>
-                <div className="profile">
-                    <Grid container direction="column" justify="center" alignItems="center" spacing={2}>
-                        <Grid item>
-                            <Avatar
-                                alt={`${profile.user.firstname} ${profile.user.lastname}`}
-                                variant="square"
-                                className="profile-avatar"
-                            />
-                        </Grid>
-                        <Grid item>
-                            <Typography>
-                                {`${profile.user.firstname} ${profile.user.lastname} (${profile.user.username})`}
-                            </Typography>
-                        </Grid>
-                        <Grid item>
-                            {profile.user.isTrainer && (
-                                <Typography>&nbsp;Trainer</Typography>
-                            )}
-                            {!profile.user.isTrainer && (
-                                <Typography>&nbsp;Client</Typography>
-                            )}
-                        </Grid>
-                        <Grid item>
-                            <Grid container direction="row" alignItems="center">
-                                <Equalizer />
-                                <Typography>
-                                    {`${profile.user.height} ${profile.user.weight}`}
-                                </Typography>
-                            </Grid>
-                        </Grid>
-                        <Grid item>
-                            <Grid container direction="row" alignItems="center">
-                                <Email />
-                                <Typography>{profile.user.email}</Typography>
-                            </Grid>
-                        </Grid>
-                        <Grid item>
-                            <Grid container direction="row" alignItems="center">
-                                <Phone />
-                                <Typography>{profile.user.phone}</Typography>
-                            </Grid>
-                        </Grid>
-                        <Grid item>
-                            <Grid container direction="row" alignItems="center">
-                                <LocationOn />
-                                <Typography>{profile.user.location}</Typography>
-                            </Grid>
-                        </Grid>
-                        <Grid item>
-                            <Grid container direction="row" alignItems="center">
-                                <Rating value={profile.user.rating} precision={0.5} readOnly />
-                            </Grid>
-                        </Grid>
-                        {
-                            user != null && profile.user.trainers.includes(user.id)
-                        && (
-                            <Grid item>
-                                <Grid container direction="row" alignItems="center">
-                                    <Link to={{ pathname: "/calendar", state: { userId: profile.user.id } }}>
-                                        <Button variant="contained">
-                                            Calendar
-                                        </Button>
-                                    </Link>
-                                </Grid>
-                            </Grid>
-                        )
-                        }
-                    </Grid>
+        <div className="ui grid center">
+            <div className="column">
+                <div className="row">
+                    <img className="ui small img" alt={`${profile.user.firstname} ${profile.user.lastname}`} />
                 </div>
-            </Paper>
+                <div className="row">
+                    {`${profile.user.firstname} ${profile.user.lastname} (${profile.user.username})`}
+                </div>
+                <div className="row">
+                    {profile.user.isTrainer && (
+                        <span>Registered Trainer</span>
+                    )}
+                    {!profile.user.isTrainer && (
+                        <span>Not Trainer</span>
+                    )}
+                </div>
+                <div className="row">
+                    {`${profile.user.height} ${profile.user.weight}`}
+                </div>
+                <div className="row">
+                    {profile.user.email}
+                </div>
+                <div className="row">
+                    {profile.user.phone}
+                </div>
+                <div className="row">
+                    {profile.user.location}
+                </div>
+                <div className="row">
+                    <div
+                        className="ui star rating"
+                        interactive="false"
+                        clearable="false"
+                        data-rating={profile.user.rating}
+                    />
+                </div>
+                {user != null && profile.user.trainers.includes(user.id) && (
+                    <div className="row">
+                        <Link to={{ pathname: "/calendar", state: { userId: profile.user.id } }}>Calendar</Link>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
