@@ -15,46 +15,49 @@ import { history } from "../store/history";
 import { store } from "../store";
 import RegisterContainer from "./RegisterContainer";
 import ProtectedRoute from "./ProtectedRoute";
+import ErrorBoundary from "./ErrorBoundary";
 
-export const Main = () => (
-    <Router history={history}>
-        <Provider store={store}>
-            <Navigation />
-            <Route
-                exact
-                path="/"
-                component={Home}
-            />
-            <Route
-                path="/login"
-                component={LoginContainer}
-            />
-            <Route
-                path="/user/:id(\d+)"
-                component={Profile}
-            />
-            <Route
-                path="/calendar"
-                component={Calendar}
-            />
-            <Route
-                path="/trainers"
-                component={SearchTrainer}
-            />
-            <Route
-                path="/exercises"
-                component={SearchExercise}
-            />
-            <Route
-                path="/register"
-                component={RegisterContainer}
-            />
-            <ProtectedRoute
-                path="/mail"
-                component={MailContainer}
-            />
-        </Provider>
-    </Router>
+const Main = () => (
+    <ErrorBoundary>
+        <Router history={history}>
+            <Provider store={store}>
+                <Navigation />
+                <Route
+                    exact
+                    path="/"
+                    component={Home}
+                />
+                <Route
+                    path="/login"
+                    component={LoginContainer}
+                />
+                <Route
+                    path="/user/:id(\d+)"
+                    component={Profile}
+                />
+                <Route
+                    path="/calendar"
+                    component={Calendar}
+                />
+                <Route
+                    path="/trainers"
+                    component={SearchTrainer}
+                />
+                <Route
+                    path="/exercises"
+                    component={SearchExercise}
+                />
+                <Route
+                    path="/register"
+                    component={RegisterContainer}
+                />
+                <ProtectedRoute
+                    path="/mail"
+                    component={MailContainer}
+                />
+            </Provider>
+        </Router>
+    </ErrorBoundary>
 );
 
 export default Main;

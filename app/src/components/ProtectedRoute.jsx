@@ -29,7 +29,7 @@ const mapStateToProps = (state) => ({
 });
 
 ProtectedRoute.propTypes = {
-    component: PropTypes.func.isRequired,
+    component: PropTypes.elementType.isRequired,
 };
 
 export default connect(mapStateToProps)(ProtectedRoute);

@@ -79,7 +79,6 @@ const MailContainer = (props) => {
     const [isCreatingMail, setIsCreatingMail] = useState(false);
     const [mail, setMail] = useState([]);
     const { classes } = props;
-
     const fetchMail = async (uid) => {
         if (uid) {
             return listOfMail;
