@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { User } from "../types/user";
 import { Calendar } from "../types/calendar";
 import { Exercise } from "../types/exercise";
