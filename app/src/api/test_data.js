@@ -2,6 +2,7 @@
 import { User } from "../types/user";
 import { Calendar } from "../types/calendar";
 import { Exercise } from "../types/exercise";
+import { workoutExerciseList, Workout } from "../types/workout";
 
 export const clientUser = new User(1, "user", "ClientFirst", "ClientLast", "client@mail.com",
     "555-555-1234", "Toronto", "6'0", "200lb", false, false, "goalType", 2.5, [2], []);
@@ -79,3 +80,6 @@ const trainerAvailability = [
 export const clientCalendar = new Calendar(clientEvents, [], 1);
 export const trainerCalendar = new Calendar(trainerEvents, trainerAvailability, 2);
 export const client2Calendar = new Calendar(client2Events, [], 3);
+
+
+export const testWorkout = new Workout(11, "Test Workout", 1, [{ exercise: exercise2, params: { name: "reps", value: 10 } }]);

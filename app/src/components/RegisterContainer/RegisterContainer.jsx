@@ -7,7 +7,6 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { loginSuccess } from "../../actions/authActions";
 import { gotUserInfo } from "../../actions/userActions";
-import { gotProfile } from "../../actions/profileActions";
 import UsernameInput from "./UsernameInput";
 import PasswordInput from "./PasswordInput";
 import UserInfoInput from "./UserInfoInput";
