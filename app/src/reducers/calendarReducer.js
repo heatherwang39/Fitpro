@@ -10,19 +10,6 @@ const defaultState = {
     clientCalendars: null,
 };
 
-const calendarWithoutEvent = (calendar, event) => {
-    if (calendar == null) return null;
-    const newCalendar = calendar;
-    newCalendar.events = calendar.events.filter((e) => e !== event);
-    return newCalendar;
-};
-
-const calendarWithNewEvent = (calendar, event) => {
-    if (calendar == null) return null;
-    const newCalendar = calendar;
-    newCalendar.events.push(event);
-    return newCalendar;
-};
 
 export default (state = defaultState, action) => {
     switch (action.type) {
@@ -45,22 +32,36 @@ export default (state = defaultState, action) => {
             gettingCalendar: false,
         };
     case ADD_CALENDAR_EVENT:
-        return {
-            ...state,
-            userCalendar: calendarWithNewEvent(state.userCalendar, action.payload),
-            updatingCalendar: true,
-        };
     case RM_CALENDAR_EVENT:
         return {
             ...state,
-            userCalendar: calendarWithoutEvent(state.userCalendar, action.payload),
             updatingCalendar: true,
         };
-    case UPDATED_CALENDAR:
+    case UPDATED_CALENDAR: {
+        if (action.payload.userId === state.userCalendar.userId) {
+            return {
+                ...state,
+                updatingCalendar: false,
+                userCalendar: action.payload,
+            };
+        }
+        const newCalendars = state.clientCalendars;
+        let waitingAdd = true;
+        for (let i = 0; i < newCalendars.length; i++) {
+            if (newCalendars.clientCalendars[i].userId === action.payload.userId) {
+                newCalendars[i] = action.payload;
+                waitingAdd = false;
+            }
+        }
+        if (waitingAdd) {
+            newCalendars.push(action.payload);
+        }
         return {
             ...state,
             updatingCalendar: false,
+            clientCalendars: newCalendars,
         };
+    }
     default:
         return state;
     }

@@ -6,6 +6,20 @@ import {
     exercise4,
 } from "./test_data";
 
+const calendarWithNewEvent = (calendar, event) => {
+    if (calendar == null) return null;
+    const newCalendar = calendar;
+    newCalendar.events.push(event);
+    return newCalendar;
+};
+
+const calendarWithoutEvent = (calendar, event) => {
+    if (calendar == null) return null;
+    const newCalendar = calendar;
+    newCalendar.events = calendar.events.filter((e) => e !== event);
+    return newCalendar;
+};
+
 export const TestAPI = {
     searchExercise: async (exerciseName) => {
         switch (exerciseName) {
@@ -99,8 +113,14 @@ export const TestAPI = {
         }
     },
 
-    deleteCalendarEvent: async (event) => ({ success: true, event }),
-    createCalendarEvent: async (event) => ({ success: true, event }),
+    deleteCalendarEvent: async (event, calendar) => ({
+        success: true,
+        calendar: calendarWithoutEvent(calendar, event),
+    }),
+    createCalendarEvent: async (event, calendar) => ({
+        success: true,
+        calendar: calendarWithNewEvent(calendar, event),
+    }),
 
     registerUser: async (userInfo) => {
         switch (userInfo.accountType) {

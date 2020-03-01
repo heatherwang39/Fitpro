@@ -27,7 +27,7 @@ export const rmCalendarEvent = (event) => ({
     payload: event,
 });
 
-export const updatedCalendar = (event) => ({
+export const updatedCalendar = (calendar) => ({
     type: UPDATED_CALENDAR,
-    payload: event,
+    payload: calendar,
 });

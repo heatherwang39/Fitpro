@@ -3,12 +3,11 @@ import React from "react";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import { PropTypes } from "prop-types";
-import { KeyboardDateTimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
-import MomentUtils from "@date-io/moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import {
-    Button, Dropdown, Form, Input, Modal, Radio, Segment,
+    Button, Dropdown, Form, Input, Label, Modal, Radio, Segment, Checkbox,
 } from "semantic-ui-react";
+import "react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css";
 import {
     addCalendarEvent as addCalendarEventAction,
     getUserCalendar as getUserCalendarAction,
@@ -35,11 +34,10 @@ const ALL_EVENT_COLOURS = [
 
 const localizer = momentLocalizer(moment);
 
-const repeatOptions = [
-    { key: 1, text: "Never", value: "never" },
-    { key: 2, text: "Daily", value: "daily" },
-    { key: 3, text: "Weekly", value: "weekly" },
-    { key: 4, text: "Monthly", value: "Monthly" },
+const repeatUnitOptions = [
+    { key: 1, text: "Days", value: "days" },
+    { key: 2, text: "Weeks", value: "weeks" },
+    { key: 3, text: "Months", value: "months" },
 ];
 
 const combineClientEvents = (clientCalendars) => {
@@ -61,7 +59,6 @@ const _Calendar = ({
     getUserCalendar, gotUserCalendar,
     addCalendarEvent, rmCalendarEvent, updatedCalendar,
 }) => {
-    (() => {})(addCalendarEvent);
     if (user == null) {
         return (<div className="center">Log in to view your calendar</div>);
     }
@@ -72,10 +69,9 @@ const _Calendar = ({
             API.getUserCalendar(user.id, auth.token).then((response) => {
                 // TODO handle failure
                 if (!response.success) {
-                    console.log("ERROR");
+                    console.log("ERROR loading calendar");
                 }
                 gotUserCalendar(response);
-                console.log(response);
             });
         }
         return (<div className="center">Loading</div>);
@@ -95,20 +91,25 @@ const _Calendar = ({
     // Properties of new event that is currently being added
     const [newEvent, setNewEvent] = React.useState({
         title: "",
-        startDate: new Date(),
-        endDate: new Date(),
+        start: new Date(),
         user,
-        duration: "60",
-        repeat: "never",
-        client: calendar.clientCalendars.length > 0 ? calendar.clientCalendars[0].id : 0,
+        personalEvent: true,
+        duration: 60,
+        durationStr: "60",
+        repeat: false,
+        repeatFreq: "60",
+        repeatUnits: "days",
+        client: user.id.toString(),
+        type: "event",
     });
 
     const setCalendarType = (type) => {
         setCalendarTypeState(type);
         switch (type) {
-        case "overview":
-            setVisibleEvents(combineClientEvents(calendar.clientCalendars));
+        case "overview": {
+            setVisibleEvents(combineClientEvents(calendar.clientCalendars).concat(calendar.userCalendar.events));
             break;
+        }
         case "me":
             // TODO
             if (typeof calendar.userCalendar.events === "undefined") {
@@ -156,7 +157,8 @@ const _Calendar = ({
     // Toggles the Add Event modal
     const toggleAddOpen = (event) => {
         setCurrentEvent(event);
-        setNewEvent({ ...newEvent, startDate: event.start, endDate: moment(event.start).add(1, "h") });
+        // TODO if event.end !== event.start set newEvent.duration accordingly
+        setNewEvent({ ...newEvent, start: event.start });
         setAddOpen(!addOpen);
     };
 
@@ -166,16 +168,49 @@ const _Calendar = ({
         setEditOpen(!editOpen);
     };
 
-    const createEvent = () => {
+    const parseMinutesDuration = (input) => {
+        if (input.match(/^\d+$/)) {
+            console.log("literal", input);
+            return parseInt(input, 10);
+        }
+        const minsMatch = input.match(/(\d)+\s*[mM].*/);
+        if (minsMatch != null) return parseInt(minsMatch[1], 10);
+        const hoursAndMinsMatch = input.match(/(\d)+\s*[h:][oOuUrR\s]*((\d)+[mM]?)?.*/);
+        if (hoursAndMinsMatch == null || hoursAndMinsMatch.length < 2) return 0;
+        return parseInt(hoursAndMinsMatch[1] * 60, 10)
+         + parseInt(hoursAndMinsMatch.length > 2 && hoursAndMinsMatch[2] !== undefined ? hoursAndMinsMatch[2] : 0, 10);
+    };
+
+    const createNewEvent = () => {
         // TODO validate event locally before API call
-        API.createCalendarEvent(newEvent, auth.token).then(
+        if (newEvent.duration <= 0) return false;
+        if (newEvent.type === "event") {
+            if (newEvent.title.length === 0) return false;
+        } else if (newEvent.type === "workout") {
+            newEvent.title = "Workout"; // TODO set this dynamically
+        } else {
+            return false;
+        }
+        newEvent.durationStr = undefined;
+        newEvent.end = new Date(newEvent.start.getTime() + newEvent.duration * 60);
+        newEvent.personalEvent = newEvent.user === user;
+        const updatingCalendar = newEvent.personalEvent
+            ? calendar.userCalendar : calendar.clientCalendars.filter((c) => c.userId === user.id)[0];
+        addCalendarEvent(newEvent);
+        API.createCalendarEvent(newEvent, updatingCalendar).then(
             (response) => {
-                // TODO handle failure
-                updatedCalendar(response);
+                if (!response.success) {
+                    // TODO show error to user
+                    console.log("Error adding event ", newEvent, "Got response ", response);
+                    return;
+                }
+                updatedCalendar(response.calendar);
+                setCalendarType(calendarType); // Force calendar to re-render if necessary
                 setCurrentEvent(null);
                 setAddOpen(false);
             },
         );
+        return true;
     };
 
     const rmCurrentEvent = () => {
@@ -191,6 +226,20 @@ const _Calendar = ({
         );
     };
 
+    // List of client calendars by name to be used in Dropdown
+    // Includes current user as top option
+    const clientCalendarOptions = () => {
+        const items = calendar.clientCalendars.map(
+            (cal) => ({
+                key: cal.id,
+                text: `${cal.firstname} ${cal.lastname}`,
+                value: cal.id.toString(),
+            }),
+        );
+        items.unshift({ key: user.id, text: `${user.firstname} ${user.lastname}`, value: user.id.toString() });
+        return items;
+    };
+
     // Modal for adding a new event
     const addModal = () => (
         <Modal
@@ -203,62 +252,99 @@ const _Calendar = ({
             </Modal.Header>
             <Modal.Content>
                 <Form>
-                    <Form.Field>
-                        <Input
-                            label="Title"
-                            value={newEvent.title}
-                            onChange={(_, v) => setNewEvent({ ...newEvent, title: v.value })}
-                        />
-                    </Form.Field>
-                    <Form.Field>
-                        <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils}>
-                            <KeyboardDateTimePicker
-                                disableToolbar
-                                format="DD-MM-YYYY hh:mm"
-                                label="Date"
-                                value={newEvent.startDate}
-                                onChange={(date) => setNewEvent({ ...newEvent, startDate: date })}
-                                autoOk
+                    <Form.Group>
+                        <Label>
+                            Type
+                            <Form.Field
+                                control={Radio}
+                                checked={newEvent.type === "event"}
+                                label="Event"
+                                onChange={() => setNewEvent({ ...newEvent, type: "event" })}
                             />
-                        </MuiPickersUtilsProvider>
-                    </Form.Field>
-                    <Form.Field>
+                            <Form.Field
+                                control={Radio}
+                                checked={newEvent.type === "workout"}
+                                label="Workout"
+                                onChange={() => setNewEvent({ ...newEvent, type: "workout" })}
+                            />
+                        </Label>
+                        { newEvent.type === "event"
+                        && (
+                            <Input
+                                label="Title"
+                                value={newEvent.title}
+                                onChange={(_, v) => setNewEvent({ ...newEvent, title: v.value })}
+                            />
+                        )}
+                        { // TODO allow selecting multiple exercises
+                            newEvent.type === "workout"
+                        && (<div />)
+                        }
+                    </Form.Group>
+                    <Form.Group>
                         <Input
-                            label="Duration"
-                            value={newEvent.duration}
-                            onChange={(_, v) => setNewEvent({ ...newEvent, duration: v.value })}
+                            labelPosition="right"
+                            type="text"
+                            value={newEvent.durationStr}
+                            onChange={(_, v) => setNewEvent({
+                                ...newEvent,
+                                durationStr: v.value,
+                                duration: parseMinutesDuration(v.value),
+                            })}
+                        >
+                            <Label>Duration</Label>
+                            <input />
+                            <Label color={newEvent.duration > 0 ? null : "red"}>
+                                {newEvent.duration > 0
+                                    ? `${newEvent.duration} minutes` : "Invalid Duration"}
+                            </Label>
+                        </Input>
+                    </Form.Group>
+                    <Form.Group inline>
+                        <Checkbox
+                            checked={newEvent.repeat}
+                            onClick={() => setNewEvent({ ...newEvent, repeat: !newEvent.repeat })}
                         />
-                    </Form.Field>
-                    <Form.Field>
+                        &nbsp;Repeat every&nbsp;
+                        <Input
+                            value={newEvent.repeatFreq}
+                            onChange={(_, v) => setNewEvent({ ...newEvent, repeatFreq: v.value })}
+                        />
                         <Dropdown
-                            text="Repeat"
-                            labeled
+                            inline
                             selection
-                            options={repeatOptions}
-                            value={newEvent.repeat}
-                            onChange={(_, v) => setNewEvent({ ...newEvent, repeat: v.value })}
+                            options={repeatUnitOptions}
+                            value={newEvent.repeatUnits}
+                            onChange={(_, v) => setNewEvent({ ...newEvent, repeatUnits: v.value })}
                         />
-                    </Form.Field>
+                    </Form.Group>
                     {calendar.clientCalendars.length > 0 && (
-                        <Form.Field>
+                        <Form.Group inline>
+                            For&nbsp;
                             <Dropdown
                                 selection
-                                options={calendar.clientCalendars.map(
-                                    (cal) => ({
-                                        key: cal.id,
-                                        text: `${cal.firstname} ${cal.lastname}`,
-                                        value: cal.id,
-                                    }),
-                                )}
+                                options={clientCalendarOptions()}
                                 value={newEvent.client}
                                 onChange={(_, v) => setNewEvent({ ...newEvent, client: v.value })}
                             />
-                        </Form.Field>
+                        </Form.Group>
                     )}
                 </Form>
             </Modal.Content>
             <Modal.Actions>
-                <Button onClick={() => { createEvent(); setAddOpen(false); }}>Create</Button>
+                <Button
+                    onClick={() => {
+                        setAddOpen(false);
+                    }}
+                >
+                    Cancel
+                </Button>
+                <Button
+                    positive
+                    onClick={createNewEvent}
+                >
+                    Create
+                </Button>
             </Modal.Actions>
         </Modal>
     );
@@ -277,7 +363,15 @@ const _Calendar = ({
                 TODO
             </Modal.Content>
             <Modal.Actions>
-                <Button negative onClick={() => { rmCurrentEvent(); setEditOpen(false); }}>Delete</Button>
+                <Button
+                    negative
+                    onClick={() => {
+                        rmCurrentEvent();
+                        setEditOpen(false);
+                    }}
+                >
+                    Delete
+                </Button>
             </Modal.Actions>
         </Modal>
     );
@@ -350,11 +444,14 @@ const _Calendar = ({
                                             (cal) => ({
                                                 key: cal.id,
                                                 text: `${cal.firstname} ${cal.lastname}`,
-                                                value: cal,
+                                                value: cal.id,
                                             }),
                                         )}
                                         value={selectedClient}
-                                        onChange={(_, v) => { setSelectedClient(v.value); setCalendarType("client"); }}
+                                        onChange={(_, v) => {
+                                            setSelectedClient(calendar.clientCalendars.filter((c) => c.id === v.value));
+                                            setCalendarType("client");
+                                        }}
                                     />
                                 </Form.Field>
                             </Form.Group>
