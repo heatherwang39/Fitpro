@@ -1,12 +1,10 @@
 import {
-    ADD_CALENDAR_EVENT, GET_USER_CALENDAR, GOT_USER_CALENDAR, RM_CALENDAR_EVENT,
-    UPDATED_CALENDAR,
+    GET_USER_CALENDAR, GOT_USER_CALENDAR, UPDATED_CALENDAR,
 } from "../actions/actionTypes";
 
 const defaultState = {
     userCalendar: null,
     gettingCalendar: false,
-    updatingCalendar: false,
     clientCalendars: null,
 };
 
@@ -31,34 +29,31 @@ export default (state = defaultState, action) => {
             userCalendar: action.payload,
             gettingCalendar: false,
         };
-    case ADD_CALENDAR_EVENT:
-    case RM_CALENDAR_EVENT:
-        return {
-            ...state,
-            updatingCalendar: true,
-        };
     case UPDATED_CALENDAR: {
         if (action.payload.userId === state.userCalendar.userId) {
             return {
                 ...state,
-                updatingCalendar: false,
                 userCalendar: action.payload,
             };
         }
+        // Find the correct user id calendar in clientCalendars and update it
         const newCalendars = state.clientCalendars;
         let waitingAdd = true;
         for (let i = 0; i < newCalendars.length; i++) {
-            if (newCalendars.clientCalendars[i].userId === action.payload.userId) {
-                newCalendars[i] = action.payload;
+            if (newCalendars[i].id === action.payload.userId) {
+                newCalendars[i].calendar = action.payload;
                 waitingAdd = false;
             }
         }
+        // If we didn't find a matching client calendar just push this as a new one
+        // Probably should never happen though
         if (waitingAdd) {
+            console.log("Warning: UPDATED_CALENDAR got a calendar which is not in clientCalendars ",
+                "Adding this calendar as a new user's calendar");
             newCalendars.push(action.payload);
         }
         return {
             ...state,
-            updatingCalendar: false,
             clientCalendars: newCalendars,
         };
     }

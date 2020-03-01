@@ -16,7 +16,7 @@ const calendarWithNewEvent = (calendar, event) => {
 const calendarWithoutEvent = (calendar, event) => {
     if (calendar == null) return null;
     const newCalendar = calendar;
-    newCalendar.events = calendar.events.filter((e) => e !== event);
+    newCalendar.events = calendar.events.filter((e) => e.id !== event.id);
     return newCalendar;
 };
 

@@ -11,10 +11,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import TimeInput from "material-ui-time-picker";
 import {
-    addCalendarEvent as addCalendarEventAction,
     getUserCalendar as getUserCalendarAction,
     gotUserCalendar as gotUserCalendarAction,
-    rmCalendarEvent as rmCalendarEventAction,
     updatedCalendar as updatedCalendarAction,
 } from "../../actions/calendarActions";
 import { User } from "../../types/user";
@@ -22,10 +20,9 @@ import { Calendar as CalendarType } from "../../types/calendar";
 import API from "../../api";
 import "./style.css";
 
+// TODO add more colours
 const ALL_EVENT_COLOURS = [
-    "lightgreen",
     "orange",
-    "orangered",
     "violet",
     "green",
     "red",
@@ -34,6 +31,20 @@ const ALL_EVENT_COLOURS = [
 ];
 
 const localizer = momentLocalizer(moment);
+
+const blankEvent = (user) => ({
+    title: "",
+    start: new Date(),
+    user,
+    personalEvent: true,
+    duration: 60,
+    durationStr: "60",
+    repeat: false,
+    repeatFreq: "1",
+    repeatUnits: "days",
+    client: user.id.toString(),
+    type: "event",
+});
 
 const repeatUnitOptions = [
     { key: 1, text: "Days", value: "days" },
@@ -58,7 +69,7 @@ const _Calendar = ({
     auth,
     location, calendar, user,
     getUserCalendar, gotUserCalendar,
-    addCalendarEvent, rmCalendarEvent, updatedCalendar,
+    updatedCalendar,
 }) => {
     if (user == null) {
         return (<div className="center">Log in to view your calendar</div>);
@@ -79,9 +90,8 @@ const _Calendar = ({
     }
 
     // Local state
-    const [currentEvent, setCurrentEvent] = React.useState(null);
-    const [addOpen, setAddOpen] = React.useState(false);
-    const [editOpen, setEditOpen] = React.useState(false);
+    const [modalOpen, setModalOpen] = React.useState(false);
+    const [editing, setEditing] = React.useState(false); // True if editing existing event, false if making new event
     const [selectedClient, setSelectedClient] = React.useState("");
     const [visibleEvents, setVisibleEvents] = React.useState(calendar.userCalendar.events);
     const [calendarType, setCalendarTypeState] = React.useState("default");
@@ -89,20 +99,8 @@ const _Calendar = ({
     const [uidColours, setUidColours] = React.useState(new Map());
     const [changeToClient, setChangeToClient] = React.useState(false);
 
-    // Properties of new event that is currently being added
-    const [newEvent, setNewEvent] = React.useState({
-        title: "",
-        start: new Date(),
-        user,
-        personalEvent: true,
-        duration: 60,
-        durationStr: "60",
-        repeat: false,
-        repeatFreq: "1",
-        repeatUnits: "days",
-        client: user.id.toString(),
-        type: "event",
-    });
+    // Properties of event currently being created/modified
+    const [curEvent, setCurEvent] = React.useState(blankEvent(user));
 
     const setCalendarType = (type) => {
         setCalendarTypeState(type);
@@ -155,18 +153,50 @@ const _Calendar = ({
         }
     });
 
-    // Toggles the Add Event modal
-    const toggleAddOpen = (event) => {
-        setCurrentEvent(event);
+    // Open modal and prepare to make a new event
+    const openModalAdding = (event) => {
+        setEditing(false);
         // TODO if event.end !== event.start set newEvent.duration accordingly
-        setNewEvent({ ...newEvent, start: event.start });
-        setAddOpen(!addOpen);
+        setCurEvent({ ...curEvent, start: event.start });
+        setModalOpen(!modalOpen);
     };
 
-    // Toggles the Edit Event modal
-    const toggleEditOpen = (event) => {
-        setCurrentEvent(event);
-        setEditOpen(!editOpen);
+    // Open modal and prepare to edit an existing event
+    const openModalEditing = (event) => {
+        setEditing(true);
+        // TODO clientCalendars should probably be a Map of userId->Calendar instead of Array
+        let newCurEvent = null;
+        if (event.userId === user.id) {
+            for (let i = 0; i < calendar.userCalendar.events.length; i++) {
+                if (calendar.userCalendar.events[i].id === event.id) {
+                    newCurEvent = calendar.userCalendar.events[i];
+                    newCurEvent.client = user.id;
+                    break;
+                }
+            }
+        } else {
+            for (let i = 0; i < calendar.clientCalendars.length; i++) {
+                if (calendar.clientCalendars[i].id === event.userId) {
+                    for (let j = 0; j < calendar.clientCalendars[i].calendar.events.length; j++) {
+                        if (calendar.clientCalendars[i].calendar.events[j].id === event.id) {
+                            newCurEvent = calendar.clientCalendars[i].calendar.events[j];
+                            newCurEvent.client = calendar.clientCalendars[i].id;
+                            break;
+                        }
+                    }
+                    if (newCurEvent != null) break;
+                }
+            }
+        }
+        if (newCurEvent == null) {
+            // TODO show error to user (this shouldn't ever happen though anyway)
+            console.log("ERROR couldn't find event ", event.id);
+        }
+        newCurEvent.duration = Math.floor((Math.abs(newCurEvent.end - newCurEvent.start) / 1000) / 60); // Minutes
+        newCurEvent.durationStr = newCurEvent.duration.toString();
+        newCurEvent.type = "event"; // TODO
+        setCurEvent(newCurEvent);
+        setModalOpen(!modalOpen);
     };
 
     const parseMinutesDuration = (input) => {
@@ -179,48 +209,59 @@ const _Calendar = ({
          + parseInt(hoursAndMinsMatch.length > 2 && hoursAndMinsMatch[2] !== undefined ? hoursAndMinsMatch[2] : 0, 10);
     };
 
-    const createNewEvent = () => {
-        // TODO validate event locally before API call
-        if (newEvent.duration <= 0) return false;
-        if (newEvent.type === "event") {
-            if (newEvent.title.length === 0) return false;
-        } else if (newEvent.type === "workout") {
-            newEvent.title = "Workout"; // TODO set this dynamically
+
+    const validateCurEvent = () => {
+        if (curEvent.duration <= 0) return false;
+        if (curEvent.type === "event") {
+            if (curEvent.title.length === 0) return false;
+        } else if (curEvent.type === "workout") {
+            curEvent.title = "Workout"; // TODO set this dynamically
         } else {
             return false;
         }
-        if (newEvent.start < new Date()) return false;
-        newEvent.durationStr = undefined;
-        newEvent.end = new Date(newEvent.start.getTime() + newEvent.duration * 60);
-        newEvent.personalEvent = newEvent.user === user;
-        const updatingCalendar = newEvent.personalEvent
-            ? calendar.userCalendar : calendar.clientCalendars.filter((c) => c.userId === user.id)[0];
-        addCalendarEvent(newEvent);
-        API.createCalendarEvent(newEvent, updatingCalendar).then(
+        if (curEvent.start < new Date()) return false;
+        curEvent.durationStr = undefined;
+        curEvent.end = new Date(curEvent.start.getTime() + curEvent.duration * 60);
+        curEvent.personalEvent = curEvent.user === user;
+        return true;
+    };
+
+    const submitCurEvent = () => {
+        if (!validateCurEvent()) return;
+        const updatingCalendar = curEvent.personalEvent
+            ? calendar.userCalendar : calendar.clientCalendars.filter((c) => c.id === curEvent.userId)[0].calendar;
+        API.createCalendarEvent(curEvent, updatingCalendar).then(
             (response) => {
                 if (!response.success) {
                     // TODO show error to user
-                    console.log("Error adding event ", newEvent, "Got response ", response);
+                    console.log("Error adding event ", curEvent, "Got response ", response);
                     return;
                 }
                 updatedCalendar(response.calendar);
                 setCalendarType(calendarType); // Force calendar to re-render if necessary
-                setCurrentEvent(null);
-                setAddOpen(false);
+                setCurEvent(blankEvent(user));
+                setModalOpen(false);
             },
         );
-        return true;
     };
 
     const rmCurrentEvent = () => {
+        if (!validateCurEvent()) return;
+        const updatingCalendar = curEvent.personalEvent
+            ? calendar.userCalendar : calendar.clientCalendars.filter((c) => c.id === curEvent.userId)[0].calendar;
         // TODO validate currentEvent
-        rmCalendarEvent(currentEvent);
-        API.deleteCalendarEvent(currentEvent, auth.token).then(
+        API.deleteCalendarEvent(curEvent, updatingCalendar).then(
             (response) => {
-                // TODO handle failure
-                updatedCalendar(response);
-                setCurrentEvent(null);
-                setEditOpen(false);
+                console.log("response", response);
+                if (!response.success) {
+                    // TODO show error to user
+                    console.log("Error deleting event ", curEvent, "Got response ", response);
+                    return;
+                }
+                updatedCalendar(response.calendar);
+                setCalendarType(calendarType); // Force calendar to re-render if necessary
+                setCurEvent(blankEvent(user));
+                setModalOpen(false);
             },
         );
     };
@@ -240,15 +281,24 @@ const _Calendar = ({
     };
 
     // Modal for adding a new event
-    const addModal = () => (
+    const modal = () => (
         <Modal
-            open={addOpen}
-            onClose={() => setAddOpen(false)}
+            open={modalOpen}
+            onClose={() => setModalOpen(false)}
             closeIcon
         >
-            <Modal.Header>
-                Add Event
-            </Modal.Header>
+            {editing
+            && (
+                <Modal.Header>
+                    Edit Event
+                </Modal.Header>
+            )}
+            {!editing
+            && (
+                <Modal.Header>
+                    Add Event
+                </Modal.Header>
+            )}
             <Modal.Content>
                 <Form>
                     <Form.Group>
@@ -256,80 +306,79 @@ const _Calendar = ({
                             Type
                             <Form.Field
                                 control={Radio}
-                                checked={newEvent.type === "event"}
+                                checked={curEvent.type === "event"}
                                 label="Event"
-                                onChange={() => setNewEvent({ ...newEvent, type: "event" })}
+                                onChange={() => setCurEvent({ ...curEvent, type: "event" })}
                             />
                             <Form.Field
                                 control={Radio}
-                                checked={newEvent.type === "workout"}
+                                checked={curEvent.type === "workout"}
                                 label="Workout"
-                                onChange={() => setNewEvent({ ...newEvent, type: "workout" })}
+                                onChange={() => setCurEvent({ ...curEvent, type: "workout" })}
                             />
                         </Label>
-                        { newEvent.type === "event"
+                        { curEvent.type === "event"
                         && (
                             <Input
                                 label="Title"
-                                value={newEvent.title}
-                                onChange={(_, v) => setNewEvent({ ...newEvent, title: v.value })}
+                                value={curEvent.title}
+                                onChange={(_, v) => setCurEvent({ ...curEvent, title: v.value })}
                             />
                         )}
                         { // TODO allow selecting multiple exercises
-                            newEvent.type === "workout"
+                            curEvent.type === "workout"
                         && (<div />)
                         }
                     </Form.Group>
                     <Form.Group inline>
                         <DatePicker
-                            selected={newEvent.start}
-                            onChange={(date) => setNewEvent({ ...newEvent, start: date })}
+                            selected={curEvent.start}
+                            onChange={(date) => setCurEvent({ ...curEvent, start: date })}
                         />
                         <TimeInput
                             mode="12h"
-                            value={newEvent.start}
+                            value={curEvent.start}
                             onChange={(time) => {
-                                const newStart = newEvent.start;
+                                const newStart = curEvent.start;
                                 newStart.setHours(time.getHours());
                                 newStart.setMinutes(time.getMinutes());
-                                setNewEvent({ ...newEvent, start: newStart });
+                                setCurEvent({ ...curEvent, start: newStart });
                             }}
                             autoOk
                         />
                         <Input
-                            labelPosition="right"
                             type="text"
-                            value={newEvent.durationStr}
-                            onChange={(_, v) => setNewEvent({
-                                ...newEvent,
+                            value={curEvent.durationStr}
+                            onChange={(_, v) => setCurEvent({
+                                ...curEvent,
                                 durationStr: v.value,
                                 duration: parseMinutesDuration(v.value),
                             })}
-                        >
-                            <Label>Duration</Label>
-                            <input />
-                            <Label color={newEvent.duration > 0 ? null : "red"}>
-                                {newEvent.duration > 0
-                                    ? `${newEvent.duration} minutes` : "Invalid Duration"}
-                            </Label>
-                        </Input>
+                            label="Duration"
+                        />
+                        <Label color={curEvent.duration > 0 ? null : "red"} pointing="left">
+                            {curEvent.duration > 0
+                                ? `${curEvent.duration} minutes` : "Invalid Duration"}
+                        </Label>
                     </Form.Group>
                     <Form.Group inline>
                         <Checkbox
-                            checked={newEvent.repeat}
-                            onClick={() => setNewEvent({ ...newEvent, repeat: !newEvent.repeat })}
+                            checked={curEvent.repeat}
+                            onClick={() => setCurEvent({ ...curEvent, repeat: !curEvent.repeat })}
                         />
                         &nbsp;Repeat every&nbsp;
                         <Input
-                            value={newEvent.repeatFreq}
-                            onChange={(_, v) => setNewEvent({ ...newEvent, repeatFreq: v.value })}
+                            value={curEvent.repeatFreq}
+                            onChange={(_, v) => setCurEvent({ ...curEvent, repeatFreq: v.value })}
+                            disabled={!curEvent.repeat}
                         />
                         <Dropdown
                             inline
                             selection
                             options={repeatUnitOptions}
-                            value={newEvent.repeatUnits}
-                            onChange={(_, v) => setNewEvent({ ...newEvent, repeatUnits: v.value })}
+                            value={curEvent.repeatUnits}
+                            onChange={(_, v) => setCurEvent({ ...curEvent, repeatUnits: v.value })}
+                            disabled={!curEvent.repeat}
                         />
                     </Form.Group>
                     {calendar.clientCalendars.length > 0 && (
@@ -338,8 +387,8 @@ const _Calendar = ({
                             <Dropdown
                                 selection
                                 options={clientCalendarOptions()}
-                                value={newEvent.client}
-                                onChange={(_, v) => setNewEvent({ ...newEvent, client: v.value })}
+                                value={curEvent.client}
+                                onChange={(_, v) => setCurEvent({ ...curEvent, client: v.value })}
                             />
                         </Form.Group>
                     )}
@@ -348,44 +397,32 @@ const _Calendar = ({
             <Modal.Actions>
                 <Button
                     onClick={() => {
-                        setAddOpen(false);
+                        setModalOpen(false);
                     }}
                 >
                     Cancel
                 </Button>
-                <Button
-                    positive
-                    onClick={createNewEvent}
-                >
-                    Create
-                </Button>
-            </Modal.Actions>
-        </Modal>
-    );
-
-    // Modal for editing existing event
-    const editModal = () => (
-        <Modal
-            open={editOpen}
-            onClose={() => setEditOpen(false)}
-            closeIcon
-        >
-            <Modal.Header>
-                Edit Event
-            </Modal.Header>
-            <Modal.Content>
-                TODO
-            </Modal.Content>
-            <Modal.Actions>
-                <Button
-                    negative
-                    onClick={() => {
-                        rmCurrentEvent();
-                        setEditOpen(false);
-                    }}
-                >
-                    Delete
-                </Button>
+                {!editing
+                && (
+                    <Button
+                        positive
+                        onClick={submitCurEvent}
+                    >
+                        Create
+                    </Button>
+                )}
+                {editing
+                && (
+                    <Button
+                        negative
+                        onClick={() => {
+                            rmCurrentEvent();
+                            setModalOpen(false);
+                        }}
+                    >
+                        Delete
+                    </Button>
+                )}
             </Modal.Actions>
         </Modal>
     );
@@ -478,8 +515,8 @@ const _Calendar = ({
                 <BigCalendar
                     localizer={localizer}
                     events={visibleEvents}
-                    onSelectSlot={toggleAddOpen}
-                    onSelectEvent={toggleEditOpen}
+                    onSelectSlot={openModalAdding}
+                    onSelectEvent={openModalEditing}
                     startAccessor="start"
                     endAccessor="end"
                     style={{ height: 500 }} // TODO move this to css
@@ -505,7 +542,7 @@ const _Calendar = ({
                 />
             </div>
             <div className="event-modal-container">
-                {addOpen ? addModal() : (editOpen ? editModal() : null)}
+                {modalOpen ? modal() : null}
             </div>
         </div>
     );
@@ -521,8 +558,6 @@ const mapDispatchToProps = (dispatch) => ({
     getUserCalendar: (id) => dispatch(getUserCalendarAction(id)),
     gotUserCalendar: (calendar) => dispatch(gotUserCalendarAction(calendar)),
     updatedCalendar: (event) => dispatch(updatedCalendarAction(event)),
-    addCalendarEvent: (event) => dispatch(addCalendarEventAction(event)),
-    rmCalendarEvent: (event) => dispatch(rmCalendarEventAction(event)),
 });
 
 _Calendar.propTypes = {
@@ -556,8 +591,6 @@ _Calendar.propTypes = {
     getUserCalendar: PropTypes.func.isRequired,
     gotUserCalendar: PropTypes.func.isRequired,
     updatedCalendar: PropTypes.func.isRequired,
-    addCalendarEvent: PropTypes.func.isRequired,
-    rmCalendarEvent: PropTypes.func.isRequired,
 };
 
 _Calendar.defaultProps = {

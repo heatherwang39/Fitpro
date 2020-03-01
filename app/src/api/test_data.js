@@ -32,11 +32,12 @@ export const exercise4 = new Exercise(24, "Barbell Deadlift", "Full Body", "Barb
     "Stand behind the barbell with the feet about shoulder-width apart, the toes slightly rotated out, and the shins almost touching the bar. Sit back into the hips slightly while keeping a straight back so that the chest is lifted upward, and bend forward to grip the bar in an over-under grip with one palm facing up and the other facing down. Squeeze the bar in the hands and sink back onto the hips while pressing the feet into the floor. Keeping the back flat, push the hips forward to move to standing position. Finish standing in a tall position with the shoulders pulled back and the legs straight. Return to the starting position by shifting the weight back into the hips and keep the back straight while allowing the knees to bend. When this movement is done properly, the glutes and the back of the thighs should feel the work, NOT the back.",
     "Advanced", "Pull");
 
-const Event = (title, start, end, userId) => ({
+const Event = (title, start, end, userId, id) => ({
     title,
     start,
     end,
     userId,
+    id,
 });
 
 const Availability = (start, end, userId, repeat) => ({
@@ -46,29 +47,29 @@ const Availability = (start, end, userId, repeat) => ({
 const today = (new Date()).getTime();
 
 const clientEvents = [
-    Event("Tues Night", new Date("February 18, 2020 21:00:00"), new Date("February 18, 2020 22:00:00"), 1),
-    Event("Wed Afternoon", new Date("February 19, 2020 15:00:00"), new Date("February 19, 2020 15:00:00"), 1),
-    Event("Thurs Morning", new Date("February 20, 2020 09:00:00"), new Date("February 20, 2020 11:00:00"), 1),
-    Event("Sat evening", new Date("February 22, 2020 18:00:00"), new Date("February 22, 2020 20:00:00"), 1),
-    Event("Client 1", new Date(today + 3600000), new Date(today + 3600000 * 2), 1),
-    Event("Client 2", new Date(today + 3600000 * 3), new Date(today + 3600000 * 4), 1),
-    Event("Client 3", new Date(today + 3600000 * 6), new Date(today + 3600000 * 7), 1),
-    Event("Client 4", new Date(today + 3600000 * 8), new Date(today + 3600000 * 10), 1),
-    Event("Sat evening", new Date("March 4, 2020 18:00:00"), new Date("February 22, 2020 20:00:00"), 1),
+    Event("Tues Night", new Date("February 18, 2020 21:00:00"), new Date("February 18, 2020 22:00:00"), 1, 1),
+    Event("Wed Afternoon", new Date("February 19, 2020 15:00:00"), new Date("February 19, 2020 15:00:00"), 1, 2),
+    Event("Thurs Morning", new Date("February 20, 2020 09:00:00"), new Date("February 20, 2020 11:00:00"), 1, 3),
+    Event("Sat evening", new Date("February 22, 2020 18:00:00"), new Date("February 22, 2020 20:00:00"), 1, 4),
+    Event("Client 1", new Date(today + 3600000), new Date(today + 3600000 * 2), 1, 5),
+    Event("Client 2", new Date(today + 3600000 * 3), new Date(today + 3600000 * 4), 1, 6),
+    Event("Client 3", new Date(today + 3600000 * 6), new Date(today + 3600000 * 7), 1, 7),
+    Event("Client 4", new Date(today + 3600000 * 8), new Date(today + 3600000 * 10), 1, 8),
+    Event("Sat evening", new Date("March 4, 2020 18:00:00"), new Date("February 22, 2020 20:00:00"), 1, 9),
 ];
 
 const client2Events = [
-    Event("Wed Night", new Date("February 19, 2020 21:00:00"), new Date("February 19, 2020 22:00:00"), 3),
-    Event("Thurs Morning", new Date("February 20, 2020 11:00:00"), new Date("February 20, 2020 12:00:00"), 3),
-    Event("Sun evening", new Date("February 23, 2020 18:00:00"), new Date("February 23, 2020 20:00:00"), 3),
+    Event("Wed Night", new Date("February 19, 2020 21:00:00"), new Date("February 19, 2020 22:00:00"), 3, 10),
+    Event("Thurs Morning", new Date("February 20, 2020 11:00:00"), new Date("February 20, 2020 12:00:00"), 3, 11),
+    Event("Sun evening", new Date("February 23, 2020 18:00:00"), new Date("February 23, 2020 20:00:00"), 3, 12),
 ];
 
 const trainerEvents = [
-    Event("Personal Event", new Date("February 22, 2020 21:00:00"), new Date("February 22, 2020 23:00:00"), 2),
-    Event("Client 1", new Date(today + 3600000), new Date(today + 3600000 * 2), 2),
-    Event("Client 2", new Date(today + 3600000 * 3), new Date(today + 3600000 * 4), 2),
-    Event("Client 3", new Date(today + 3600000 * 6), new Date(today + 3600000 * 7), 2),
-    Event("Client 4", new Date(today + 3600000 * 8), new Date(today + 3600000 * 10), 2),
+    Event("Personal Event", new Date("February 22, 2020 21:00:00"), new Date("February 22, 2020 23:00:00"), 2, 13),
+    Event("Client 1", new Date(today + 3600000), new Date(today + 3600000 * 2), 2, 14),
+    Event("Client 2", new Date(today + 3600000 * 3), new Date(today + 3600000 * 4), 2, 15),
+    Event("Client 3", new Date(today + 3600000 * 6), new Date(today + 3600000 * 7), 2, 16),
+    Event("Client 4", new Date(today + 3600000 * 8), new Date(today + 3600000 * 10), 2, 17),
 ];
 
 const trainerAvailability = [
