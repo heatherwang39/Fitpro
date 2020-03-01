@@ -36,6 +36,7 @@ export const TestAPI = {
             return {};
         }
     },
+
     searchTrainer: async (firstname) => {
         switch (firstname) {
         case "Jamie":
@@ -51,19 +52,17 @@ export const TestAPI = {
             return {};
         }
     },
-    getProfile: async (id, token) => {
-        (() => {
-        })(token);
+
+    getProfile: async (id) => {
         switch (id) {
         case 1:
-            return clientUser;
+            return { success: true, profile: clientUser };
         case 2:
-            return trainerUser;
+            return { success: true, profile: trainerUser };
         case 3:
-            return client2User;
+            return { success: true, profile: client2User };
         default:
-            console.log(`INVALID ID ${id}`);
-            return {};
+            return { success: false, error: `Invalid user ID ${id}` };
         }
     },
 
@@ -117,6 +116,7 @@ export const TestAPI = {
         success: true,
         calendar: calendarWithoutEvent(calendar, event),
     }),
+
     createCalendarEvent: async (event, calendar) => ({
         success: true,
         calendar: calendarWithNewEvent(calendar, event),
@@ -133,6 +133,7 @@ export const TestAPI = {
         }
     },
 
+    updateProfile: async (profile) => ({ success: true, profile }),
 };
 
 export default TestAPI;

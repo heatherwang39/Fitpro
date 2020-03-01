@@ -7,7 +7,8 @@
     "test": "echo TODO set up tests",
     "build": "webpack -p",
     "start": "webpack-dev-server --open",
-    "lint": "eslint \"./**/*.js\" \"./**/*.jsx\""
+    "lint": "eslint \"./**/*.js\" \"./**/*.jsx\"",
+    "lint-fix": "eslint \"./**/*.js\" \"./**/*.jsx\" --fix"
   },
   "author": "",
   "license": "ISC",

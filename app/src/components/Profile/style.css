@@ -1,10 +1,21 @@
 .profile-avatar {
-    width: 300px;
-    height: 300px;
+    width: 128px;
+    height: 128px;
     margin-left: auto;
     margin-right: auto;
+    margin-top: 16px;
 }
 
 .profile {
+    padding: 16px;
+    font-size: 20pt;
+}
+
+.profile-editing {
+    padding: 16px;
+    font-size: 16pt;
+}
+
+.profile.p {
     padding: 16px;
 }
