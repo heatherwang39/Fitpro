@@ -47,3 +47,11 @@
     padding-left: 0;
     padding-right: 4em;
 }
+
+.TimePicker-header-81 {
+    background: black !important;
+}
+
+.Clock-pointer-91, .Clock-innerDot-94, .Clock-outerDot-95, .Clock-innerDot-276, .Clock-outerDot-277, .Clock-animatedPointer-92 {
+    background-color: black !important;
+}

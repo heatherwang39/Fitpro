@@ -7,7 +7,9 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import {
     Button, Dropdown, Form, Input, Label, Modal, Radio, Segment, Checkbox,
 } from "semantic-ui-react";
-import "react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import TimeInput from "material-ui-time-picker";
 import {
     addCalendarEvent as addCalendarEventAction,
     getUserCalendar as getUserCalendarAction,
@@ -20,7 +22,6 @@ import { Calendar as CalendarType } from "../../types/calendar";
 import API from "../../api";
 import "./style.css";
 
-// These are used in reverse order (last element is used for first client)
 const ALL_EVENT_COLOURS = [
     "lightgreen",
     "orange",
@@ -97,7 +98,7 @@ const _Calendar = ({
         duration: 60,
         durationStr: "60",
         repeat: false,
-        repeatFreq: "60",
+        repeatFreq: "1",
         repeatUnits: "days",
         client: user.id.toString(),
         type: "event",
@@ -169,10 +170,7 @@ const _Calendar = ({
     };
 
     const parseMinutesDuration = (input) => {
-        if (input.match(/^\d+$/)) {
-            console.log("literal", input);
-            return parseInt(input, 10);
-        }
+        if (input.match(/^\d+$/)) return parseInt(input, 10);
         const minsMatch = input.match(/(\d)+\s*[mM].*/);
         if (minsMatch != null) return parseInt(minsMatch[1], 10);
         const hoursAndMinsMatch = input.match(/(\d)+\s*[h:][oOuUrR\s]*((\d)+[mM]?)?.*/);
@@ -191,6 +189,7 @@ const _Calendar = ({
         } else {
             return false;
         }
+        if (newEvent.start < new Date()) return false;
         newEvent.durationStr = undefined;
         newEvent.end = new Date(newEvent.start.getTime() + newEvent.duration * 60);
         newEvent.personalEvent = newEvent.user === user;
@@ -281,7 +280,22 @@ const _Calendar = ({
                         && (<div />)
                         }
                     </Form.Group>
-                    <Form.Group>
+                    <Form.Group inline>
+                        <DatePicker
+                            selected={newEvent.start}
+                            onChange={(date) => setNewEvent({ ...newEvent, start: date })}
+                        />
+                        <TimeInput
+                            mode="12h"
+                            value={newEvent.start}
+                            onChange={(time) => {
+                                const newStart = newEvent.start;
+                                newStart.setHours(time.getHours());
+                                newStart.setMinutes(time.getMinutes());
+                                setNewEvent({ ...newEvent, start: newStart });
+                            }}
+                            autoOk
+                        />
                         <Input
                             labelPosition="right"
                             type="text"
