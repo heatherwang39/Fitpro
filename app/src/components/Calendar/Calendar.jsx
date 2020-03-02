@@ -10,6 +10,7 @@ import {
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import TimeInput from "material-ui-time-picker";
+import useStateWithCallback from "use-state-with-callback";
 import {
     getUserCalendar as getUserCalendarAction,
     gotUserCalendar as gotUserCalendarAction,
@@ -93,15 +94,19 @@ const _Calendar = ({
     // Local state
     const [modalOpen, setModalOpen] = React.useState(false);
     const [editing, setEditing] = React.useState(false); // True if editing existing event, false if making new event
-    const [selectedClient, setSelectedClient] = React.useState(
-        calendar.clientCalendars && calendar.clientCalendars.length > 0 ? calendar.clientCalendars[0] : null,
-    );
     const [visibleEvents, setVisibleEvents] = React.useState(calendar.userCalendar.events);
     const [calendarType, setCalendarTypeState] = React.useState("default");
     const [availableColours, setAvailableColours] = React.useState(ALL_EVENT_COLOURS);
     const [uidColours, setUidColours] = React.useState(new Map());
     const [changeToClient, setChangeToClient] = React.useState(false);
     const [selectedWorkout, setSelectedWorkout] = React.useState(null);
+    const [lastSelectedClient, setLastSelectedClient] = React.useState(null);
+    const [selectedClient, setSelectedClient] = useStateWithCallback(null, (client) => {
+        if (client != null && client !== lastSelectedClient) {
+            setCalendarType("client"); // eslint-disable-line no-use-before-define
+        }
+        setLastSelectedClient(client);
+    });
 
     // Properties of event currently being created/modified
     const [curEvent, setCurEvent] = React.useState(blankEvent(user));
@@ -123,12 +128,13 @@ const _Calendar = ({
             if (selectedClient === null) setVisibleEvents([]);
             setVisibleEvents(selectedClient.calendar.events);
             break;
-        default:
+        // no default
         }
     };
 
+
     // Select the client that was passed with location if they are a client of this trainer
-    if (location != null && user.isTrainer && typeof location.state !== "undefined" && selectedClient === "") {
+    if (location != null && user.isTrainer && typeof location.state !== "undefined" && selectedClient === null) {
         let found = false;
         for (let i = 0; i < calendar.clientCalendars.length; i++) {
             if (calendar.clientCalendars[i].id === location.state.userId) {
@@ -197,13 +203,7 @@ const _Calendar = ({
         newCurEvent.durationStr = newCurEvent.duration.toString();
         setCurEvent(newCurEvent);
         setModalOpen(!modalOpen);
-        console.log(curEvent.duration, curEvent.durationStr);
     };
-
-    // if (curEvent.duration === 0 && curEvent.end !== undefined && curEvent.end > curEvent.start) {
-    //     const duration = Math.floor((Math.abs(curEvent.end - curEvent.start) / 1000) / 60); // Minutes
-    //     setCurEvent({ ...curEvent, duration, durationStr: duration.toString() });
-    // }
 
     const parseMinutesDuration = (input) => {
         if (input.match(/^\d+$/)) return parseInt(input, 10);
@@ -235,7 +235,6 @@ const _Calendar = ({
         }
         if (selectedWorkout != null) curEvent.workout = selectedWorkout;
         const end = new Date(curEvent.start.getTime() + curEvent.duration * 60000);
-        console.log("end", end);
         const personalEvent = curEvent.userId === user.id;
         setCurEvent({
             ...curEvent, title, end, personalEvent,
@@ -264,13 +263,11 @@ const _Calendar = ({
                     return;
                 }
                 updatedCalendar(response.calendar);
-                console.log(response.calendar);
                 setCalendarType(calendarType); // Force calendar to re-render if necessary
                 setCurEvent(blankEvent(user));
                 setModalOpen(false);
             },
         );
-        return true;
     };
 
     const rmCurrentEvent = () => {
@@ -308,22 +305,22 @@ const _Calendar = ({
         return items;
     };
 
-    const workoutOptions = () => {
-        // TODO fetch these from server dynamically based on user input
-        const workouts = [];
-        for (let i = 0; i < allWorkouts.length; i++) {
-            workouts.push({ key: i + 1, value: allWorkouts[i].id.toString(), text: allWorkouts[i].name });
-        }
-        return workouts;
-    };
+    // const workoutOptions = () => {
+    // // TODO fetch these from server dynamically based on user input
+    // const workouts = [];
+    // for (let i = 0; i < allWorkouts.length; i++) {
+    // workouts.push({ key: i + 1, value: allWorkouts[i].id.toString(), text: allWorkouts[i].name });
+    // }
+    // return workouts;
+    // };
 
-    const toggleSelectedWorkout = () => {
-        if (selectedWorkout == null) {
-            setSelectedWorkout(workoutOptions()[0].value);
-        } else {
-            setSelectedWorkout(null);
-        }
-    };
+    // const toggleSelectedWorkout = () => {
+    // if (selectedWorkout == null) {
+    // setSelectedWorkout(workoutOptions()[0].value);
+    // } else {
+    // setSelectedWorkout(null);
+    // }
+    // };
 
     // Modal for adding a new event
     const modal = () => (
@@ -352,21 +349,23 @@ const _Calendar = ({
                             value={curEvent.title}
                             onChange={(_, v) => setCurEvent({ ...curEvent, title: v.value })}
                         />
-                        <Label id="include-workouts-radio">
-                            Include Workout
-                            <Checkbox
-                                checked={selectedWorkout !== null}
-                                onChange={toggleSelectedWorkout}
-                            />
-                        </Label>
-                        <Dropdown
-                            inline
-                            selection
-                            options={workoutOptions()}
-                            value={selectedWorkout}
-                            onChange={(_, v) => setSelectedWorkout(v.value)}
-                            disabled={selectedWorkout == null}
-                        />
+                        {
+                            // <Label id="include-workouts-radio">
+                            // Include Workout
+                            // <Checkbox
+                            // checked={selectedWorkout !== null}
+                            // onChange={toggleSelectedWorkout}
+                            // />
+                        // </Label>
+                        // <Dropdown
+                            // inline
+                            // selection
+                            // options={workoutOptions()}
+                            // value={selectedWorkout}
+                            // onChange={(_, v) => setSelectedWorkout(v.value)}
+                            // disabled={selectedWorkout == null}
+                        // />
+                        }
                     </Form.Group>
                     <Form.Group inline>
                         <DatePicker
@@ -502,6 +501,7 @@ const _Calendar = ({
         setCalendarType("me");
     }
 
+
     return (
         <div className="page">
             <h4 className="center">Click an event for more info or click a blank day to add an event</h4>
@@ -537,7 +537,6 @@ const _Calendar = ({
                                         onChange={() => setCalendarType("client")}
                                     />
                                     <Dropdown
-                                        search
                                         selection
                                         options={calendar.clientCalendars.map(
                                             (cal) => ({
@@ -546,13 +545,11 @@ const _Calendar = ({
                                                 value: cal.id,
                                             }),
                                         )}
-                                        value={selectedClient.id}
+                                        value={selectedClient === null ? "" : selectedClient.id}
                                         onChange={(_, v) => {
-                                            console.log(calendar.clientCalendars.filter((c) => c.id === v.value)[0]);
                                             setSelectedClient(calendar.clientCalendars.filter(
                                                 (c) => c.id === v.value,
                                             )[0]);
-                                            setCalendarType("client");
                                         }}
                                     />
                                 </Form.Field>

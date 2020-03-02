@@ -298,9 +298,11 @@ const _Profile = ({
                     </Grid.Row>
                     <Grid.Row>
                         {user != null && profile.trainers.includes(user.id) && (
-                            <Link to={{ pathname: "/calendar", state: { userId: profile.id } }}>
-                                <Button>Calendar</Button>
-                            </Link>
+                            <p>
+                                <Link to={{ pathname: "/calendar", state: { userId: profile.id } }}>
+                                    <Button>Calendar</Button>
+                                </Link>
+                            </p>
                         )}
                     </Grid.Row>
                 </Grid.Column>
