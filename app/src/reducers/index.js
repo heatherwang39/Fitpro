@@ -3,7 +3,6 @@ import authReducer from "./authReducer";
 import calendarReducer from "./calendarReducer";
 import relationshipReducer from "./relationshipReducer";
 import userReducer from "./userReducer";
-import trainersReducer from "./trainersReducer";
 import exerciseReducer from "./exerciseReducer";
 
 
@@ -13,6 +12,5 @@ export default combineReducers({
     calendarReducer,
     relationshipReducer,
     userReducer,
-    trainersReducer,
     exerciseReducer,
 });

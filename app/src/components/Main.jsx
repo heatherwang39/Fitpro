@@ -40,7 +40,7 @@ const Main = () => (
                     component={Calendar}
                 />
                 <Route
-                    path="/trainers"
+                    path="/my_trainers"
                     component={SearchTrainer}
                 />
                 <Route
