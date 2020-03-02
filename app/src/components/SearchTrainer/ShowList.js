@@ -1,15 +1,7 @@
 import React from "react";
 import faker from "faker";
-// import API from "../../api";
-import {
-    trainerUser1, trainerUser2, trainerUser3, trainerUser4,
-} from "../../api/test_data";
 
-const trainerList = [
-    trainerUser1, trainerUser2, trainerUser3, trainerUser4,
-];
-
-const ShowList=()=> {
+const ShowList=(trainerList)=> {
     return (trainerList.map((trainer) => {
         return(
             <div key={trainer.firstname} className="item">

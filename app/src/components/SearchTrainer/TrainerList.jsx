@@ -3,22 +3,37 @@ import PropTypes from "prop-types";
 import faker from "faker";
 
 import TrainerDetail from "./TrainerDetail";
-import {
-    trainerUser1, trainerUser2, trainerUser3, trainerUser4,
-} from "../../api/test_data";
-
-const trainerList = [
-    trainerUser1, trainerUser2, trainerUser3, trainerUser4,
-];
+import API from "../../api";
 
 class TrainerList extends Component {
     constructor(props) {
         super(props);
-        this.state = { selectedTrainer: null };
+        this.state = { selectedTrainer: null, trainerList: null, searchedName: props.searchedName, filters: props.filters };
+        this.getSearchResults();
+    }
+
+    async getSearchResults() {
+        API.searchTrainer({text: this.state.searchedName, filters: this.state.filters}).then(
+            (response) => {
+                if (!response.success) {
+                    // TODO show error to user
+                    console.log("Error searching, got response ", response);
+                    return;
+                }
+                this.setState({...this.state, searching: false, trainerList: response.results});
+            }
+        );
+    }
+
+    // TODO refactor this to not use deprecated method
+    UNSAFE_componentWillReceiveProps({searchedName, filters}) {
+        const needNewResults = this.state.searchedName !== searchedName || this.state.filters !== filters;
+        this.setState({...this.state, searchedName, filters}, () => needNewResults ? this.getSearchResults() : null);
     }
 
     showList() {
-        return (trainerList.map((trainer) => {
+        if (this.state.trainerList === null) return (<div>Loading</div>)
+        return (this.state.trainerList.map((trainer) => {
             return(
                 <div key={trainer.firstname} className="item">
                     <div className="ui small image">
@@ -26,9 +41,7 @@ class TrainerList extends Component {
                     </div>
                     <div className="content">
                         <a className="header">
-                            Name:
-                            {trainer.firstname}
-                            {trainer.lastname}
+                            {`Name: ${trainer.firstname} ${trainer.lastname}`}
                         </a>
                         <div className="meta">
                             <span>Price:</span>
@@ -60,16 +73,16 @@ class TrainerList extends Component {
         );
     }
 
-    showOne() {
-        const searchTrainerByName = (trainer) => {
-            return trainer.firstname === this.props.searchedName
-        };
-        const searchedTrainer = trainerList.filter(searchTrainerByName);
-        console.log(searchedTrainer[0])
-    }
+    //showOne() {
+        //const searchTrainerByName = (trainer) => {
+            //return trainer.firstname === this.props.searchedName
+        //};
+        //const searchedTrainer = trainerList.filter(searchTrainerByName);
+        //console.log(searchedTrainer[0])
+    //}
 
     render() {
-        console.log(trainerList);
+        //console.log(trainerList);
         return (
             <div className="wrapper ui grid">
                 <div className="filterContainer ten wide column">
@@ -95,10 +108,6 @@ TrainerList.defaultProps = {
     searchedName: null,
 };
 
-TrainerList.propTypes = {
-    TrainerListProps: PropTypes.object,
-    searchedName: PropTypes.string,
-};
 
 
 /*

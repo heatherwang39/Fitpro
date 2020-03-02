@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-
+import { Input } from "semantic-ui-react";
 import TrainerList from "./TrainerList";
 
 import Filter from './Filter';
@@ -9,7 +9,7 @@ import Filter from './Filter';
 class SearchTrainer extends Component {
     constructor(props) {
         super(props);
-        this.state = { searchedName: null };
+        this.state = { searchedName: "", filters: {} };
     }
 
     onFormSubmit(e) {
@@ -28,15 +28,16 @@ class SearchTrainer extends Component {
                     <form onSubmit={(e) => { this.onFormSubmit(e); }} className="ui form">
                         <div className="field">
                             <h3>Search Trainers</h3>
-                            <input
+                            <Input
                                 type="text"
-                                placeholder="please enter name..."
-                                onChange={(e) => { console.log(e.target.value); }}
+                                placeholder="Search for a trainer..."
+                                value={this.state.searchedName}
+                                onChange={(_, v) => { this.setState({searchedName: v.value})}}
                             />
                         </div>
                     </form>
                     <br />
-                    <TrainerList searchedName={this.state.searchedName} />
+                    <TrainerList searchedName={this.state.searchedName} filters={this.state.filters} />
                 </div>
             </div>
         );

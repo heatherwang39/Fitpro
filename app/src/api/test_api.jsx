@@ -20,6 +20,8 @@ const calendarWithoutEvent = (calendar, event) => {
     return newCalendar;
 };
 
+const allTrainers = [trainerUser1, trainerUser2, trainerUser3, trainerUser4];
+
 export const TestAPI = {
     searchExercise: async (exerciseName) => {
         switch (exerciseName) {
@@ -37,20 +39,22 @@ export const TestAPI = {
         }
     },
 
-    searchTrainer: async (firstname) => {
-        switch (firstname) {
-        case "Jamie":
-            return trainerUser1;
-        case "Mika":
-            return trainerUser2;
-        case "Andy":
-            return trainerUser3;
-        case "Ivy":
-            return trainerUser4;
-        default:
-            console.log(`INVALID FIRSTNAME ${firstname}`);
-            return {};
-        }
+    searchTrainer: async (query) => {
+        query.text = query.text.toLowerCase();
+        const results = [];
+        allTrainers.forEach((trainer) => {
+            if (query.text != undefined && query.text.length > 0) {
+                if (!trainer.firstname.toLowerCase().includes(query.text) &&
+                    !trainer.lastname.toLowerCase().includes(query.text)) {
+                    return;
+                }
+            }
+            results.push(trainer);
+        });
+        return {
+            success: true,
+            results
+        };
     },
 
     getProfile: async (id) => {
