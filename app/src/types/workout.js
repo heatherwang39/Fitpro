@@ -11,7 +11,7 @@ export const workoutExerciseList = (exercises, params) => exercises.map(
  * A single workout consisting of exercises and their parameters
  */
 export class Workout {
-    constructor(id, workoutExercises, name, ownerUserId) {
+    constructor(id, name, ownerUserId, workoutExercises) {
         this.id = id;
         this.name = name;
         this.ownerUserId = ownerUserId;

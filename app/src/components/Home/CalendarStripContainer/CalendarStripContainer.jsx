@@ -42,7 +42,7 @@ const CalendarStripContainer = ({
         if (!calendar.gettingCalendar) {
             getUserCalendar(calUserId);
             API.getUserCalendar(calUserId).then((response) => {
-                console.log("response", response);
+                if (!response.success) console.log("Error getting user calendar, got response ", response);
                 // TODO handle failure
                 gotUserCalendar(response);
                 setFilteredCalendar(formatEventsListToObject(response.userCalendar.events));

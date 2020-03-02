@@ -38,11 +38,6 @@
     background-color: green;
 }
 
-.test {
-    width: 50%;
-    height: 50%;
-}
-
 .caltype-label {
     padding-left: 0;
     padding-right: 4em;
@@ -54,4 +49,9 @@
 
 .Clock-pointer-91, .Clock-innerDot-94, .Clock-outerDot-95, .Clock-innerDot-276, .Clock-outerDot-277, .Clock-animatedPointer-92 {
     background-color: black !important;
+}
+
+#include-workouts-radio {
+    margin-left: 8em;
+    margin-right: 2em;
 }

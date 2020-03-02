@@ -83,3 +83,6 @@ export const client2Calendar = new Calendar(client2Events, [], 3);
 
 
 export const testWorkout = new Workout(11, "Test Workout", 1, [{ exercise: exercise2, params: { name: "reps", value: 10 } }]);
+export const testWorkout2 = new Workout(12, "Other Test Workout", 1, [{ exercise: exercise2, params: { name: "reps", value: 10 } }]);
+export const testWorkout3 = new Workout(13, "Some Workout", 1, [{ exercise: exercise2, params: { name: "reps", value: 10 } }]);
+export const allWorkouts = [testWorkout, testWorkout2, testWorkout3];

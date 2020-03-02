@@ -104,7 +104,6 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
     _loginSuccess: (user) => dispatch(loginSuccess(user)),
     _gotUserInfo: (userInfo) => dispatch(gotUserInfo(userInfo)),
-    _gotProfile: (profile) => dispatch(gotProfile(profile)),
 });
 
 RegisterContainer.propTypes = {

@@ -6,19 +6,35 @@ import {
     exercise4,
 } from "./test_data";
 
+let lastEventId = 10;
+
 const calendarWithNewEvent = (calendar, event) => {
     if (calendar == null) return null;
     const newCalendar = calendar;
-    newCalendar.events.push(event);
+    let notFound = true;
+    for (let i = 0; i < newCalendar.events.length; i++) {
+        if (newCalendar.events[i].id === event.id) {
+            newCalendar.events[i] = event;
+            notFound = false;
+        }
+    }
+    if (notFound) {
+        lastEventId++;
+        const newEvent = event;
+        newEvent.id = lastEventId;
+        newCalendar.events.push(newEvent);
+    }
     return newCalendar;
 };
 
 const calendarWithoutEvent = (calendar, event) => {
+    console.log(calendar, event);
     if (calendar == null) return null;
     const newCalendar = calendar;
     newCalendar.events = calendar.events.filter((e) => e.id !== event.id);
     return newCalendar;
 };
+
 
 export const TestAPI = {
     searchExercise: async (exerciseName) => {

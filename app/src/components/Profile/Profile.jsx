@@ -129,14 +129,15 @@ const _Profile = ({
                             }
                             <img
                                 alt={`${profile.firstname} ${profile.lastname}`}
-                                src={typeof profile.imageUrl === "undefined" || profile.imageUrl == null || profile.imageUrl.length === 0
+                                src={typeof profile.imageUrl === "undefined" || profile.imageUrl == null
+                                                                             || profile.imageUrl.length === 0
                                     ? defaultProfileImage : profile.imageUrl}
                                 className="profile-avatar"
                             />
                         </Grid.Row>
                         {profile.id === user.id && (
                             <Grid.Row>
-                                <Button onClick={cancelEdits} negative>cancel</Button>
+                                <Button onClick={cancelEdits} negative>Cancel</Button>
                                 <Button onClick={saveEdits} positive>Save</Button>
                             </Grid.Row>
                         )}
