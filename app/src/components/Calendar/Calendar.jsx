@@ -270,6 +270,7 @@ const _Calendar = ({
                 setModalOpen(false);
             },
         );
+        return true;
     };
 
     const rmCurrentEvent = () => {

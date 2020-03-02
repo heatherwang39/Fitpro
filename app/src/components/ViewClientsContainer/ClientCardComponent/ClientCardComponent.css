@@ -1,0 +1,73 @@
+.client-card-container {
+    width: 180px;
+    height: 282px;
+    background-color: white;
+    border-radius: 2px;
+    border: 1px solid grey;
+    margin: 10px 12px 10px 0px;
+    padding: 12px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.client-card-container:hover {
+    border: 1px solid black;
+}
+
+.client-card-body {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    height: 220px;
+    justify-content: center;
+}
+
+.client-card-body h1 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 5px 10px 5px 10px;
+    text-overflow: ellipsis;
+    text-align: center;
+    height: 19px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.client-card-body h2 {
+    margin: auto;
+    margin: 5px 0 5px 0;
+    font-size: 15px;
+    text-align: center;
+}
+
+.client-card-body h3 {
+    margin: 5px 0 5px 0;
+    font-size: 15px;
+}
+
+.client-card-body h4 {
+    margin: 5px 0 15px 0;
+    font-size: 15px;
+}
+
+.client-card-calendar-button {
+    width: 20px;
+    margin-left: auto;
+    background-color: white;
+    border: none;
+}
+
+.client-card-footer {
+    flex: 1;
+}
+
+.client-card-image-container {
+    height: 40px;
+    width: 96px;
+    height: 96px;
+    margin: 0px 29px 5px 29px;
+    border-radius: 50%;
+}

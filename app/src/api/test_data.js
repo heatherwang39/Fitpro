@@ -4,12 +4,18 @@ import { Calendar } from "../types/calendar";
 import { Exercise } from "../types/exercise";
 import { workoutExerciseList, Workout } from "../types/workout";
 
-export const clientUser = new User(1, "user", "ClientFirst", "ClientLast", "client@mail.com",
+export const clientUser = new User(1, "user", "George", "Attwel", "client@mail.com",
     "555-555-1234", "Toronto", "6'0", "200lb", false, false, "goalType", 2.5, [2], []);
 export const trainerUser = new User(2, "user2", "TrainerFirst", "TrainerLast", "trainer@mail.com",
-    "555-123-4567", "Toronto", "6'3", "220lb", true, false, "goalType", 4, [], [1, 3]);
-export const client2User = new User(1, "user3", "Client2First", "Client2Last", "client2@mail.com",
+    "555-123-4567", "Toronto", "6'3", "220lb", true, false, "goalType", 4, [], [1, 3, 4, 5]);
+export const client2User = new User(3, "user3", "Client2First", "Client2Last", "client2@mail.com",
     "555-555-4321", "Toronto", "6'1", "190lb", false, false, "goalType", 3.5, [2], []);
+export const client3User = new User(4, "user4", "Client4First", "Client4Last", "client4@mail.com",
+    "555-555-4321", "Toronto", "6'1", "190lb", false, false, "goalType", 3.5, [2], []);
+
+export const client4User = new User(5, "user5", "Client5First", "Client5Last", "client5@mail.com",
+    "555-555-4321", "Toronto", "6'1", "190lb", false, false, "goalType", 3.5, [2], []);
+
 
 export const trainerUser1 = new User(11, "user11", "Jamie", "Doe", "trainer11@mail.com",
     "555-123-4544", "Toronto", "6'3", "230lb", true, false, "goalType", 4.5, [], []);

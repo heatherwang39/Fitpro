@@ -22,11 +22,7 @@ const CalendarStripContainer = ({
         oneWeekFromNow.setDate((new Date()).getDate() + 7);
         events.forEach((event) => {
             const { start } = event;
-            const month = start.getUTCMonth() + 1;
-            const day = start.getUTCDate();
-            const year = start.getUTCFullYear();
-
-            const newDate = `${year}/${month}/${day}`;
+            const newDate = start.toLocaleDateString();
             if (start.getTime() > oneWeekFromNow.getTime() || start.getTime() < (new Date()).getTime()) return;
             // Remove the following line if you want events that occur for the next week
             if (start.getDate() !== (new Date()).getDate()) return;

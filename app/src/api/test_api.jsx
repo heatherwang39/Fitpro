@@ -3,7 +3,7 @@
 import {
     clientUser, client2User, trainerUser, clientCalendar, client2Calendar, trainerCalendar,
     trainerUser1, trainerUser2, trainerUser3, trainerUser4, exercise1, exercise2, exercise3,
-    exercise4,
+    exercise4, client3User, client4User,
 } from "./test_data";
 
 let lastEventId = 10;
@@ -147,6 +147,17 @@ export const TestAPI = {
         default:
             return { success: true, user: clientUser };
         }
+    },
+
+    getRelationships: async (userInfo) => {
+        if (userInfo.username.includes("user")) {
+            return {
+                success: true,
+                clients: [clientUser, client2User, client3User, client4User],
+                trainers: [trainerUser1],
+            };
+        }
+        return { success: false };
     },
 
     updateProfile: async (profile) => ({ success: true, profile }),
