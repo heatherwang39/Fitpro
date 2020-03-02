@@ -49,6 +49,11 @@ export const TestAPI = {
                     return;
                 }
             }
+            if (query.filters !== undefined) { // Just in case request forgets to include
+                if (query.filters.minRating !== undefined && query.filters.minRating > trainer.rating) return;
+                if (query.filters.gender !== undefined && query.filters.gender != trainer.gender) return;
+                if (query.filters.maxPrice !== undefined && query.filters.maxPrice < trainer.price) return;
+            }
             results.push(trainer);
         });
         return {

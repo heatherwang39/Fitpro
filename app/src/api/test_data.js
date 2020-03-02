@@ -5,20 +5,20 @@ import { Exercise } from "../types/exercise";
 import { workoutExerciseList, Workout } from "../types/workout";
 
 export const clientUser = new User(1, "user", "ClientFirst", "ClientLast", "client@mail.com",
-    "555-555-1234", "Toronto", "6'0", "200lb", false, false, "goalType", 2.5, [2], []);
+    "555-555-1234", "Toronto", "6'0", "200lb", false, false, "goalType", 2.5, [2], [], "male", 20);
 export const trainerUser = new User(2, "user2", "TrainerFirst", "TrainerLast", "trainer@mail.com",
-    "555-123-4567", "Toronto", "6'3", "220lb", true, false, "goalType", 4, [], [1, 3]);
+    "555-123-4567", "Toronto", "6'3", "220lb", true, false, "goalType", 4, [], [1, 3], "male", 30);
 export const client2User = new User(1, "user3", "Client2First", "Client2Last", "client2@mail.com",
-    "555-555-4321", "Toronto", "6'1", "190lb", false, false, "goalType", 3.5, [2], []);
+    "555-555-4321", "Toronto", "6'1", "190lb", false, false, "goalType", 3.5, [2], [], "male", 30);
 
 export const trainerUser1 = new User(11, "user11", "Jamie", "Doe", "trainer11@mail.com",
-    "555-123-4544", "Toronto", "6'3", "230lb", true, false, "goalType", 4.5, [], []);
+    "555-123-4544", "Toronto", "6'3", "230lb", true, false, "goalType", 4.5, [], [], "male", 20);
 export const trainerUser2 = new User(12, "user12", "Mika", "Lahey", "trainer12@mail.com",
-    "555-123-4555", "Toronto", "6'2", "220lb", true, false, "goalType", 4.0, [], []);
+    "555-123-4555", "Toronto", "6'2", "220lb", true, false, "goalType", 4.0, [], [], "male", 25);
 export const trainerUser3 = new User(13, "user13", "Andy", "Richards", "trainer13@mail.com",
-    "555-123-4566", "Toronto", "6'1", "210lb", true, false, "goalType", 3.5, [], []);
+    "555-123-4566", "Toronto", "6'1", "210lb", true, false, "goalType", 3.5, [], [], "male", 35);
 export const trainerUser4 = new User(14, "user14", "Ivy", "Persson", "trainer14@mail.com",
-    "555-123-4577", "Toronto", "6'0", "200lb", true, false, "goalType", 3.0, [], []);
+    "555-123-4577", "Toronto", "6'0", "200lb", true, false, "goalType", 3.0, [], [], "female", 30);
 
 export const exercise1 = new Exercise(21, "Barbell Bench Press", "Chest, Shoulders, Triceps",
     "Bench, Barbell", "Lie face up on a flat bench, and grip a barbell with the hands slightly wider than shoulder-width. Press the feet into the ground and the hips into the bench while lifting the bar off the rack. Slowly lower the bar to the chest by allowing the elbows to bend out to the side. Stop when the elbows are just below the bench, and press feet into the floor to press the weight straight up to return to the starting position.",
