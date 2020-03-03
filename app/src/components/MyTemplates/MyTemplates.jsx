@@ -1,15 +1,15 @@
 import { connect } from "react-redux";
 import React from "react";
-import { Link } from "react-router-dom";
 import { PropTypes } from "prop-types";
 import useStateWithCallback from "use-state-with-callback";
 
 import {
-    Button, Container, Dropdown, Grid,
+    Button, Checkbox, Container, Dropdown, Form, Grid,
 } from "semantic-ui-react";
 import { User } from "../../types/user";
 import "./style.css";
 import API from "../../api";
+import { exercises as allExercises } from "../../api/test_exercises_data";
 
 
 const templateDropdownOptions = (templates) => {
@@ -20,10 +20,26 @@ const templateDropdownOptions = (templates) => {
     return options;
 };
 
+const exerciseDropdownOptions = () => {
+    const options = [];
+    for (let i = 0; i < allExercises.length; i++) {
+        options.push({ key: i + 1, value: allExercises[i], text: allExercises[i].title });
+    }
+    return options;
+};
+
+const emptyExerciseSelection = {
+    exercise: "",
+    days: {
+        m: false, t: false, w: false, r: false, f: false, s: false, u: false,
+    },
+};
+
 const _MyTemplates = ({
     user,
 }) => {
     const [selectedTemplate, setSelectedTemplate] = React.useState(null);
+    const [selectedExercise, setSelectedExercise] = React.useState(emptyExerciseSelection);
     const [templates, setTemplates] = useStateWithCallback(null, (t) => {
         if (t == null) return;
         if (!templates.includes(selectedTemplate)) setSelectedTemplate(templates[0]);
@@ -65,7 +81,116 @@ const _MyTemplates = ({
         return (<div className="center">Loading</div>);
     }
 
-    const addExerciseRow = () => (<Grid.Row id="new-exercise-row" centered><Button>New</Button></Grid.Row>);
+    const addExercise = () => {
+        if (selectedExercise === "") return;
+        const days = [];
+        if (selectedExercise.days.m) days.push("Monday");
+        if (selectedExercise.days.t) days.push("Tuesday");
+        if (selectedExercise.days.w) days.push("Wednesday");
+        if (selectedExercise.days.r) days.push("Thursday");
+        if (selectedExercise.days.f) days.push("Friday");
+        if (selectedExercise.days.s) days.push("Saturday");
+        if (selectedExercise.days.u) days.push("Sunday");
+        selectedTemplate.exercises.push(
+            {
+                exercise: selectedExercise.exercise,
+                days,
+            },
+        );
+        setSelectedTemplate({
+            ...selectedTemplate,
+            render: selectedTemplate.render === undefined ? 0 : selectedTemplate.render + 1,
+        });
+        setSelectedExercise(emptyExerciseSelection);
+    };
+
+    const addExerciseRow = () => (
+        <Grid.Row id="new-exercise-row" centered>
+            <Form>
+                <Form.Group inline>
+                    <Dropdown
+                        id="exercise-dropdown"
+                        selection
+                        inline
+                        options={exerciseDropdownOptions()}
+                        value={selectedExercise.exercise}
+                        onChange={(_, v) => setSelectedExercise({ ...selectedExercise, exercise: v.value })}
+                    />
+                    <Form.Field
+                        control={Checkbox}
+                        checked={selectedExercise.days.m}
+                        label="M"
+                        onChange={(_, v) => {
+                            setSelectedExercise(
+                                { ...selectedExercise, days: { ...selectedExercise.days, m: v.checked } },
+                            );
+                        }}
+                    />
+                    <Form.Field
+                        control={Checkbox}
+                        checked={selectedExercise.days.t}
+                        label="T"
+                        onChange={(_, v) => {
+                            setSelectedExercise(
+                                { ...selectedExercise, days: { ...selectedExercise.days, t: v.checked } },
+                            );
+                        }}
+                    />
+                    <Form.Field
+                        control={Checkbox}
+                        checked={selectedExercise.days.w}
+                        label="W"
+                        onChange={(_, v) => {
+                            setSelectedExercise(
+                                { ...selectedExercise, days: { ...selectedExercise.days, w: v.checked } },
+                            );
+                        }}
+                    />
+                    <Form.Field
+                        control={Checkbox}
+                        checked={selectedExercise.days.r}
+                        label="R"
+                        onChange={(_, v) => {
+                            setSelectedExercise(
+                                { ...selectedExercise, days: { ...selectedExercise.days, r: v.checked } },
+                            );
+                        }}
+                    />
+                    <Form.Field
+                        control={Checkbox}
+                        checked={selectedExercise.days.f}
+                        label="F"
+                        onChange={(_, v) => {
+                            setSelectedExercise(
+                                { ...selectedExercise, days: { ...selectedExercise.days, f: v.checked } },
+                            );
+                        }}
+                    />
+                    <Form.Field
+                        control={Checkbox}
+                        checked={selectedExercise.days.s}
+                        label="S"
+                        onChange={(_, v) => {
+                            setSelectedExercise(
+                                { ...selectedExercise, days: { ...selectedExercise.days, s: v.checked } },
+                            );
+                        }}
+                    />
+                    <Form.Field
+                        control={Checkbox}
+                        checked={selectedExercise.days.u}
+                        label="U"
+                        onChange={(_, v) => {
+                            setSelectedExercise(
+                                { ...selectedExercise, days: { ...selectedExercise.days, u: v.checked } },
+                            );
+                        }}
+                    />
+                    <Button positive onClick={addExercise}>Add Exercise</Button>
+                </Form.Group>
+            </Form>
+        </Grid.Row>
+    );
 
     return (
         <Container>
@@ -100,7 +225,10 @@ const _MyTemplates = ({
                     selectedTemplate.exercises.map(
                         (exercise) => (
                             <Grid.Row columns={3}>
-                                <Grid.Column>{exercise.exercise.exerciseName}</Grid.Column>
+                                <Grid.Column>
+                                    {exercise.exercise.exerciseName === undefined
+                                        ? exercise.exercise.title : exercise.exercise.exerciseName}
+                                </Grid.Column>
                                 <Grid.Column>{exercise.days.reduce((acc, v) => `${acc} ${v}`)}</Grid.Column>
                                 <Grid.Column>
                                     <Button
