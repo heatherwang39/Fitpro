@@ -215,7 +215,6 @@ const _Calendar = ({
          + parseInt(hoursAndMinsMatch.length > 2 && hoursAndMinsMatch[2] !== undefined ? hoursAndMinsMatch[2] : 0, 10);
     };
 
-
     const validateCurEvent = () => {
         if (curEvent.duration <= 0) {
             console.log("Invalid duration");

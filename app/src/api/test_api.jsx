@@ -8,6 +8,49 @@ import {
 
 let lastEventId = 10;
 
+// Returns a big random id. This is used instead of actually keeping track of ids
+// Probability of getting duplicate id in 2 sequential calls is at most 1/1000000
+const randomId = () => Math.ceil(Math.random() * 1000000);
+
+/*
+ * Returns events for the next year for a given event and repeat frequency
+ * This will be replaced with server calls that generate dates for more than 1 year
+ * in Phase 2
+ */
+const repeatToEvents = (event, repeatVal, repeatType) => {
+    let addToDate;
+    switch (repeatType) {
+    case "days":
+        addToDate = (date) => new Date(date.getTime() + repeatVal * 86400000);
+        break;
+    case "weeks":
+        addToDate = (date) => new Date(date.getTime() + repeatVal * 604800000);
+        break;
+    case "months":
+        addToDate = (date) => {
+            const newDate = new Date(date);
+            newDate.setMonth(date.getMonth() + parseInt(repeatVal, 10));
+            return newDate;
+        };
+        break;
+    default:
+        console.log("Invalid repeat frequency");
+        return undefined;
+    }
+    let cur = event;
+    const events = [];
+    while (cur.start.getYear() === event.start.getYear()) {
+        cur = {
+            ...cur,
+            start: addToDate(cur.start),
+            end: addToDate(cur.end),
+            id: randomId(),
+        };
+        events.push(cur);
+    }
+    return events;
+};
+
 const calendarWithNewEvent = (calendar, event) => {
     if (calendar == null) return null;
     const newCalendar = calendar;
@@ -24,11 +67,15 @@ const calendarWithNewEvent = (calendar, event) => {
         newEvent.id = lastEventId;
         newCalendar.events.push(newEvent);
     }
+    if (event.repeat) {
+        newCalendar.events = newCalendar.events.concat(
+            repeatToEvents(event, event.repeatFreq, event.repeatUnits),
+        );
+    }
     return newCalendar;
 };
 
 const calendarWithoutEvent = (calendar, event) => {
-    console.log(calendar, event);
     if (calendar == null) return null;
     const newCalendar = calendar;
     newCalendar.events = calendar.events.filter((e) => e.id !== event.id);
