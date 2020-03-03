@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-for, jsx-a11y/label-has-associated-control */
 import React, { Component } from "react";
 import {
-    Form, Grid, Input, Radio,
+    Card, Form, Grid, Input, Radio,
 } from "semantic-ui-react";
 import TrainerList from "./TrainerList";
 import "./style.css";
@@ -20,61 +20,92 @@ class SearchTrainer extends Component {
     filter() {
         const { filters } = this.state;
         return (
-            <div>
+            <Card id="filter-container">
                 <Form id="filter-form">
                     <Form.Group inline>
                         <label className="filter-label">Min Rating</label>
-                        <Form.Field
-                            className="filter-first-option"
-                            control={Radio}
-                            checked={filters.minRating === 4}
-                            label="4"
-                            onChange={() => this.setState((prevState) => ({
-                                prevState,
-                                filters: {
-                                    ...prevState.filters,
-                                    minRating: prevState.filters.minRating === 4 ? undefined : 4,
-                                },
-                            }))}
-                        />
-                        <Form.Field
-                            control={Radio}
-                            checked={filters.minRating === 3}
-                            label="3"
-                            onChange={() => this.setState((prevState) => ({
-                                prevState,
-                                filters: {
-                                    ...prevState.filters,
-                                    minRating: prevState.filters.minRating === 3 ? undefined : 3,
-                                },
-                            }))}
-                        />
-                        <Form.Field
-                            control={Radio}
-                            checked={filters.minRating === 2}
-                            label="2"
-                            onChange={() => this.setState((prevState) => ({
-                                prevState,
-                                filters: {
-                                    ...prevState.filters,
-                                    minRating: prevState.filters.minRating === 2 ? undefined : 2,
-                                },
-                            }))}
-                        />
+                        <Form.Field>
+                            <Radio
+                                checked={filters.minRating === 5}
+                                label="5"
+                                onClick={() => this.setState((prevState) => ({
+                                    ...prevState,
+                                    filters: {
+                                        ...prevState.filters,
+                                        minRating: prevState.filters.minRating === 5 ? 0 : 5,
+                                    },
+                                }))}
+                            />
+                        </Form.Field>
+                        <Form.Field>
+                            <Radio
+                                checked={filters.minRating === 4}
+                                label="4"
+                                onClick={() => this.setState((prevState) => ({
+                                    ...prevState,
+                                    filters: {
+                                        ...prevState.filters,
+                                        minRating: prevState.filters.minRating === 4 ? 0 : 4,
+                                    },
+                                }))}
+                            />
+                        </Form.Field>
+                        <Form.Field>
+                            <Radio
+                                checked={filters.minRating === 3}
+                                label="3"
+                                onClick={() => this.setState((prevState) => ({
+                                    ...prevState,
+                                    filters: {
+                                        ...prevState.filters,
+                                        minRating: prevState.filters.minRating === 3 ? 0 : 3,
+                                    },
+                                }))}
+                            />
+                        </Form.Field>
+                        <Form.Field>
+                            <Radio
+                                checked={filters.minRating === 2}
+                                label="2"
+                                onClick={() => this.setState((prevState) => ({
+                                    ...prevState,
+                                    filters: {
+                                        ...prevState.filters,
+                                        minRating: prevState.filters.minRating === 2 ? 0 : 2,
+                                    },
+                                }))}
+                            />
+                        </Form.Field>
+                        <Form.Field>
+                            <Radio
+                                checked={filters.minRating === 1}
+                                label="1"
+                                onClick={() => this.setState((prevState) => ({
+                                    ...prevState,
+                                    filters: {
+                                        ...prevState.filters,
+                                        minRating: prevState.filters.minRating === 1 ? 0 : 1,
+                                    },
+                                }))}
+                            />
+                        </Form.Field>
                     </Form.Group>
 
                     <Form.Group inline>
                         <label className="filter-label">Gender</label>
-                        <Form.Field
-                            control={Radio}
-                            checked={filters.gender === "male"}
-                            label="Male"
-                            onChange={() => this.setState((prevState) => (
-                                {
+                        <Form.Field id="gender-radio-field">
+                            <Radio
+                                checked={filters.gender === "male"}
+                                label="Male"
+                                onClick={() => this.setState((prevState) => ({
                                     ...prevState,
-                                    filters: { ...prevState.filters, gender: "male" },
+                                    filters: {
+                                        ...prevState.filters,
+                                        gender: prevState.filters.gender === "male" ? undefined : "male",
+                                    },
                                 }))}
-                        />
+                            />
+                        </Form.Field>
                         <Form.Field
                             control={Radio}
                             checked={filters.gender === "female"}
@@ -121,7 +152,7 @@ class SearchTrainer extends Component {
                         />
                     </Form.Group>
                 </Form>
-            </div>
+            </Card>
         );
     }
 

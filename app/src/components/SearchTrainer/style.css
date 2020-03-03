@@ -21,10 +21,24 @@
 }
 
 #filter-form {
-    margin-top: 4em;
-    margin-left: 2em;
 }
 
 #search-items {
     margin-top: 1em;
+}
+
+#filter-container {
+    margin-top: 4em;
+    margin-left: 2em;
+    padding-left: 0.2em;
+}
+
+#gender-radio-field {
+    margin-right: 1em;
+}
+
+.profile-btn {
+    margin-left: 2em;
+    margin-bottom: 1em;
+    display: inline-block;
 }

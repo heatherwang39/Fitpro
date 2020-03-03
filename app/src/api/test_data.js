@@ -138,3 +138,14 @@ export const testOffers = [
     { title: "Monthly Special", details: "Workout 3 times/week + on-demand diet advice via FitPro.", price: "$200/month" },
     { title: "Full Year", details: "Monthly Special for an entire year", price: "$2000/year" },
 ];
+
+export const allUsers = [
+    clientUser,
+    client2User,
+    client3User,
+    client4User,
+    trainerUser,
+    trainerUser1,
+    trainerUser2,
+    trainerUser3,
+    trainerUser4];

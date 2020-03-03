@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { withRouter, Link } from "react-router-dom";
+import { withRouter, Link, useHistory } from "react-router-dom";
 
 import { Button, Dropdown, Menu } from "semantic-ui-react";
 import { connect } from "react-redux";
@@ -15,8 +15,23 @@ import { User } from "../../types/user";
 import { loggedOut as loggedOutAction } from "../../actions/userActions";
 import "./style.css";
 
+const userMenuOptions = [{ key: 1, value: "profile", text: "Me" }, { key: 2, value: "logout", text: "Log Out" }];
+
 function _Navigation({ user, loggedOut, location }) {
     const currentPage = location.pathname;
+    const history = useHistory();
+
+    const moreMenuOptions = () => {
+        const options = [{ key: 1, value: "exercises", text: "Exercises" }];
+        if (user.isTrainer) {
+            options.push({ key: 2, value: "clients", text: "My Clients" });
+            options.push({ key: 3, value: "templates", text: "My Templates" });
+        } else {
+            options.push({ key: 4, value: "trainers", text: "My Trainers" });
+        }
+        return options;
+    };
+
 
     return (
         <Menu inverted attached>
@@ -43,26 +58,14 @@ function _Navigation({ user, loggedOut, location }) {
 
                 {/* eslint-disable jsx-a11y/click-events-have-key-events */
                     user != null && (
-                        <Dropdown item text="More" simple>
-                            <Dropdown.Menu>
-                                <Dropdown.Item as={Link} to="/exercises" text="Exercises" />
-                                { user.isTrainer && (
-                                    <Dropdown.Item as={Link} to="/clients">
-                                        My Clients
-                                    </Dropdown.Item>
-                                )}
-                                { !user.isTrainer && (
-                                    <Dropdown.Item as={Link} to="/my_trainers">
-                                        My Trainers
-                                    </Dropdown.Item>
-                                )}
-                                { user.isTrainer && (
-                                    <Dropdown.Item as={Link} to="/templates">
-                                        My Templates
-                                    </Dropdown.Item>
-                                )}
-                            </Dropdown.Menu>
-                        </Dropdown>
+                        <Dropdown
+                            item
+                            text="More"
+                            simple
+                            closeOnChange
+                            options={moreMenuOptions()}
+                            onChange={(_, v) => history.push(`/${v.value}`)}
+                        />
                     )
                 /* eslint-enable */
                 }
@@ -92,12 +95,14 @@ function _Navigation({ user, loggedOut, location }) {
                 )}
                 {/* eslint-disable jsx-a11y/click-events-have-key-events */
                     user != null && (
-                        <Dropdown item text={user.firstname} simple>
-                            <Dropdown.Menu>
-                                <Dropdown.Item as={Link} to={`/user/${user.id}`} text="Me" />
-                                <Dropdown.Item onClick={loggedOut} text="Log Out" />
-                            </Dropdown.Menu>
-                        </Dropdown>
+                        <Dropdown
+                            item
+                            text={user.firstname}
+                            simple
+                            options={userMenuOptions}
+                            onChange={(_, v) => (v.value === "logout"
+                                ? loggedOut() && history.push("/") : history.push(`/user/${user.id}`))}
+                        />
                     )
                 /* eslint-enable */
                 }

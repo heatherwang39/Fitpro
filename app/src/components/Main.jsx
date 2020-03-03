@@ -70,6 +70,10 @@ const Main = () => (
                     path="/templates"
                     component={MyTemplates}
                 />
+                <Route
+                    path="/trainers"
+                    component={SearchTrainer}
+                />
             </Provider>
         </Router>
     </ErrorBoundary>

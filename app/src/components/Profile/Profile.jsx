@@ -177,7 +177,7 @@ const _Profile = ({
                                 className="profile-avatar"
                             />
                         </Grid.Row>
-                        {profile.id === user.id && (
+                        {user !== null && profile.id === user.id && (
                             <Grid.Row>
                                 <Button onClick={cancelEdits} negative>Cancel</Button>
                                 <Button onClick={saveEdits} positive>Save</Button>
@@ -310,12 +310,12 @@ const _Profile = ({
                             className="profile-avatar"
                         />
                     </Grid.Row>
-                    {profile.id === user.id && (
+                    {user !== null && profile.id === user.id && (
                         <Grid.Row>
                             <p><Button onClick={() => setEditing(true)}>Edit</Button></p>
                         </Grid.Row>
                     )}
-                    <Grid.Row inline>
+                    <Grid.Row>
                         <p>{`${profile.firstname} ${profile.lastname}`}</p>
                     </Grid.Row>
                     {profile.isTrainer && (
@@ -349,7 +349,7 @@ const _Profile = ({
                     </Grid.Row>
                 </Grid.Column>
             </Grid>
-            {user.isTrainer && (
+            {profile.isTrainer && (
                 <Grid>
                     <Grid.Row columns={2}>
                         {offersColumn()}

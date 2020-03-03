@@ -4,6 +4,7 @@ import {
     clientUser, client2User, trainerUser, clientCalendar, client2Calendar, trainerCalendar,
     trainerUser1, trainerUser2, trainerUser3, trainerUser4, exercise1, exercise2, exercise3,
     exercise4, client3User, client4User, placeholderTemplates, client3Calendar, client4Calendar,
+    allUsers,
 } from "./test_data";
 
 let lastEventId = 10;
@@ -105,22 +106,22 @@ export const TestAPI = {
         query.text = query.text.toLowerCase();
         const results = [];
         allTrainers.forEach((trainer) => {
-            if (query.text != undefined && query.text.length > 0) {
-                if (!trainer.firstname.toLowerCase().includes(query.text) &&
-                    !trainer.lastname.toLowerCase().includes(query.text)) {
+            if (query.text !== undefined && query.text.length > 0) {
+                if (!trainer.firstname.toLowerCase().includes(query.text)
+                    && !trainer.lastname.toLowerCase().includes(query.text)) {
                     return;
                 }
             }
             if (query.filters !== undefined) { // Just in case request forgets to include
                 if (query.filters.minRating !== undefined && query.filters.minRating > trainer.rating) return;
-                if (query.filters.gender !== undefined && query.filters.gender != trainer.gender) return;
+                if (query.filters.gender !== undefined && query.filters.gender !== trainer.gender) return;
                 if (query.filters.maxPrice !== undefined && query.filters.maxPrice < trainer.price) return;
             }
             results.push(trainer);
         });
         return {
             success: true,
-            results
+            results,
         };
     },
 
@@ -136,6 +137,9 @@ export const TestAPI = {
         case 3:
             return { success: true, profile: client2User };
         default:
+            for (let i = 0; i < allTrainers.length; i++) {
+                if (allTrainers[i].id === id) return { success: true, profile: allTrainers[i] };
+            }
             return { success: false, error: `Invalid user ID ${id}` };
         }
     },
@@ -192,6 +196,10 @@ export const TestAPI = {
             };
         case 3:
             return { success: true, userCalendar: client2Calendar };
+        case 4:
+            return { success: true, userCalendar: client3Calendar };
+        case 5:
+            return { success: true, userCalendar: client4Calendar };
         default:
             console.log(`User ID ${id} HAS NO CALENDAR`);
             return { success: false };

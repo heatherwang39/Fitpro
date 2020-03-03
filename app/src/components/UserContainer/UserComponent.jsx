@@ -1,7 +1,9 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { Button } from "semantic-ui-react";
 import { PropTypes } from "prop-types";
 import Img from "react-image";
-import { Button } from "semantic-ui-react";
+
 import styles from "./UserComponent.module.css";
 import defaultImage from "../../../static/images/defaultProfile.png";
 
@@ -32,6 +34,8 @@ const UserComponent = (props) => {
                     <Button fluid onClick={onClickCalendar}>
                         Calendar
                     </Button>
+                    <br />
+                    <Button fluid as={Link} to={`/user/${user.id}`}>Profile</Button>
                 </div>
             </div>
             <div className={[styles.card, styles.infoCard].join(" ")}>
