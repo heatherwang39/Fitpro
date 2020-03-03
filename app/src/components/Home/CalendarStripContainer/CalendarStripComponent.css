@@ -4,3 +4,58 @@
     padding: 15px 23px 15px 23px;
     box-sizing: border-box;
 }
+
+.calendar-card-container {
+    width: 500px;
+    height: 320px;
+    border: 2px solid black; 
+    border-radius: 10px;
+    background-color: white;
+    box-sizing: border-box;
+    padding: 20px 0px 30px 30px;
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-card-container header {
+    width: 100%;
+    padding: 0 0 10px 0;
+}
+
+.calendar-card-content {
+    display: flex;
+    width: 100%;
+    flex: 1;
+    box-sizing: border-box;
+    flex-direction: row;
+}
+
+.calendar-card-info {
+    width: 37%;
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-card-events-container {
+    flex: 1;
+}
+
+.calendar-card-date {
+    padding: 0 0 0 0px;
+    background-color: white;
+}
+
+.bullet {
+    width: 4px;
+    height: 4px;
+    background-color: red;
+    margin: auto;
+    margin-right: 10px;
+    margin-left: 3px;
+}
+
+.event-row {
+    display: flex;
+    flex-direction: horizontal;
+    padding-top: 5px;
+}

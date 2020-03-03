@@ -7,9 +7,6 @@ import defaultImage from "../../../static/images/defaultProfile.png";
 
 const UserComponent = (props) => {
     const { user, shouldShowBanner, onClickCalendar } = props;
-    console.log(styles);
-    console.log(user);
-    console.log(shouldShowBanner);
     return (
         <div className={styles.container}>
             {

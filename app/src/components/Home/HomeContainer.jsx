@@ -3,7 +3,7 @@ import { PropTypes } from "prop-types";
 import React from "react";
 import { addClient, removeClient } from "../../actions/relationshipActions";
 import NewsFeedContainer from "./NewsFeedContainer";
-import "./HomeContainer.css";
+import styles from "./HomeContainer.module.css";
 import CalenderStripContainer from "./CalendarStripContainer";
 import { User } from "../../types/user";
 
@@ -11,13 +11,13 @@ const _Home = (props) => {
     (() => {})(props); // Shut eslint up
     const { user } = props;
     return (
-        <div className="home-container">
+        <div className={styles.container}>
             {
                 user != null && (
                     <CalenderStripContainer />
                 )
             }
-            <div style={{ width: "60%" }}>
+            <div style={{ width: "60%", height: 350 }}>
                 Placeholder
             </div>
             <NewsFeedContainer />

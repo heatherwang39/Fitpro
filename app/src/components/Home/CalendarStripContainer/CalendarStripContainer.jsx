@@ -14,23 +14,19 @@ const CalendarStripContainer = ({
     user, calendar, getUserCalendar, gotUserCalendar,
 }) => {
     const calUserId = user.id;
-    const [filteredCalendar, setFilteredCalendar] = useState(null);
+    const [filteredEvents, setFilteredEvents] = useState([]);
 
     const formatEventsListToObject = (events) => {
-        const eventsObj = {};
         const oneWeekFromNow = new Date();
         oneWeekFromNow.setDate((new Date()).getDate() + 7);
-        events.forEach((event) => {
+        const eventsList = events.filter((event) => {
             const { start } = event;
             const newDate = start.toLocaleDateString();
-            if (start.getTime() > oneWeekFromNow.getTime() || start.getTime() < (new Date()).getTime()) return;
+            if (start.getTime() > oneWeekFromNow.getTime() || start.getTime() < (new Date()).getTime()) return false;
             // Remove the following line if you want events that occur for the next week
-            if (start.getDate() !== (new Date()).getDate()) return;
-            if ((new Date(newDate)).getDate() !== (new Date()).getDate()) return;
-            if (!(newDate in eventsObj)) eventsObj[newDate] = [];
-            eventsObj[newDate].push(event);
+            return (new Date(newDate)).getDate() === (new Date()).getDate();
         });
-        return eventsObj;
+        return eventsList;
     };
 
     useEffect(() => {
@@ -41,14 +37,13 @@ const CalendarStripContainer = ({
                 if (!response.success) console.log("Error getting user calendar, got response ", response);
                 // TODO handle failure
                 gotUserCalendar(response);
-                setFilteredCalendar(formatEventsListToObject(response.userCalendar.events));
+                setFilteredEvents(formatEventsListToObject(response.userCalendar.events));
             });
         }
     }, []);
 
-
     return (
-        <CalendarStripComponent calendar={filteredCalendar} />
+        <CalendarStripComponent events={filteredEvents} />
     );
 };
 
