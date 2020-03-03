@@ -50,6 +50,11 @@ function _Navigation({ user, loggedOut, location }) {
                                         My Trainers
                                     </Link>
                                 )}
+                                { user.isTrainer && (
+                                    <Link to="/templates" className="item">
+                                        My Templates
+                                    </Link>
+                                )}
                             </div>
                         </div>
                     )

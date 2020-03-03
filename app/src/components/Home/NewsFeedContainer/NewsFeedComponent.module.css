@@ -1,0 +1,36 @@
+.container {
+    background-color: white;
+    flex: 1;
+    height: 100%;
+    border-top: 1px grey solid;
+    padding: 20px 0 0 0px;
+    display: flex;
+}
+
+.feedContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.navButton {
+    position: fixed;
+    background-color: red;
+    width: 100px;
+    height: 40px;
+    color: white;
+    border-radius: 6px;
+    text-align: center;
+    bottom: 100px;
+    left: 100px;
+    font-weight: bold;
+    border-style: none;
+    border: 2px red solid;
+}
+
+.navButton:hover {
+    position: fixed;
+    width: 100px;
+    height: 40px;
+    color: white;
+    border: 2px white solid;
+}

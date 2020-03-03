@@ -1,0 +1,37 @@
+#new-exercise-row {
+    padding-top: 2em;
+    padding-bottom: 1em;
+    text-align: center;
+}
+
+#template-name {
+    padding-top: 0.2em;
+    font-size: 32pt;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+#delete-template-btn {
+    margin-left: 1em;
+}
+
+#exercise-dropdown {
+    margin-right: 1em;
+}
+
+#template-header-left {
+    float: left;
+}
+
+#template-header-right {
+    float: right;
+}
+
+#template-header {
+    padding-bottom: 3em;
+}
+
+#assign-template-button {
+    margin-left: 1em;
+}

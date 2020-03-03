@@ -4,31 +4,31 @@ import {
 
 
 const initialState = {
-    trainer: [],
-    client: [],
+    trainers: [],
+    clients: [],
 };
 
 export default (state = initialState, action) => {
     switch (action.type) {
     case ADD_TRAINER:
         return {
-            client: [...state.client],
-            trainer: [...state.trainer, action.payload],
+            clients: [...state.clients],
+            trainers: [...action.payload],
         };
     case REMOVE_TRAINER:
         return {
-            client: [...state.client],
-            trainer: state.trainer.filter((trainerID) => trainerID !== action.payload),
+            clients: [...state.clients],
+            trainers: state.trainers.filter((trainerID) => trainerID !== action.payload),
         };
     case ADD_CLIENT:
         return {
-            client: [...state.client, action.payload],
-            trainer: [...state.trainer],
+            clients: [...action.payload],
+            trainers: [...state.trainers],
         };
     case REMOVE_CLIENT:
         return {
-            client: state.client.filter((clientID) => clientID !== action.payload),
-            trainer: [...state.trainer],
+            clients: state.clients.filter((clientID) => clientID !== action.payload),
+            trainers: [...state.trainers],
         };
     default:
         return state;

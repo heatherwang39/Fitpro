@@ -7,7 +7,9 @@ import Home from "./Home";
 import LoginContainer from "./LoginContainer";
 import Profile from "./Profile";
 import MailContainer from "./MailContainer";
+import MyTemplates from "./MyTemplates";
 import Calendar from "./Calendar";
+import ViewClientsContainer from "./ViewClientsContainer";
 import SearchTrainer from "./SearchTrainer";
 import SearchExercise from "./SearchExercise";
 
@@ -16,6 +18,7 @@ import { store } from "../store";
 import RegisterContainer from "./RegisterContainer";
 import ProtectedRoute from "./ProtectedRoute";
 import ErrorBoundary from "./ErrorBoundary";
+import UserContainer from "./UserContainer";
 
 const Main = () => (
     <ErrorBoundary>
@@ -54,6 +57,18 @@ const Main = () => (
                 <ProtectedRoute
                     path="/mail"
                     component={MailContainer}
+                />
+                <ProtectedRoute
+                    path="/clients"
+                    component={ViewClientsContainer}
+                />
+                <ProtectedRoute
+                    path="/client"
+                    component={UserContainer}
+                />
+                <ProtectedRoute
+                    path="/templates"
+                    component={MyTemplates}
                 />
             </Provider>
         </Router>

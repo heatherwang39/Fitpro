@@ -4,11 +4,16 @@ import { Calendar } from "../types/calendar";
 import { Exercise } from "../types/exercise";
 import { workoutExerciseList, Workout } from "../types/workout";
 
-export const clientUser = new User(1, "user", "ClientFirst", "ClientLast", "client@mail.com",
+export const clientUser = new User(1, "user", "George", "Attwel", "client@mail.com",
     "555-555-1234", "Toronto", "6'0", "200lb", false, false, "goalType", 2.5, [2], [], "male", 20, "");
 export const trainerUser = new User(2, "user2", "TrainerFirst", "TrainerLast", "trainer@mail.com",
-    "555-123-4567", "Toronto", "6'3", "220lb", true, false, "goalType", 4, [], [1, 3], "male", 30, "");
-export const client2User = new User(1, "user3", "Client2First", "Client2Last", "client2@mail.com",
+    "555-123-4567", "Toronto", "6'3", "220lb", true, false, "goalType", 4, [], [1, 3, 4, 5], "male", 30, "");
+export const client2User = new User(3, "user3", "Client2First", "Client2Last", "client2@mail.com",
+    "555-555-4321", "Toronto", "6'1", "190lb", false, false, "goalType", 3.5, [2], [], "male", 30, "");
+export const client3User = new User(4, "user4", "Client4First", "Client4Last", "client4@mail.com",
+    "555-555-4321", "Toronto", "6'1", "190lb", false, false, "goalType", 3.5, [2], [], "male", 30, "");
+
+export const client4User = new User(5, "user5", "Client5First", "Client5Last", "client5@mail.com",
     "555-555-4321", "Toronto", "6'1", "190lb", false, false, "goalType", 3.5, [2], [], "male", 30, "");
 
 export const trainerUser1 = new User(11, "user11", "Jamie", "Doe", "trainer11@mail.com",
@@ -65,6 +70,15 @@ const client2Events = [
     Event("Sun evening", new Date("February 23, 2020 18:00:00"), new Date("February 23, 2020 20:00:00"), 3, 12),
 ];
 
+const client3Events = [
+    Event("Meeting 1", new Date(today + 3600000), new Date(today + 3600000 * 2), 2, 18),
+    Event("Meeting 2", new Date(today + 3600000 * 6), new Date(today + 3600000 * 7), 2, 19),
+];
+
+const client4Events = [
+    Event("Client 4", new Date(today + 3600000 * 6), new Date(today + 3600000 * 7), 2, 20),
+];
+
 const trainerEvents = [
     Event("Personal Event", new Date("February 22, 2020 21:00:00"), new Date("February 22, 2020 23:00:00"), 2, 13),
     Event("Client 1", new Date(today + 3600000), new Date(today + 3600000 * 2), 2, 14),
@@ -77,9 +91,50 @@ const trainerAvailability = [
     Availability(new Date("February 22, 2020 21:00:00"), new Date("February 22, 2020 23:00:00"), 2, "weekly"),
 ];
 
+export const placeholderTemplates = [
+    {
+        name: "Template 1",
+        id: 1,
+        exercises: [
+            { exercise: exercise1, days: ["Monday", "Wednesday", "Friday"] },
+            { exercise: exercise2, days: ["Monday", "Wednesday", "Friday"] },
+            { exercise: exercise3, days: ["Monday", "Wednesday", "Friday"] },
+            { exercise: exercise4, days: ["Tuesday", "Thursday", "Saturday"] },
+        ],
+    },
+    {
+        name: "Template 2",
+        id: 2,
+        exercises: [
+            { exercise: exercise4, days: ["Monday", "Wednesday", "Friday"] },
+            { exercise: exercise2, days: ["Tuesday", "Thursday", "Saturday"] },
+            { exercise: exercise1, days: ["Monday", "Wednesday", "Friday"] },
+            { exercise: exercise3, days: ["Tuesday", "Thursday", "Saturday"] },
+        ],
+    },
+];
+
 export const clientCalendar = new Calendar(clientEvents, [], 1);
 export const trainerCalendar = new Calendar(trainerEvents, trainerAvailability, 2);
 export const client2Calendar = new Calendar(client2Events, [], 3);
+export const client3Calendar = new Calendar(client3Events, [], 4);
+export const client4Calendar = new Calendar(client4Events, [], 5);
 
 
 export const testWorkout = new Workout(11, "Test Workout", 1, [{ exercise: exercise2, params: { name: "reps", value: 10 } }]);
+export const testWorkout2 = new Workout(12, "Other Test Workout", 1, [{ exercise: exercise2, params: { name: "reps", value: 10 } }]);
+export const testWorkout3 = new Workout(13, "Some Workout", 1, [{ exercise: exercise2, params: { name: "reps", value: 10 } }]);
+export const allWorkouts = [testWorkout, testWorkout2, testWorkout3];
+
+
+export const testReviews = [
+    { name: "Cory Trevor", rating: 5, review: "Great trainer and very nice person!" },
+    { name: "Piston Honda", rating: 1, review: "Not knowledgable about fitness and took a long time to reply >:(" },
+    { name: "Randy Lahey", rating: 4, review: "Sometimes late but otherwise good" },
+];
+
+export const testOffers = [
+    { title: "Weekly Workout", details: "Workout once per week", price: "$30/week" },
+    { title: "Monthly Special", details: "Workout 3 times/week + on-demand diet advice via FitPro.", price: "$200/month" },
+    { title: "Full Year", details: "Monthly Special for an entire year", price: "$2000/year" },
+];

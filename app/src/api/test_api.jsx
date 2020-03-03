@@ -3,13 +3,75 @@
 import {
     clientUser, client2User, trainerUser, clientCalendar, client2Calendar, trainerCalendar,
     trainerUser1, trainerUser2, trainerUser3, trainerUser4, exercise1, exercise2, exercise3,
-    exercise4,
+    exercise4, client3User, client4User, placeholderTemplates, client3Calendar, client4Calendar,
 } from "./test_data";
+
+let lastEventId = 10;
+
+// Returns a big random id. This is used instead of actually keeping track of ids
+// Probability of getting duplicate id in 2 sequential calls is at most 1/1000000
+const randomId = () => Math.ceil(Math.random() * 1000000);
+
+/*
+ * Returns events for the next year for a given event and repeat frequency
+ * This will be replaced with server calls that generate dates for more than 1 year
+ * in Phase 2
+ */
+const repeatToEvents = (event, repeatVal, repeatType) => {
+    let addToDate;
+    switch (repeatType) {
+    case "days":
+        addToDate = (date) => new Date(date.getTime() + repeatVal * 86400000);
+        break;
+    case "weeks":
+        addToDate = (date) => new Date(date.getTime() + repeatVal * 604800000);
+        break;
+    case "months":
+        addToDate = (date) => {
+            const newDate = new Date(date);
+            newDate.setMonth(date.getMonth() + parseInt(repeatVal, 10));
+            return newDate;
+        };
+        break;
+    default:
+        console.log("Invalid repeat frequency");
+        return undefined;
+    }
+    let cur = event;
+    const events = [];
+    while (cur.start.getYear() === event.start.getYear()) {
+        cur = {
+            ...cur,
+            start: addToDate(cur.start),
+            end: addToDate(cur.end),
+            id: randomId(),
+        };
+        events.push(cur);
+    }
+    return events;
+};
 
 const calendarWithNewEvent = (calendar, event) => {
     if (calendar == null) return null;
     const newCalendar = calendar;
-    newCalendar.events.push(event);
+    let notFound = true;
+    for (let i = 0; i < newCalendar.events.length; i++) {
+        if (newCalendar.events[i].id === event.id) {
+            newCalendar.events[i] = event;
+            notFound = false;
+        }
+    }
+    if (notFound) {
+        lastEventId++;
+        const newEvent = event;
+        newEvent.id = lastEventId;
+        newCalendar.events.push(newEvent);
+    }
+    if (event.repeat) {
+        newCalendar.events = newCalendar.events.concat(
+            repeatToEvents(event, event.repeatFreq, event.repeatUnits),
+        );
+    }
     return newCalendar;
 };
 
@@ -67,7 +129,10 @@ export const TestAPI = {
         case 1:
             return { success: true, profile: clientUser };
         case 2:
-            return { success: true, profile: trainerUser };
+            return {
+                success: true,
+                profile: trainerUser,
+            };
         case 3:
             return { success: true, profile: client2User };
         default:
@@ -101,15 +166,27 @@ export const TestAPI = {
                 clientCalendars: [
                     {
                         id: 1,
-                        firstname: "ClientFirst",
-                        lastname: "ClientLast",
+                        firstname: clientUser.firstname,
+                        lastname: clientUser.lastname,
                         calendar: clientCalendar,
                     },
                     {
                         id: 3,
-                        firstname: "Client2First",
-                        lastname: "Client2Last",
+                        firstname: client2User.firstname,
+                        lastname: client2User.lastname,
                         calendar: client2Calendar,
+                    },
+                    {
+                        id: 4,
+                        firstname: client3User.firstname,
+                        lastname: client3User.lastname,
+                        calendar: client3Calendar,
+                    },
+                    {
+                        id: 5,
+                        firstname: client4User.firstname,
+                        lastname: client4User.lastname,
+                        calendar: client4Calendar,
                     },
                 ],
             };
@@ -142,7 +219,20 @@ export const TestAPI = {
         }
     },
 
+    getRelationships: async (userInfo) => {
+        if (userInfo.username.includes("user")) {
+            return {
+                success: true,
+                clients: [clientUser, client2User, client3User, client4User],
+                trainers: [trainerUser1],
+            };
+        }
+        return { success: false };
+    },
+
     updateProfile: async (profile) => ({ success: true, profile }),
+
+    getTemplates: async (user) => ({ success: true, templates: placeholderTemplates }),
 };
 
 export default TestAPI;

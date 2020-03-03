@@ -26,8 +26,10 @@ export default (state = defaultState, action) => {
             };
         }
         return {
-            userCalendar: action.payload,
+            ...state,
+            userCalendar: action.payload.userCalendar,
             gettingCalendar: false,
+            clientCalendars: [],
         };
     case UPDATED_CALENDAR: {
         if (action.payload.userId === state.userCalendar.userId) {

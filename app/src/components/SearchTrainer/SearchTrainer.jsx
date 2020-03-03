@@ -26,7 +26,11 @@ class SearchTrainer extends Component {
                             control={Radio}
                             checked={this.state.filters.minRating === 4}
                             label="4.0"
-                            onChange={() => this.setState({...this.state, filters: { ...this.state.filters, minRating: 4 } })}
+                            onChange={() => this.setState(
+                                {
+                                ...this.state,
+                                    filters: { ...this.state.filters, minRating: this.state.filters.minRating === 4 ? undefined : 4}
+                            })}
                         />
                         <Form.Field
                             control={Radio}

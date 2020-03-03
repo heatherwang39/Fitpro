@@ -1,0 +1,98 @@
+.container {
+    width: 100%;
+    display: inline-flex;
+    flex-direction: column;
+    padding: 0 357px 0 357px;
+    flex-wrap: nowrap;
+}
+
+.card {
+    margin-top: 50px;
+    width: 800px;
+    height: 370px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.15), 0 2px 3px rgba(0,0,0,.2);
+    display: flex;
+    flex-direction: row;
+    padding: 50px 24px 24px 24px;
+    flex-wrap: wrap;
+}
+
+.card img {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.card h1 {
+    margin: 5px;
+}
+
+.card h2 {
+    margin: 5px;
+}
+
+.cardHeader {
+    width: 100%;
+}
+
+.cardInformation {
+    flex: 1;
+}
+
+.infoCard div {
+    width: 100%;
+    height: 30px;
+    margin: 10px 0 10px 0;
+    font-size: large;
+    font-weight: bold;
+}
+
+.infoCard {
+    justify-content: start;
+    flex-direction: column;
+}
+
+.cardControls {
+    width: 200px;
+}
+
+.userBannerContainer {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    background-color: white;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.15),0 2px 3px rgba(0,0,0,.2);
+    padding: 0 357px 0 357px;
+}
+
+.userBannerContainer span {
+    height: 20px;
+    margin: 15px 0 15px 10px;
+
+}
+
+.userBannerImage {
+    width: 40px;
+    height: 40px;
+    border: none;
+    margin-top: 5px;
+}
+
+.centerCard {
+    margin-top: 50px;
+    background-color: red;
+    width: 800px;
+    height: 370px;
+}
+
+.bottomCard {
+    margin-top: 50px;
+    background-color: red;
+    width: 800px;
+    height: 370px;
+}
