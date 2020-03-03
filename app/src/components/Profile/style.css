@@ -19,3 +19,52 @@
 .profile.p {
     padding: 16px;
 }
+
+#profile-offers-header {
+    text-align: center;
+}
+
+.review-name {
+    float: right;
+}
+
+.review-body {
+    float: left;
+}
+
+#profile-reviews-header {
+    text-align: center;
+}
+
+.offer-body {
+    float: left;
+}
+
+.offer-price {
+    float: right;
+}
+
+.offer-title {
+    text-align: center;
+    margin-bottom: 0.3em;
+}
+
+.profile-offer {
+    padding-bottom: 3em;
+    min-height: 5em;
+}
+
+.profile-review {
+    padding-bottom: 1em;
+    min-height: 5em;
+}
+
+.review-rating {
+    margin-top: .5em;
+}
+
+.review-name {
+    margin-top: auto;
+    margin-bottom: auto;
+    display: inline;
+}

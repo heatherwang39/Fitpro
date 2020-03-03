@@ -71,6 +71,15 @@ const client2Events = [
     Event("Sun evening", new Date("February 23, 2020 18:00:00"), new Date("February 23, 2020 20:00:00"), 3, 12),
 ];
 
+const client3Events = [
+    Event("Meeting 1", new Date(today + 3600000), new Date(today + 3600000 * 2), 2, 18),
+    Event("Meeting 2", new Date(today + 3600000 * 6), new Date(today + 3600000 * 7), 2, 19),
+];
+
+const client4Events = [
+    Event("Client 4", new Date(today + 3600000 * 6), new Date(today + 3600000 * 7), 2, 20),
+];
+
 const trainerEvents = [
     Event("Personal Event", new Date("February 22, 2020 21:00:00"), new Date("February 22, 2020 23:00:00"), 2, 13),
     Event("Client 1", new Date(today + 3600000), new Date(today + 3600000 * 2), 2, 14),
@@ -109,9 +118,24 @@ export const placeholderTemplates = [
 export const clientCalendar = new Calendar(clientEvents, [], 1);
 export const trainerCalendar = new Calendar(trainerEvents, trainerAvailability, 2);
 export const client2Calendar = new Calendar(client2Events, [], 3);
+export const client3Calendar = new Calendar(client3Events, [], 4);
+export const client4Calendar = new Calendar(client4Events, [], 5);
 
 
 export const testWorkout = new Workout(11, "Test Workout", 1, [{ exercise: exercise2, params: { name: "reps", value: 10 } }]);
 export const testWorkout2 = new Workout(12, "Other Test Workout", 1, [{ exercise: exercise2, params: { name: "reps", value: 10 } }]);
 export const testWorkout3 = new Workout(13, "Some Workout", 1, [{ exercise: exercise2, params: { name: "reps", value: 10 } }]);
 export const allWorkouts = [testWorkout, testWorkout2, testWorkout3];
+
+
+export const testReviews = [
+    { name: "Cory Trevor", rating: 5, review: "Great trainer and very nice person!" },
+    { name: "Piston Honda", rating: 1, review: "Not knowledgable about fitness and took a long time to reply >:(" },
+    { name: "Randy Lahey", rating: 4, review: "Sometimes late but otherwise good" },
+];
+
+export const testOffers = [
+    { title: "Weekly Workout", details: "Workout once per week", price: "$30/week" },
+    { title: "Monthly Special", details: "Workout 3 times/week + on-demand diet advice via FitPro.", price: "$200/month" },
+    { title: "Full Year", details: "Monthly Special for an entire year", price: "$2000/year" },
+];

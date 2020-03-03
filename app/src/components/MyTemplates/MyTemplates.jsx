@@ -35,6 +35,13 @@ const emptyExerciseSelection = {
     },
 };
 
+const clientOptions = () => ([
+    { key: 1, value: "John Smith", text: "John Smith" },
+    { key: 2, value: "Jackie Chan", text: "Jackie Chan" },
+    { key: 3, value: "Randy Lahey", text: "Randy Lahey" },
+    { key: 4, value: "Cory Trevor", text: "Cory Trevor" },
+]);
+
 const _MyTemplates = ({
     user,
 }) => {
@@ -195,20 +202,28 @@ const _MyTemplates = ({
     return (
         <Container>
             <h1 id="template-name">{selectedTemplate.name}</h1>
-            <Dropdown
-                selection
-                inline
-                defaultValue={templates[0]}
-                options={templateDropdownOptions(templates)}
-                onChange={(_, v) => setSelectedTemplate(v.value)}
-            />
-            <Button
-                negative
-                onClick={() => setTemplates(templates.filter((t) => t.id !== selectedTemplate.id))}
-                id="delete-template-btn"
-            >
-                Delete
-            </Button>
+            <div id="template-header">
+                <div id="template-header-left">
+                    <Dropdown
+                        selection
+                        inline
+                        defaultValue={templates[0]}
+                        options={templateDropdownOptions(templates)}
+                        onChange={(_, v) => setSelectedTemplate(v.value)}
+                    />
+                    <Button
+                        negative
+                        onClick={() => setTemplates(templates.filter((t) => t.id !== selectedTemplate.id))}
+                        id="delete-template-btn"
+                    >
+                        Delete
+                    </Button>
+                </div>
+                <div id="template-header-right">
+                    <Dropdown selection options={clientOptions(user)} defaultValue={clientOptions(user)[0].value} />
+                    <Button id="assign-template-button">Assign</Button>
+                </div>
+            </div>
             <Grid columns={3} celled>
                 <Grid.Row columns={3}>
                     <Grid.Column>

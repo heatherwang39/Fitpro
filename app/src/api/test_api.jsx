@@ -3,7 +3,7 @@
 import {
     clientUser, client2User, trainerUser, clientCalendar, client2Calendar, trainerCalendar,
     trainerUser1, trainerUser2, trainerUser3, trainerUser4, exercise1, exercise2, exercise3,
-    exercise4, client3User, client4User, placeholderTemplates,
+    exercise4, client3User, client4User, placeholderTemplates, client3Calendar, client4Calendar,
 } from "./test_data";
 
 let lastEventId = 10;
@@ -121,7 +121,10 @@ export const TestAPI = {
         case 1:
             return { success: true, profile: clientUser };
         case 2:
-            return { success: true, profile: trainerUser };
+            return {
+                success: true,
+                profile: trainerUser,
+            };
         case 3:
             return { success: true, profile: client2User };
         default:
@@ -155,15 +158,27 @@ export const TestAPI = {
                 clientCalendars: [
                     {
                         id: 1,
-                        firstname: "ClientFirst",
-                        lastname: "ClientLast",
+                        firstname: clientUser.firstname,
+                        lastname: clientUser.lastname,
                         calendar: clientCalendar,
                     },
                     {
                         id: 3,
-                        firstname: "Client2First",
-                        lastname: "Client2Last",
+                        firstname: client2User.firstname,
+                        lastname: client2User.lastname,
                         calendar: client2Calendar,
+                    },
+                    {
+                        id: 4,
+                        firstname: client3User.firstname,
+                        lastname: client3User.lastname,
+                        calendar: client3Calendar,
+                    },
+                    {
+                        id: 5,
+                        firstname: client4User.firstname,
+                        lastname: client4User.lastname,
+                        calendar: client4Calendar,
                     },
                 ],
             };

@@ -4,10 +4,11 @@ import { Link } from "react-router-dom";
 import { PropTypes } from "prop-types";
 
 import {
-    Button, Container, Grid, Input, Label, Rating,
+    Button, Container, Grid, Input, Label, Rating, Segment,
 } from "semantic-ui-react";
 import { User } from "../../types/user";
 import { gotUserInfo as gotUserInfoAction } from "../../actions/userActions";
+import { testReviews, testOffers } from "../../api/test_data";
 import API from "../../api";
 import "./style.css";
 
@@ -23,6 +24,47 @@ const errorComponent = (errorMessage) => (
             <p>{errorMessage}</p>
         </Container>
     </div>
+);
+
+
+const reviewsColumn = () => (
+    <Grid.Column>
+        <Container id="profile-reviews" divided>
+            <h4 id="profile-reviews-header">Reviews</h4>
+            {testReviews.map((review) => (
+                <Segment className="profile-review">
+                    <div className="review-body">
+                        {review.review}
+                        <br />
+                        <Rating
+                            className="review-rating"
+                            disabled
+                            icon="star"
+                            maxRating={review.rating}
+                            defaultRating={review.rating}
+                        />
+                    </div>
+                    <div className="review-name">{`— ${review.name}`}</div>
+                </Segment>
+            ))}
+        </Container>
+    </Grid.Column>
+);
+
+const offersColumn = () => (
+    <Grid.Column>
+        <Container id="profile-offers" divided>
+            <h4 id="profile-offers-header">Specials</h4>
+            {testOffers.map((offer) => (
+                <Segment className="profile-offer">
+                    <div className="offer-title"><h5>{offer.title}</h5></div>
+                    <div className="offer-body">{offer.details}</div>
+                    <div className="offer-price">{offer.price}</div>
+                </Segment>
+            ))}
+        </Container>
+    </Grid.Column>
+
 );
 
 const _Profile = ({
@@ -257,7 +299,7 @@ const _Profile = ({
     return (
         <Container>
             <Grid className="profile" stackable>
-                <Grid.Column width={6} textAlign="center">
+                <Grid.Column width={8} textAlign="center">
                     <Grid.Row>
                         <img
                             alt={`${profile.firstname} ${profile.lastname}`}
@@ -273,7 +315,7 @@ const _Profile = ({
                             <p><Button onClick={() => setEditing(true)}>Edit</Button></p>
                         </Grid.Row>
                     )}
-                    <Grid.Row>
+                    <Grid.Row inline>
                         <p>{`${profile.firstname} ${profile.lastname}`}</p>
                     </Grid.Row>
                     {profile.isTrainer && (
@@ -294,7 +336,7 @@ const _Profile = ({
                         <p>{profile.location}</p>
                     </Grid.Row>
                     <Grid.Row>
-                        <Rating icon="star" disabled rating={profile.rating} />
+                        <Rating icon="star" disabled maxRating={profile.rating} defaultRating={profile.rating} />
                     </Grid.Row>
                     <Grid.Row>
                         {user != null && profile.trainers.includes(user.id) && (
@@ -307,6 +349,14 @@ const _Profile = ({
                     </Grid.Row>
                 </Grid.Column>
             </Grid>
+            {user.isTrainer && (
+                <Grid>
+                    <Grid.Row columns={2}>
+                        {offersColumn()}
+                        {reviewsColumn()}
+                    </Grid.Row>
+                </Grid>
+            )}
         </Container>
     );
 };

@@ -21,7 +21,7 @@ import { Calendar as CalendarType } from "../../types/calendar";
 import API from "../../api";
 import "./style.css";
 
-import { allWorkouts } from "../../api/test_data";
+// import { allWorkouts } from "../../api/test_data";
 
 const ALL_EVENT_COLOURS = [
     "orange",
@@ -66,6 +66,29 @@ const combineClientEvents = (clientCalendars) => {
     }
     return events;
 };
+    // List of client calendars by name to be used in Dropdown
+    // Includes current user as top option
+const clientCalendarOptions = (calendar, user) => {
+    const items = calendar.clientCalendars.map(
+        (cal) => ({
+            key: cal.id,
+            text: `${cal.firstname} ${cal.lastname}`,
+            value: cal.id.toString(),
+        }),
+    );
+    items.unshift({ key: user.id, text: `${user.firstname} ${user.lastname}`, value: user.id.toString() });
+    return items;
+};
+
+const parseMinutesDuration = (input) => {
+    if (input.match(/^\d+$/)) return parseInt(input, 10);
+    const minsMatch = input.match(/(\d)+\s*[mM].*/);
+    if (minsMatch != null) return parseInt(minsMatch[1], 10);
+    const hoursAndMinsMatch = input.match(/(\d)+\s*[h:][oOuUrR\s]*((\d)+[mM]?)?.*/);
+    if (hoursAndMinsMatch == null || hoursAndMinsMatch.length < 2) return 0;
+    return parseInt(hoursAndMinsMatch[1] * 60, 10)
+         + parseInt(hoursAndMinsMatch.length > 2 && hoursAndMinsMatch[2] !== undefined ? hoursAndMinsMatch[2] : 0, 10);
+};
 
 const _Calendar = ({
     auth,
@@ -99,7 +122,7 @@ const _Calendar = ({
     const [availableColours, setAvailableColours] = React.useState(ALL_EVENT_COLOURS);
     const [uidColours, setUidColours] = React.useState(new Map());
     const [changeToClient, setChangeToClient] = React.useState(false);
-    const [selectedWorkout, setSelectedWorkout] = React.useState(null);
+    const [selectedWorkout, setSelectedWorkout] = React.useState(null); // Unused in Phase 1
     const [lastSelectedClient, setLastSelectedClient] = React.useState(null);
     const [selectedClient, setSelectedClient] = useStateWithCallback(null, (client) => {
         if (client != null && client !== lastSelectedClient) {
@@ -205,15 +228,6 @@ const _Calendar = ({
         setModalOpen(!modalOpen);
     };
 
-    const parseMinutesDuration = (input) => {
-        if (input.match(/^\d+$/)) return parseInt(input, 10);
-        const minsMatch = input.match(/(\d)+\s*[mM].*/);
-        if (minsMatch != null) return parseInt(minsMatch[1], 10);
-        const hoursAndMinsMatch = input.match(/(\d)+\s*[h:][oOuUrR\s]*((\d)+[mM]?)?.*/);
-        if (hoursAndMinsMatch == null || hoursAndMinsMatch.length < 2) return 0;
-        return parseInt(hoursAndMinsMatch[1] * 60, 10)
-         + parseInt(hoursAndMinsMatch.length > 2 && hoursAndMinsMatch[2] !== undefined ? hoursAndMinsMatch[2] : 0, 10);
-    };
 
     const validateCurEvent = () => {
         if (curEvent.duration <= 0) {
@@ -247,8 +261,6 @@ const _Calendar = ({
             ? (curEvent.client === user.id.toString()
                 ? calendar.userCalendar : calendar.clientCalendars.filter((c) => c.id === curEvent.client)[0].calendar)
             : calendar.userCalendar;
-        // stuff with event is just wasting time so setCurEvent in validateCurEvent hopefully finishes before API call
-        // TODO handle it properly
         let event = curEvent;
         if (curEvent.end === undefined) {
             event.end = new Date(curEvent.start.getTime() + curEvent.duration * 60000);
@@ -290,20 +302,9 @@ const _Calendar = ({
         );
     };
 
-    // List of client calendars by name to be used in Dropdown
-    // Includes current user as top option
-    const clientCalendarOptions = () => {
-        const items = calendar.clientCalendars.map(
-            (cal) => ({
-                key: cal.id,
-                text: `${cal.firstname} ${cal.lastname}`,
-                value: cal.id.toString(),
-            }),
-        );
-        items.unshift({ key: user.id, text: `${user.firstname} ${user.lastname}`, value: user.id.toString() });
-        return items;
-    };
 
+    // Workout options removed for phase 1 since we have no Manage Workouts view yet
+    //
     // const workoutOptions = () => {
     // // TODO fetch these from server dynamically based on user input
     // const workouts = [];
@@ -422,7 +423,7 @@ const _Calendar = ({
                             For&nbsp;
                             <Dropdown
                                 selection
-                                options={clientCalendarOptions()}
+                                options={clientCalendarOptions(calendar, user)}
                                 value={curEvent.client}
                                 onChange={(_, v) => setCurEvent({ ...curEvent, client: v.value })
                                 && setCalendarType(calendarType)}
