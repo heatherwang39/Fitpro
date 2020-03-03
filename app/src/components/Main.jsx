@@ -7,6 +7,7 @@ import Home from "./Home";
 import LoginContainer from "./LoginContainer";
 import Profile from "./Profile";
 import MailContainer from "./MailContainer";
+import MyTemplates from "./MyTemplates";
 import Calendar from "./Calendar";
 import ViewClientsContainer from "./ViewClientsContainer";
 import SearchTrainer from "./SearchTrainer";
@@ -64,6 +65,10 @@ const Main = () => (
                 <ProtectedRoute
                     path="/client"
                     component={UserContainer}
+                />
+                <ProtectedRoute
+                    path="/templates"
+                    component={MyTemplates}
                 />
             </Provider>
         </Router>

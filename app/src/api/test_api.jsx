@@ -3,7 +3,7 @@
 import {
     clientUser, client2User, trainerUser, clientCalendar, client2Calendar, trainerCalendar,
     trainerUser1, trainerUser2, trainerUser3, trainerUser4, exercise1, exercise2, exercise3,
-    exercise4, client3User, client4User,
+    exercise4, client3User, client4User, placeholderTemplates,
 } from "./test_data";
 
 let lastEventId = 10;
@@ -208,6 +208,8 @@ export const TestAPI = {
     },
 
     updateProfile: async (profile) => ({ success: true, profile }),
+
+    getTemplates: async (user) => ({ success: true, templates: placeholderTemplates }),
 };
 
 export default TestAPI;

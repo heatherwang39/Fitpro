@@ -1,0 +1,17 @@
+#new-exercise-row {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    text-align: center;
+}
+
+#template-name {
+    padding-top: 8px;
+    font-size: 32pt;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+#delete-template-btn {
+    margin-left: 8px;
+}

@@ -83,6 +83,29 @@ const trainerAvailability = [
     Availability(new Date("February 22, 2020 21:00:00"), new Date("February 22, 2020 23:00:00"), 2, "weekly"),
 ];
 
+export const placeholderTemplates = [
+    {
+        name: "Template 1",
+        id: 1,
+        exercises: [
+            { exercise: exercise1, days: ["Monday", "Wednesday", "Friday"] },
+            { exercise: exercise2, days: ["Monday", "Wednesday", "Friday"] },
+            { exercise: exercise3, days: ["Monday", "Wednesday", "Friday"] },
+            { exercise: exercise4, days: ["Tuesday", "Thursday", "Saturday"] },
+        ],
+    },
+    {
+        name: "Template 2",
+        id: 2,
+        exercises: [
+            { exercise: exercise4, days: ["Monday", "Wednesday", "Friday"] },
+            { exercise: exercise2, days: ["Tuesday", "Thursday", "Saturday"] },
+            { exercise: exercise1, days: ["Monday", "Wednesday", "Friday"] },
+            { exercise: exercise3, days: ["Tuesday", "Thursday", "Saturday"] },
+        ],
+    },
+];
+
 export const clientCalendar = new Calendar(clientEvents, [], 1);
 export const trainerCalendar = new Calendar(trainerEvents, trainerAvailability, 2);
 export const client2Calendar = new Calendar(client2Events, [], 3);
