@@ -6,6 +6,7 @@ import NewsFeedContainer from "./NewsFeedContainer";
 import styles from "./HomeContainer.module.css";
 import CalenderStripContainer from "./CalendarStripContainer";
 import { User } from "../../types/user";
+import TrainerSearchComponent from "./TrainerSearch/TrainerSearchComponent";
 
 const _Home = (props) => {
     (() => {})(props); // Shut eslint up
@@ -17,9 +18,7 @@ const _Home = (props) => {
                     <CalenderStripContainer />
                 )
             }
-            <div style={{ width: "60%", height: 350 }}>
-                Placeholder
-            </div>
+            <TrainerSearchComponent isAuth={user !== null} />
             <NewsFeedContainer />
         </div>
     );
