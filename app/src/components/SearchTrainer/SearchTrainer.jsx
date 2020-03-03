@@ -1,9 +1,10 @@
+/* eslint-disable jsx-a11y/label-has-for, jsx-a11y/label-has-associated-control */
 import React, { Component } from "react";
-import TrainerList from "./TrainerList";
 import {
-    Form, Input, Radio,
+    Form, Grid, Input, Radio,
 } from "semantic-ui-react";
-
+import TrainerList from "./TrainerList";
+import "./style.css";
 
 class SearchTrainer extends Component {
     constructor(props) {
@@ -17,104 +18,140 @@ class SearchTrainer extends Component {
     }
 
     filter() {
+        const { filters } = this.state;
         return (
             <div>
-                <Form>
-                    <Form.Group grouped>
-                        <label>Min Rating:</label>
+                <Form id="filter-form">
+                    <Form.Group inline>
+                        <label className="filter-label">Min Rating</label>
                         <Form.Field
+                            className="filter-first-option"
                             control={Radio}
-                            checked={this.state.filters.minRating === 4}
-                            label="4.0"
-                            onChange={() => this.setState(
-                                {
-                                ...this.state,
-                                    filters: { ...this.state.filters, minRating: this.state.filters.minRating === 4 ? undefined : 4}
-                            })}
+                            checked={filters.minRating === 4}
+                            label="4"
+                            onChange={() => this.setState((prevState) => ({
+                                prevState,
+                                filters: {
+                                    ...prevState.filters,
+                                    minRating: prevState.filters.minRating === 4 ? undefined : 4,
+                                },
+                            }))}
                         />
                         <Form.Field
                             control={Radio}
-                            checked={this.state.filters.minRating === 3.5}
-                            label="3.5"
-                            onChange={() => this.setState({...this.state, filters: { ...this.state.filters, minRating: 3.5 } })}
+                            checked={filters.minRating === 3}
+                            label="3"
+                            onChange={() => this.setState((prevState) => ({
+                                prevState,
+                                filters: {
+                                    ...prevState.filters,
+                                    minRating: prevState.filters.minRating === 3 ? undefined : 3,
+                                },
+                            }))}
                         />
                         <Form.Field
                             control={Radio}
-                            checked={this.state.filters.minRating === 3}
-                            label="3.0"
-                            onChange={() => this.setState({...this.state, filters: { ...this.state.filters, minRating: 3 } })}
+                            checked={filters.minRating === 2}
+                            label="2"
+                            onChange={() => this.setState((prevState) => ({
+                                prevState,
+                                filters: {
+                                    ...prevState.filters,
+                                    minRating: prevState.filters.minRating === 2 ? undefined : 2,
+                                },
+                            }))}
                         />
                     </Form.Group>
 
-                    <Form.Group grouped>
-                        <label>Gender:</label>
+                    <Form.Group inline>
+                        <label className="filter-label">Gender</label>
                         <Form.Field
                             control={Radio}
-                            checked={this.state.filters.gender === "male"}
+                            checked={filters.gender === "male"}
                             label="Male"
-                            onChange={() => this.setState({...this.state, filters: { ...this.state.filters, gender: "male" } })}
+                            onChange={() => this.setState((prevState) => (
+                                {
+                                    ...prevState,
+                                    filters: { ...prevState.filters, gender: "male" },
+                                }))}
                         />
                         <Form.Field
                             control={Radio}
-                            checked={this.state.filters.gender === "female"}
+                            checked={filters.gender === "female"}
                             label="Female"
-                            onChange={() => this.setState({...this.state, filters: { ...this.state.filters, gender: "female" } })}
+                            onChange={() => this.setState((prevState) => (
+                                {
+                                    ...prevState,
+                                    filters: { ...prevState.filters, gender: "female" },
+                                }))}
                         />
                     </Form.Group>
 
-                    <Form.Group grouped>
-                        <label>Max Price:</label>
+                    <Form.Group inline>
+                        <label className="filter-label">Max Price (Hourly)</label>
                         <Form.Field
                             control={Radio}
-                            checked={this.state.filters.maxPrice === 40}
-                            label="within $40 per hour"
-                            onChange={() => this.setState({...this.state, filters: { ...this.state.filters, maxPrice: 40 } })}
+                            checked={filters.maxPrice === 40}
+                            label="$40"
+                            onChange={() => this.setState((prevState) => (
+                                {
+                                    ...prevState,
+                                    filters: { ...prevState.filters, maxPrice: 40 },
+                                }))}
                         />
                         <Form.Field
                             control={Radio}
-                            checked={this.state.filters.maxPrice === 30}
-                            label="within $30 per hour"
-                            onChange={() => this.setState({...this.state, filters: { ...this.state.filters, maxPrice: 30 } })}
+                            checked={filters.maxPrice === 30}
+                            label="$30"
+                            onChange={() => this.setState((prevState) => (
+                                {
+                                    ...prevState,
+                                    filters: { ...prevState.filters, maxPrice: 30 },
+                                }))}
                         />
                         <Form.Field
                             control={Radio}
-                            checked={this.state.filters.maxPrice === 20}
-                            label="within $20 per hour"
-                            onChange={() => this.setState({...this.state, filters: { ...this.state.filters, maxPrice: 20 } })}
+                            checked={filters.maxPrice === 20}
+                            label="$20"
+                            onChange={() => this.setState((prevState) => (
+                                {
+                                    ...prevState,
+                                    filters: { ...prevState.filters, maxPrice: 20 },
+                                }))}
                         />
                     </Form.Group>
                 </Form>
             </div>
-        )
-        }
+        );
+    }
 
     render() {
+        const { searchedName, filters } = this.state;
         return (
-            <div className="wrapper ui grid">
-                <div className="filterContainer four wide column">
-                    <div className="ui block header">
+            <Grid className="search-container">
+                <Grid.Column className="filterContainer" width={4}>
+                    <div className="filter-header">
                         {this.filter()}
                     </div>
-                </div>
-
-                <div className="twelve wide column">
+                </Grid.Column>
+                <Grid.Column width={12}>
                     <div className="searchBarContainer">
-                        <form onSubmit={(e) => { this.onFormSubmit(e); }} className="ui form">
-                            <div className="field">
+                        <Form onSubmit={(e) => { this.onFormSubmit(e); }} className="ui form">
+                            <Form.Field>
                                 <h3>Search Trainers</h3>
                                 <Input
                                     type="text"
                                     placeholder="Search for a trainer..."
-                                    value={this.state.searchedName}
-                                    onChange={(_, v) => { this.setState({searchedName: v.value})}}
+                                    value={searchedName}
+                                    onChange={(_, v) => { this.setState({ searchedName: v.value }); }}
                                 />
-                            </div>
-                        </form>
+                            </Form.Field>
+                        </Form>
                     </div>
                     <br />
-                    <TrainerList searchedName={this.state.searchedName} filters={this.state.filters} />
-                </div>
-            </div>
+                    <TrainerList searchedName={searchedName} filters={filters} />
+                </Grid.Column>
+            </Grid>
         );
     }
 }

@@ -6,8 +6,10 @@
 import React from "react";
 import { withRouter, Link } from "react-router-dom";
 
+import { Button, Dropdown, Menu } from "semantic-ui-react";
 import { connect } from "react-redux";
 import { PropTypes } from "prop-types";
+
 
 import { User } from "../../types/user";
 import { loggedOut as loggedOutAction } from "../../actions/userActions";
@@ -17,82 +19,90 @@ function _Navigation({ user, loggedOut, location }) {
     const currentPage = location.pathname;
 
     return (
-        <div className="ui inverted menu attached">
-            <div className="menu left">
-                <Link to="/" className={`item ${currentPage === "/" ? "active" : ""}`}>
-                    Home
+        <Menu inverted attached>
+            <Menu.Menu position="left">
+                <Link to="/">
+                    <Menu.Item active={currentPage === "/"}>
+                        Home
+                    </Menu.Item>
                 </Link>
                 {user != null && (
-                    <Link to="/calendar" className={`item ${currentPage === "/calendar" ? "active" : ""}`}>
-                        Calendar
+                    <Link to="/calendar">
+                        <Menu.Item active={currentPage === "/calendar"}>
+                            Calendar
+                        </Menu.Item>
                     </Link>
                 )}
                 { user != null && (
-                    <Link to="/mail" className={`item ${currentPage === "/mail" ? "active" : ""}`}>
-                        Mail
+                    <Link to="/mail">
+                        <Menu.Item active={currentPage === "/mail"}>
+                            Mail
+                        </Menu.Item>
                     </Link>
                 )}
 
                 {/* eslint-disable jsx-a11y/click-events-have-key-events */
                     user != null && (
-                        <div className="ui simple dropdown item">
-                            More
-                            <i className="dropdown icon" />
-                            <div className="menu">
-                                <Link to="/exercises" className="item">Exercises</Link>
+                        <Dropdown item text="More" simple>
+                            <Dropdown.Menu>
+                                <Dropdown.Item as={Link} to="/exercises" text="Exercises" />
                                 { user.isTrainer && (
-                                    <Link to="/clients" className="item">
+                                    <Dropdown.Item as={Link} to="/clients">
                                         My Clients
-                                    </Link>
+                                    </Dropdown.Item>
                                 )}
                                 { !user.isTrainer && (
-                                    <Link to="/my_trainers" className="item">
+                                    <Dropdown.Item as={Link} to="/my_trainers">
                                         My Trainers
-                                    </Link>
+                                    </Dropdown.Item>
                                 )}
                                 { user.isTrainer && (
-                                    <Link to="/templates" className="item">
+                                    <Dropdown.Item as={Link} to="/templates">
                                         My Templates
-                                    </Link>
+                                    </Dropdown.Item>
                                 )}
-                            </div>
-                        </div>
+                            </Dropdown.Menu>
+                        </Dropdown>
                     )
                 /* eslint-enable */
                 }
 
                 { user == null && (
-                    <Link to="/exercises" className={`item ${currentPage === "/exercises" ? "active" : ""}`}>
-                        Exercises
+                    <Link to="/exercises">
+                        <Menu.Item active={currentPage === "/exercises"}>
+                            Exercises
+                        </Menu.Item>
                     </Link>
                 )}
                 { user == null && (
-                    <Link to="/trainers" className={`item ${currentPage === "/trainers" ? "active" : ""}`}>
-                        Trainers
+                    <Link to="/trainers">
+                        <Menu.Item active={currentPage === "/trainers"}>
+                            Trainers
+                        </Menu.Item>
                     </Link>
                 )}
-            </div>
-            <div className="menu right">
+            </Menu.Menu>
+            <Menu.Menu position="right">
                 {user == null && (
-                    <Link to="/login" className="item ui inverted button">
-                        Log In
+                    <Link to="/login">
+                        <Button inverted id="login-btn">
+                            Log In
+                        </Button>
                     </Link>
                 )}
                 {/* eslint-disable jsx-a11y/click-events-have-key-events */
                     user != null && (
-                        <div className="ui simple dropdown item">
-                            {user.firstname}
-                            <i className="dropdown icon" />
-                            <div className="menu">
-                                <Link to={`/user/${user.id}`} className="item">Me</Link>
-                                <div role="none" onClick={loggedOut} className="item">Log Out</div>
-                            </div>
-                        </div>
+                        <Dropdown item text={user.firstname} simple>
+                            <Dropdown.Menu>
+                                <Dropdown.Item as={Link} to={`/user/${user.id}`} text="Me" />
+                                <Dropdown.Item onClick={loggedOut} text="Log Out" />
+                            </Dropdown.Menu>
+                        </Dropdown>
                     )
                 /* eslint-enable */
                 }
-            </div>
-        </div>
+            </Menu.Menu>
+        </Menu>
     );
 }
 

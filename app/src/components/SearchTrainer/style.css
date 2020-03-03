@@ -1,14 +1,30 @@
-.wrapper ui grid{
+.search-container {
     top: 20px;
     left:20px;
 }
-
 
 .searchBarContainer{
     width:50%;
     position: relative;
     top: 20px;
 }
-.ui block header{
+.filter-header{
     height:100%
+}
+
+.filter-label {
+    margin-right: 1em;
+}
+
+#filter-container {
+    padding-top: 2em;
+}
+
+#filter-form {
+    margin-top: 4em;
+    margin-left: 2em;
+}
+
+#search-items {
+    margin-top: 1em;
 }
