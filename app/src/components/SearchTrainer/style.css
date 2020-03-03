@@ -1,35 +1,14 @@
-.wrapper{
+.wrapper ui grid{
     top: 20px;
-    position: relative;
+    left:20px;
 }
 
-
-
-/*
-.filterContainer{
-    width:20%;
-    background-color: lightgray;
-    float:left;
-    position: relative;
-    top: 20px;
-    height:500px;
-    border-radius: 10px;
-    margin:20px;
-}
 
 .searchBarContainer{
     width:50%;
-    float:left;
     position: relative;
     top: 20px;
 }
-.detailsContainer{
-    float: left;
-    width:20%;
-    background-color: lightgray;
-    position: relative;
-    top: 20px;
-    margin:20px;
-
+.ui block header{
+    height:100%
 }
-*/

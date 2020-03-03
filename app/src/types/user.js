@@ -1,7 +1,7 @@
 export class User {
     constructor(id, username, firstname, lastname, email, phone, location, height,
         weight, isTrainer, isAdmin, goalType, rating, trainers, clients, gender,
-        price,
+        price, imgsrc,
     ) {
         this.id = id;
         this.username = username;
@@ -19,7 +19,8 @@ export class User {
         this.trainers = trainers;
         this.clients = clients;
         this.gender = gender;
-        this.price = price
+        this.price = price;
+        this.imgsrc = imgsrc;
     }
 }
 
