@@ -44,7 +44,7 @@ const Main = () => (
                 />
                 <Route
                     path="/my_trainers"
-                    component={SearchTrainer}
+                    component={ViewClientsContainer}
                 />
                 <Route
                     path="/exercises"

@@ -32,10 +32,16 @@ const ViewClientsContainer = (props) => {
     };
 
     const onClickExpand = (userObject) => () => {
-        history.push({
-            pathname: "/client",
-            state: { user: userObject },
-        });
+        if (user.isTrainer) {
+            history.push({
+                pathname: "/client",
+                state: { user: userObject },
+            });
+        } else {
+            history.push({
+                pathname: `/user/${userObject.id}`,
+            });
+        }
     };
 
     const onClickCalendar = (userObject) => () => {

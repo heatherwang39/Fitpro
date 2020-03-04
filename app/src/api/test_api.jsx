@@ -4,7 +4,6 @@ import {
     clientUser, client2User, trainerUser, clientCalendar, client2Calendar, trainerCalendar,
     trainerUser1, trainerUser2, trainerUser3, trainerUser4, exercise1, exercise2, exercise3,
     exercise4, client3User, client4User, placeholderTemplates, client3Calendar, client4Calendar,
-    allUsers,
 } from "./test_data";
 
 let lastEventId = 10;
@@ -228,14 +227,14 @@ export const TestAPI = {
     },
 
     getRelationships: async (userInfo) => {
-        if (userInfo.username.includes("user")) {
+        if (userInfo.isTrainer) {
             return {
                 success: true,
                 clients: [clientUser, client2User, client3User, client4User],
                 trainers: [trainerUser1],
             };
         }
-        return { success: false };
+        return { success: true, clients: [trainerUser1], trainers: [] };
     },
 
     updateProfile: async (profile) => ({ success: true, profile }),

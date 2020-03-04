@@ -27,7 +27,7 @@ function _Navigation({ user, loggedOut, location }) {
             options.push({ key: 2, value: "clients", text: "My Clients" });
             options.push({ key: 3, value: "templates", text: "My Templates" });
         } else {
-            options.push({ key: 4, value: "trainers", text: "My Trainers" });
+            options.push({ key: 4, value: "my_trainers", text: "My Trainers" });
         }
         return options;
     };
@@ -39,6 +39,16 @@ function _Navigation({ user, loggedOut, location }) {
                 <Link to="/">
                     <Menu.Item active={currentPage === "/"}>
                         Home
+                    </Menu.Item>
+                </Link>
+                <Link to="/trainers">
+                    <Menu.Item active={currentPage === "/trainers"}>
+                        Trainers
+                    </Menu.Item>
+                </Link>
+                <Link to="/exercises">
+                    <Menu.Item active={currentPage === "/exercises"}>
+                        Exercises
                     </Menu.Item>
                 </Link>
                 {user != null && (
@@ -69,21 +79,6 @@ function _Navigation({ user, loggedOut, location }) {
                     )
                 /* eslint-enable */
                 }
-
-                { user == null && (
-                    <Link to="/exercises">
-                        <Menu.Item active={currentPage === "/exercises"}>
-                            Exercises
-                        </Menu.Item>
-                    </Link>
-                )}
-                { user == null && (
-                    <Link to="/trainers">
-                        <Menu.Item active={currentPage === "/trainers"}>
-                            Trainers
-                        </Menu.Item>
-                    </Link>
-                )}
             </Menu.Menu>
             <Menu.Menu position="right">
                 {user == null && (
