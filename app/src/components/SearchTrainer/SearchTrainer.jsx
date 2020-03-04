@@ -159,30 +159,29 @@ class SearchTrainer extends Component {
     render() {
         const { searchedName, filters } = this.state;
         return (
-            <Grid className="search-container">
-                <Grid.Column className="filterContainer" width={4}>
-                    <div className="filter-header">
+            <div id="search-container">
+                <Grid>
+                    <Grid.Column className="filterContainer" width={4}>
                         {this.filter()}
-                    </div>
-                </Grid.Column>
-                <Grid.Column width={12}>
-                    <div className="searchBarContainer">
-                        <Form onSubmit={(e) => { this.onFormSubmit(e); }} className="ui form">
-                            <Form.Field>
-                                <h3>Search Trainers</h3>
-                                <Input
-                                    type="text"
-                                    placeholder="Search for a trainer..."
-                                    value={searchedName}
-                                    onChange={(_, v) => { this.setState({ searchedName: v.value }); }}
-                                />
-                            </Form.Field>
-                        </Form>
-                    </div>
-                    <br />
-                    <TrainerList searchedName={searchedName} filters={filters} />
-                </Grid.Column>
-            </Grid>
+                    </Grid.Column>
+                    <Grid.Column width={12}>
+                        <div className="searchBarContainer">
+                            <Form onSubmit={(e) => { this.onFormSubmit(e); }}>
+                                <Form.Field>
+                                    <Input
+                                        type="text"
+                                        placeholder="Search for a trainer..."
+                                        value={searchedName}
+                                        onChange={(_, v) => { this.setState({ searchedName: v.value }); }}
+                                    />
+                                </Form.Field>
+                            </Form>
+                        </div>
+                        <br />
+                        <TrainerList searchedName={searchedName} filters={filters} />
+                    </Grid.Column>
+                </Grid>
+            </div>
         );
     }
 }

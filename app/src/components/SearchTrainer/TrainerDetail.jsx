@@ -42,7 +42,11 @@ TrainerDetail.propTypes = {
         phone: PropTypes.string,
         location: PropTypes.string,
         id: PropTypes.number,
-    }).isRequired,
+    }),
+};
+
+TrainerDetail.defaultProps = {
+    selectedTrainer: null,
 };
 
 export default TrainerDetail;

@@ -1,15 +1,11 @@
-.search-container {
-    top: 20px;
-    left:20px;
+#search-container {
+    margin-left: 24px;
 }
 
 .searchBarContainer{
     width:50%;
     position: relative;
     top: 20px;
-}
-.filter-header{
-    height:100%
 }
 
 .filter-label {
@@ -41,4 +37,8 @@
     margin-left: 2em;
     margin-bottom: 1em;
     display: inline-block;
+}
+
+#search-container {
+    padding-top: 10px;
 }

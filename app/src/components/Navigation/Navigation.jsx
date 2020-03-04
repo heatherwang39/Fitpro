@@ -22,7 +22,7 @@ function _Navigation({ user, loggedOut, location }) {
     const history = useHistory();
 
     const moreMenuOptions = () => {
-        const options = [{ key: 1, value: "exercises", text: "Exercises" }];
+        const options = [];
         if (user.isTrainer) {
             options.push({ key: 2, value: "clients", text: "My Clients" });
             options.push({ key: 3, value: "templates", text: "My Templates" });
