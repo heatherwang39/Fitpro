@@ -5,7 +5,8 @@ To run the frontend for Phase 1:
 
 - `git clone https://github.com/csc309-winter-2020/team35/ && cd team35`
 - `cd app && npm install && npm start`
-- `user and user2 presents 2 different account authorization level instead of an admin account`
+
+Note that user and user2 represent the authorization levels of "Client" and "Trainer" respectively (as opposed to "standard" and "admin"). 
 
 ## Development
 `cd app` or `cd server` then `npm install && npm start`
