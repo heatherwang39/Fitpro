@@ -1,25 +1,50 @@
-import path from "path";
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const mongoose = require("mongoose");
+const logger = require("morgan");
+const bodyParser = require("body-parser");
+const fs = require("fs");
+const https = require("https");
+const cors = require("cors");
 
-import express from "express";
-import bodyParser from "body-parser";
+const usersRouter = require("./routes/users");
+const authRouter = require("./routes/auth");
 
-import { testRoute } from "./test";
-
-const port = process.env.PORT || 4321;
 const app = express();
 
-app.use(
-    bodyParser.urlencoded({ extended: true }),
-    bodyParser.json(),
-);
+// Middleware
+app.use(logger("dev"));
+app.use(cors());
+app.use(cookieParser());
+app.use(bodyParser.urlencoded({
+    extended: true,
+}));
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, "public")));
 
-app.listen(port, console.info("Server running, listening on port ", port));
+// Database
+const dbUrl = process.env.DB_URL || "mongodb://localhost/fitpro";
+mongoose.connect(dbUrl, {
+    useNewUrlParser: true, useUnifiedTopology: true,
+});
+const db = mongoose.connection;
+db.on("error", (e) => {
+    console.log(e, "\nError connecting to database, exiting");
+    process.exit();
+});
+db.on("open", () => console.log(`Connected to database at ${dbUrl}`));
 
-testRoute(app);
+// Routes
+app.use("/users", usersRouter);
+app.use("/auth", authRouter);
+app.use("/", (req, res) => res.status(200).send());
 
-if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.resolve(__dirname, "../../dist")));
-    app.get("/*", (_, res) => {
-        res.sendFile(path.resolve("index.html"));
-    });
-}
+const port = process.env.PORT || 3333;
+
+const httpsOptions = {
+    key: fs.readFileSync("./keys/key.pem"),
+    cert: fs.readFileSync("./keys/cert.pem"),
+};
+
+https.createServer(httpsOptions, app).listen(port, () => console.log(`Started on port ${port}`));
