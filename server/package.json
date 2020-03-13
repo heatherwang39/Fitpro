@@ -4,9 +4,8 @@
   "description": "Backend server for FitPro",
   "main": "server.js",
   "scripts": {
-    "server": "cross-env NODE_ENV=production",
-    "server-dev": "nodemon server.js",
-    "start": "npm run server-dev",
+    "start": "nodemon server.js",
+    "start-prod": "npm run server-dev",
     "lint": "eslint \"./**/*.js\""
   },
   "author": "",
@@ -20,7 +19,8 @@
     "https": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.5",
-    "mongoose": "^5.9.4"
+    "mongoose": "^5.9.4",
+    "morgan": "^1.9.1"
   },
   "engines": {
     "node": "9.2.0"
@@ -31,8 +31,6 @@
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-promise": "^4.2.1",
-    "morgan": "^1.9.1",
-    "nodemon": "^2.0.2",
-    "webpack": "^4.41.6"
+    "nodemon": "^2.0.2"
   }
 }

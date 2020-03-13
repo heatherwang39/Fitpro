@@ -53,6 +53,7 @@ const schema = new mongoose.Schema({
     price: Number,
     goalType: String,
     imageUrl: String,
+    token: String,
 });
 
 schema.pre("save", function (next) { /* eslint-disable-line func-names */

@@ -8,6 +8,7 @@ const fs = require("fs");
 const https = require("https");
 const cors = require("cors");
 
+const auth = require("./auth");
 const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
 
@@ -22,6 +23,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(auth);
 
 // Database
 const dbUrl = process.env.DB_URL || "mongodb://localhost/fitpro";
@@ -38,7 +40,6 @@ db.on("open", () => console.log(`Connected to database at ${dbUrl}`));
 // Routes
 app.use("/users", usersRouter);
 app.use("/auth", authRouter);
-app.use("/", (req, res) => res.status(200).send());
 
 const port = process.env.PORT || 3333;
 
