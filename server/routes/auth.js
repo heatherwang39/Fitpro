@@ -4,7 +4,8 @@
 
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
+const ObjectId = require("mongodb").ObjectID;
 const jwtSecret = require("../keys/jwtsecret");
 
 const router = express.Router();
@@ -51,6 +52,10 @@ router.post("/login", (req, res) => {
             const token = jwt.sign(resUser,
                 jwtSecret + user.password,
                 resUser.remember ? undefined : { expiresIn: "1h" });
+
+            user.tokens.push(token);
+            user.save();
+
             res.cookie("token", token, {
                 // 2147483647000 = epoch + 2^31 - 1 (Jan 2038)
                 expires: new Date(resUser.remember ? 2147483647000 : Date.now() + 3.6e6),
@@ -68,5 +73,21 @@ router.post("/login", (req, res) => {
 // Returns 200 if token is valid
 // Requires auth middleware to have already run to populate req.user
 router.get("/validate", (req, res) => res.status(req.user ? 200 : 401).send());
+
+// Delete the token from cookies and user
+// 400 if token is invalid else 200
+router.get("/logout", (req, res) => {
+    if (!req.cookies || !req.cookies.token) {
+        res.status(200).send();
+        return;
+    }
+    const { id } = jwt.decode(req.cookies.token); // Get UserID without verifying signature
+    User.findOne({ _id: ObjectId(id) }, (err, user) => {
+        res.status(err || !user ? 400 : 200);
+        user.tokens.pull(req.cookies.token);
+        res.clearCookie("token");
+        res.send();
+    });
+});
 
 module.exports = router;

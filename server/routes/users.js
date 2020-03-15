@@ -20,7 +20,7 @@ router.post("/", (req, res) => {
     user.save((err) => {
         if (err) {
             console.log("error in /users POST", err);
-            res.status(500).send(); // This should sometimes be a 400 e.g. existing email/username
+            res.status(err.name === "ValidationError" ? 400 : 500).send();
         } else res.status(201).send(resUser);
     });
 });

@@ -13,7 +13,6 @@ const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
 
 const app = express();
-
 // Middleware
 app.use(logger("dev"));
 app.use(cors());

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 const saltRounds = 10;
 
@@ -53,7 +53,12 @@ const schema = new mongoose.Schema({
     price: Number,
     goalType: String,
     imageUrl: String,
-    token: String,
+    tokens: [
+        {
+            type: String,
+            expires: 3600,
+        },
+    ],
 });
 
 schema.pre("save", function (next) { /* eslint-disable-line func-names */
