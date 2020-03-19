@@ -1,0 +1,4 @@
+langdetect
+lxml
+requests
+tqdm
