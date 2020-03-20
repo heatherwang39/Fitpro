@@ -49,13 +49,15 @@ def save_exercise_urls():
         file.writelines(names)
 
 
-def load_exercise_urls(download: bool = True):
+def load_exercise_urls(download: bool = True, overwrite: bool = False):
     if not path.exists("bbcom_urls.txt"):
         if download:
             save_exercise_urls()
         else:
             print("bbcom_urls.txt doesn't exist, can't load urls")
             return
+    elif overwrite:
+        save_exercise_urls()
     with open("bbcom_urls.txt", "r") as file:
         return [l.rstrip() for l in file.readlines()]
 
@@ -72,6 +74,8 @@ def fetch_exercise(url: str):
         for x in page.xpath('//ul[@class="bb-list--plain"]/li')
     ]:
         details[s[0]] = s[1]
+    if "Type" not in details:
+        return None
     exercise = {
         "name": page.xpath("//h1/text()")[0].lstrip().rstrip(),
         "type": details.get("Type"),
@@ -101,19 +105,15 @@ def fetch_exercise(url: str):
 
 
 def save_exercises() -> None:
-    last_save = 0
-    save_freq = 10
-    exercises = []
     urls = load_exercise_urls()
     print("Getting exercises...")
-    for i, url in enumerate(tqdm(urls)):
-        exercises.append(fetch_exercise(url))
-        if i - last_save > save_freq:
-            last_save = i
-            with open(OUT_FILE_NAME, "a") as file:
-                json.dump(exercises, file, indent=4)
+    exercises = []
+    for url in tqdm(urls):
+        e = fetch_exercise(url)
+        if e:
+            exercises.append(e)
 
-    with open(OUT_FILE_NAME, "a") as file:
+    with open(OUT_FILE_NAME, "w") as file:
         json.dump(exercises, file, indent=4)
 
 

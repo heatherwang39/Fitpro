@@ -1,4 +1,3 @@
-langdetect
 lxml
 requests
 tqdm
