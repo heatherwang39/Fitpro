@@ -11,11 +11,12 @@ const cors = require("cors");
 const auth = require("./auth");
 const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
+const workoutsRouter = require("./routes/workouts");
 
 const app = express();
 // Middleware
 app.use(logger("dev"));
-app.use(cors());
+app.use(cors({ origin: "http://localhost:8080", credentials: true }));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({
     extended: true,
@@ -39,6 +40,7 @@ db.on("open", () => console.log(`Connected to database at ${dbUrl}`));
 // Routes
 app.use("/users", usersRouter);
 app.use("/auth", authRouter);
+app.use("/workouts", workoutsRouter);
 
 const port = process.env.PORT || 3333;
 

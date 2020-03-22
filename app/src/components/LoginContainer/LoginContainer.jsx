@@ -4,10 +4,11 @@ import PropTypes from "prop-types";
 import {
     useHistory,
 } from "react-router-dom";
-import API from "../../api";
+import API from "../../api/api";
 import { loginUser, loginSuccess, loginFailure } from "../../actions/authActions";
 import { gotUserInfo } from "../../actions/userActions";
 import LoginComponent from "./LoginComponent";
+import { User } from "../../types";
 
 const checkLoginSuccess = (response) => response.status === "success";
 
@@ -27,7 +28,7 @@ const LoginContainer = (props) => {
                 const success = checkLoginSuccess(response);
                 if (success) {
                     props.loginSuccess(response.user);
-                    props.gotUserInfo(response.user);
+                    props.gotUserInfo(User.fromJSON(response.user));
                     history.push("/");
                 } else {
                     props.loginFailure();

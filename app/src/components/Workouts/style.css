@@ -1,0 +1,44 @@
+.workout-name {
+    font-size: 200%;
+    font-weight: bold;
+    margin-bottom: 0.3em;
+}
+
+#search-header{
+    margin-bottom: 1em;
+}
+
+#search-input {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#workout-info-container {
+    text-align: center;
+    max-width: 50em;
+    min-width: 30em;
+}
+
+#workout-name {
+    font-size: 300%;
+    font-weight: bold;
+    margin-bottom: 1em;
+    margin-top: 1em;
+}
+
+.exercise-image {
+    max-width: 20em;
+    height: 8em;
+}
+
+.exercise-name {
+    font-weight: bold;
+    font-size: 125%;
+    margin-bottom: 1em;
+}
+
+#no-workouts-container {
+    font-size: 125%;
+    font-weight: bold;
+    text-align: center;
+}

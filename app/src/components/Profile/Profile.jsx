@@ -70,6 +70,7 @@ const offersColumn = () => (
 const _Profile = ({
     match, user, gotUserInfo,
 }) => {
+    console.log(user);
     const id = parseInt(match.params.id, 10);
     const [profile, setProfile] = React.useState(null);
     const [fetchingProfile, setFetchingProfile] = React.useState(false);
