@@ -12,6 +12,8 @@ import Calendar from "./Calendar";
 import ViewClientsContainer from "./ViewClientsContainer";
 import SearchTrainer from "./SearchTrainer";
 import SearchExercise from "./SearchExercise";
+import Workouts from "./Workouts";
+import WorkoutComponent from "./Workouts/WorkoutComponent";
 
 import { history } from "../store/history";
 import { store } from "../store";
@@ -35,7 +37,7 @@ const Main = () => (
                     component={LoginContainer}
                 />
                 <Route
-                    path="/user/:id(\d+)"
+                    path="/user/:id"
                     component={Profile}
                 />
                 <Route
@@ -73,6 +75,14 @@ const Main = () => (
                 <Route
                     path="/trainers"
                     component={SearchTrainer}
+                />
+                <Route
+                    path="/workouts"
+                    component={Workouts}
+                />
+                <Route
+                    path="/workout/:id"
+                    component={WorkoutComponent}
                 />
             </Provider>
         </Router>
