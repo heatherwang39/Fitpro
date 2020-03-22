@@ -36,3 +36,9 @@
     font-size: 125%;
     margin-bottom: 1em;
 }
+
+#no-workouts-container {
+    font-size: 125%;
+    font-weight: bold;
+    text-align: center;
+}

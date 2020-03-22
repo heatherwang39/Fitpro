@@ -51,6 +51,11 @@ function _Navigation({ user, loggedOut, location }) {
                         Exercises
                     </Menu.Item>
                 </Link>
+                <Link to="/workouts">
+                    <Menu.Item active={currentPage === "/workouts"}>
+                        Workouts
+                    </Menu.Item>
+                </Link>
                 {user != null && (
                     <Link to="/calendar">
                         <Menu.Item active={currentPage === "/calendar"}>

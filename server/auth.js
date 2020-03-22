@@ -55,7 +55,7 @@ const auth = (req, res, next) => {
             res.cookie("token", token, { expires: new Date(Date.now() + 3.6e6), httpOnly: true, secure: true });
         }
         req.user = {
-            _id: payload._id,
+            _id: id,
             username: payload.username,
             firstname: payload.firstname,
             lastname: payload.lastname,

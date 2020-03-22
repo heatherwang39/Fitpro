@@ -21,8 +21,8 @@ router.post("/", (req, res) => {
         res.status(400).send();
         return;
     }
-    const workout = new Workout(EDITABLE_WORKOUT_FIELDS.reduce((acc, cur) => ({ ...acc, [cur]: req.body[cur] }), {}));
-    workout.creator = req.user._id;
+    const workout = new Workout({ creator: req.user._id, ...EDITABLE_WORKOUT_FIELDS.reduce((acc, cur) => ({ ...acc, [cur]: req.body[cur] }), {}) });
+    console.log(req.user);
     workout.save((err) => {
         if (err) {
             console.log("error in POST /workouts", err);
@@ -43,7 +43,7 @@ router.get("/", (req, res) => {
     }
     if (req.query.id) {
         if (req.query.id.length !== 24) { // default length of _id
-            res.status(400).send();
+            res.status(400).send("Invalid ID");
             return;
         }
         Workout.findOne({ _id: ObjectId(req.query.id) }).populate("exercises.exercise").exec((err, workout) => {
@@ -53,7 +53,7 @@ router.get("/", (req, res) => {
                 return;
             }
             if (!workout) {
-                res.status(404).send();
+                res.status(404).send("No workout with that ID");
                 return;
             }
             res.setHeader("Content-Type", "application/json");
@@ -62,28 +62,53 @@ router.get("/", (req, res) => {
         });
         return;
     }
-    const { name, ...rest } = req.query;
-    Workout.paginate({ name: { $regex: name, $options: "i" }, ...rest }).then((workouts) => {
+    if (req.query) {
+        if (req.query.mine) {
+            delete req.query.mine;
+            if (!req.user) {
+                res.status(400).send();
+                return;
+            }
+            req.query.creator = req.user._id;
+        }
+        if (req.query.name !== undefined) {
+            req.query.name = { $regex: req.query.name, $options: "i" };
+        }
+    }
+    Workout.paginate(req.query, { populate: { path: "exercises.exercise", limit: 3 } }).then((workouts) => {
         res.setHeader("Content-Type", "application/json");
         res.status(200);
         res.json(workouts);
     });
-    // User
-    //     .findOne({ _id: ObjectId(req.query.id) })
-    //     .populate("trainers clients", "_id username firstname lastname")
-    //     .exec((err, user) => {
-    //         if (err) {
-    //             console.log("error in /users GET", err);
-    //             res.status(500).send();
-    //             return;
-    //         }
-    //         if (!user) {
-    //             res.status(404).send();
-    //         }
-    //         res.setHeader("Content-Type", "application/json");
-    //         res.status(200);
-    //         res.json(user.populate());
-    //     });
+});
+
+// Update workout
+router.patch("/", async (req, res) => {
+    if (!req.body) {
+        res.status(400).send();
+        return;
+    }
+    if (!req.user) {
+        console.log("no user");
+        res.status(401).send();
+        return;
+    }
+    const updated = { name: req.body.name, description: req.body.description };
+    if (req.body.exercises && req.body.exercises.map) {
+        updated.exercises = req.body.exercises.map((e) => ObjectId(e));
+    }
+    let workout;
+    try {
+        workout = await Workout.findOneAndUpdate({
+            _id: ObjectId(req.body._id),
+            creator: ObjectId(req.user._id),
+        }, updated, { new: true });
+    } catch (e) {
+        console.log(e);
+        res.status(400).send();
+    }
+    console.log(workout);
+    res.status(200).json(workout);
 });
 
 

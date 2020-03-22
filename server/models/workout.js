@@ -20,14 +20,12 @@ const schema = mongoose.Schema({
         type: String,
         required: true,
     },
-    creator: {
+    owner: {
         type: mongoose.ObjectId,
         ref: "user",
     },
     exercises: [
         {
-            count: Number,
-            countUnits: String,
             instructions: String,
             exercise: {
                 type: mongoose.ObjectId,
@@ -39,12 +37,13 @@ const schema = mongoose.Schema({
     level: String,
     rating: Number,
     avgExerciseRating: Number,
+    numExercises: Number,
 });
 
 schema.pre("save", function (next) { /* eslint-disable-line func-names */
     if (this.isNew || this.isModified("exercises")) {
+        this.numExercises = this.exercises.length;
         this.populate("exercises.exercise").execPopulate(() => {
-            // console.log(this.exercises);
             this.level = mode(this.exercises.reduce(
                 (acc, cur) => (cur.exercise.level ? acc.concat([cur.exercise.level]) : acc), [],
             ));
