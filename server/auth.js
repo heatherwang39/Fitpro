@@ -46,7 +46,7 @@ const auth = (req, res, next) => {
             return;
         }
         // Renew token for an hour if it expires in < 15 mins
-        if (payload.exp - Date.now() / 1000 < 900) { // should always be false if payload.remember
+        if (payload.exp - Date.now() / 1000 < 900) {
             delete payload.iat;
             delete payload.exp;
             delete payload.nbf;
