@@ -7,7 +7,7 @@ const mode = (l) => {
     const freq = {};
     let mostCommon = l[0];
     l.forEach((x) => {
-        freq[x] = freq[x] ? 1 : freq[x] + 1;
+        freq[x] = freq[x] ? freq[x] + 1 : 1;
         if (freq[x] > freq[mostCommon]) {
             mostCommon = x;
         }

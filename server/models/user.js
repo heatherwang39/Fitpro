@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const mongoosePaginate = require("mongoose-paginate-v2");
 
 const saltRounds = 10;
 
@@ -59,6 +60,10 @@ const schema = new mongoose.Schema({
             expires: 3600,
         },
     ],
+    searchable: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 schema.pre("save", function (next) { /* eslint-disable-line func-names */
@@ -74,5 +79,7 @@ schema.pre("save", function (next) { /* eslint-disable-line func-names */
     } else next();
     // TODO update correspoding clients/trainers if trainers/clients changed
 });
+
+schema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model("user", schema);

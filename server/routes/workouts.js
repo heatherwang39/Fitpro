@@ -21,8 +21,11 @@ router.post("/", (req, res) => {
         res.status(400).send();
         return;
     }
-    const workout = new Workout({ creator: req.user._id, ...EDITABLE_WORKOUT_FIELDS.reduce((acc, cur) => ({ ...acc, [cur]: req.body[cur] }), {}) });
-    console.log(req.user);
+    const workout = new Workout({
+        creator: req.user._id,
+        // Copy editable workout fields from req.body
+        ...EDITABLE_WORKOUT_FIELDS.reduce((acc, cur) => ({ ...acc, [cur]: req.body[cur] }), {}),
+    });
     workout.save((err) => {
         if (err) {
             console.log("error in POST /workouts", err);

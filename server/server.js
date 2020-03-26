@@ -13,6 +13,7 @@ const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
 const workoutsRouter = require("./routes/workouts");
 const eventsRouter = require("./routes/events")
+const trainersRouter = require("./routes/trainers");
 
 const app = express();
 // Middleware
@@ -43,6 +44,7 @@ app.use("/users", usersRouter);
 app.use("/auth", authRouter);
 app.use("/workouts", workoutsRouter);
 app.use("/events", eventsRouter);
+app.use("/trainers", trainersRouter);
 
 const port = process.env.PORT || 3333;
 

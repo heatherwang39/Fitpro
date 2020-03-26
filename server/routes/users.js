@@ -9,47 +9,76 @@ const ObjectId = require("mongodb").ObjectID;
 const User = require("../models/user");
 
 // Register
-router.post("/", (req, res) => {
-    if (!req.body || req.body.email === undefined
-        || req.body.password === undefined || req.body.username === undefined) {
-        res.status(400).send();
-        return;
+router.post("/", async (req, res) => {
+    const userInputs = Object.keys(req.body)
+    const requiredInputs = ["email", "password", "username", "firstname", "lastname", "gender", "isTrainer"]
+    const isValidOperation = requiredInputs.every((requiredInput)=>userInputs.includes(requiredInput))
+    if(!isValidOperation){
+        return res.status(400).send({error : "missing required inputs!"})
     }
+    
     const user = new User(req.body);
     const { password, ...resUser } = user._doc; // Don't send password in response
-    user.save((err) => {
-        if (err) {
-            console.log("error in /users POST", err);
-            res.status(err.name === "ValidationError" ? 400 : 500).send();
-        } else res.status(201).send(resUser);
-    });
+    try{
+        await user.save()
+        res.status(201).send(resUser);
+    }catch(err){
+        console.log("error in /users POST", err);
+        res.status(err.name === "ValidationError" ? 400 : 500).send()
+    }
+    
 });
 
-router.get("/", (req, res) => {
-    if (!req.query || !req.query.id) {
-        res.status(400).send();
-        return;
+//find by id
+router.get("/:id", async(req, res) => {
+    if (!req.params || !req.params.id) {
+        return res.status(400).send();
     }
-    if (req.query.id.length !== 24) { // default length of _id
-        res.status(404).send();
-        return;
+    if (req.params.id.length !== 24) { // default length of _id
+        return res.status(404).send();
     }
-    User
-        .findOne({ _id: ObjectId(req.query.id) })
-        .populate("trainers clients", "_id username firstname lastname")
-        .exec((err, user) => {
-            if (err) {
-                console.log("error in /users GET", err);
-                res.status(500).send();
-                return;
-            }
-            if (!user) {
-                res.status(404).send();
-            }
-            res.setHeader("Content-Type", "application/json");
-            res.status(200);
-            res.json(user.populate());
-        });
+    try{
+        const user = await User.findById(req.params.id).populate("trainers clients", "_id username firstname lastname")
+        if(!user){
+            return res.status(404).send();
+        }
+        res.setHeader("Content-Type", "application/json");
+        res.status(200);
+        res.json(user.populate());
+    }catch(err){
+        console.log("error in /users GET", err);
+        res.status(500).send();
+    }    
+});
+
+//Update by id
+router.patch("/:id",async(req,res)=>{
+    if (!req.params || !req.params.id) {
+        return res.status(400).send();
+    }
+    if (req.params.id.length !== 24) { // default length of _id
+        return res.status(404).send();
+    }
+    
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ["email", "password", "username", "firstname", "lastname", "gender", "isTrainer", 
+    "phone", "height", "weight", "rating", "price", "goalType: String", "imageUrl", 
+    "trainers", "clients"]
+    const isValidOperation = updates.every((update)=>allowedUpdates.includes(update))
+    if(!isValidOperation){
+        res.status(400).send({error : "Invalid updates!"})
+    }
+
+    try{
+        const user = await User.findByIdAndUpdate(req.params.id, req.body, { new:true })
+        const { password, ...resUser } = user._doc;
+        if(!user){
+            return res.status(404).send()
+        }
+        res.status(200).send(resUser)
+    }catch(err){
+        res.status(400).send(err)
+    }
 });
 
 
