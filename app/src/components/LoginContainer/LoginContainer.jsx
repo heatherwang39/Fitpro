@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import {
     useHistory,
 } from "react-router-dom";
-import API from "../../api/api";
+import API from "../../api/";
 import { loginUser, loginSuccess, loginFailure } from "../../actions/authActions";
 import { gotUserInfo } from "../../actions/userActions";
 import LoginComponent from "./LoginComponent";

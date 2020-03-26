@@ -6,7 +6,7 @@ import {
     Button, Form, Grid, Segment, Image, Rating,
 } from "semantic-ui-react";
 import { User } from "../../types/user";
-import API from "../../api/api";
+import API from "../../api";
 
 const exerciseListItem = (e, editing, deleteExercise, deleted, undoDelete) => (deleted ? (
     <Segment key={e._id}>

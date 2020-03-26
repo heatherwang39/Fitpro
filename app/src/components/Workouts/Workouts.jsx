@@ -8,7 +8,7 @@ import {
 } from "semantic-ui-react";
 import { User } from "../../types/user";
 import "./style.css";
-import API from "../../api/api";
+import API from "../../api";
 
 const workoutListItem = (w) => (
     <Segment key={w._id}>

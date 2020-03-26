@@ -12,6 +12,7 @@ const auth = require("./auth");
 const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
 const workoutsRouter = require("./routes/workouts");
+const eventsRouter = require("./routes/events")
 
 const app = express();
 // Middleware
@@ -41,6 +42,7 @@ db.on("open", () => console.log(`Connected to database at ${dbUrl}`));
 app.use("/users", usersRouter);
 app.use("/auth", authRouter);
 app.use("/workouts", workoutsRouter);
+app.use("/events", eventsRouter);
 
 const port = process.env.PORT || 3333;
 
