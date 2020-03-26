@@ -50,6 +50,9 @@
         ],
         "no-underscore-dangle": [
             "off"
+        ],
+        "no-bitwise": [
+            "off"
         ]
     }
 }
