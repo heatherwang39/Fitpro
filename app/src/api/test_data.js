@@ -1,6 +1,5 @@
 /* eslint-disable max-len */
 import { User } from "../types/user";
-import { Calendar } from "../types/calendar";
 import { Exercise } from "../types/exercise";
 import { workoutExerciseList, Workout } from "../types/workout";
 
@@ -37,88 +36,6 @@ export const exercise3 = new Exercise(23, "Barbell Bent Over Row", "Arms, Back, 
 export const exercise4 = new Exercise(24, "Barbell Deadlift", "Full Body", "Barbell",
     "Stand behind the barbell with the feet about shoulder-width apart, the toes slightly rotated out, and the shins almost touching the bar. Sit back into the hips slightly while keeping a straight back so that the chest is lifted upward, and bend forward to grip the bar in an over-under grip with one palm facing up and the other facing down. Squeeze the bar in the hands and sink back onto the hips while pressing the feet into the floor. Keeping the back flat, push the hips forward to move to standing position. Finish standing in a tall position with the shoulders pulled back and the legs straight. Return to the starting position by shifting the weight back into the hips and keep the back straight while allowing the knees to bend. When this movement is done properly, the glutes and the back of the thighs should feel the work, NOT the back.",
     "Advanced", "Pull");
-
-const Event = (title, start, end, userId, id) => ({
-    title,
-    start,
-    end,
-    userId,
-    id,
-});
-
-const Availability = (start, end, userId, repeat) => ({
-    start, end, userId, repeat,
-});
-
-const today = (new Date()).getTime();
-
-const clientEvents = [
-    Event("Tues Night", new Date("February 18, 2020 21:00:00"), new Date("February 18, 2020 22:00:00"), 1, 1),
-    Event("Wed Afternoon", new Date("February 19, 2020 15:00:00"), new Date("February 19, 2020 15:00:00"), 1, 2),
-    Event("Thurs Morning", new Date("February 20, 2020 09:00:00"), new Date("February 20, 2020 11:00:00"), 1, 3),
-    Event("Sat evening", new Date("February 22, 2020 18:00:00"), new Date("February 22, 2020 20:00:00"), 1, 4),
-    Event("Client 1", new Date(today + 3600000), new Date(today + 3600000 * 2), 1, 5),
-    Event("Client 2", new Date(today + 3600000 * 3), new Date(today + 3600000 * 4), 1, 6),
-    Event("Client 3", new Date(today + 3600000 * 6), new Date(today + 3600000 * 7), 1, 7),
-    Event("Client 4", new Date(today + 3600000 * 8), new Date(today + 3600000 * 10), 1, 8),
-    Event("Sat evening", new Date("March 4, 2020 18:00:00"), new Date("February 22, 2020 20:00:00"), 1, 9),
-];
-
-const client2Events = [
-    Event("Wed Night", new Date("February 19, 2020 21:00:00"), new Date("February 19, 2020 22:00:00"), 3, 10),
-    Event("Thurs Morning", new Date("February 20, 2020 11:00:00"), new Date("February 20, 2020 12:00:00"), 3, 11),
-    Event("Sun evening", new Date("February 23, 2020 18:00:00"), new Date("February 23, 2020 20:00:00"), 3, 12),
-];
-
-const client3Events = [
-    Event("Meeting 1", new Date(today + 3600000), new Date(today + 3600000 * 2), 2, 18),
-    Event("Meeting 2", new Date(today + 3600000 * 6), new Date(today + 3600000 * 7), 2, 19),
-];
-
-const client4Events = [
-    Event("Client 4", new Date(today + 3600000 * 6), new Date(today + 3600000 * 7), 2, 20),
-];
-
-const trainerEvents = [
-    Event("Personal Event", new Date("February 22, 2020 21:00:00"), new Date("February 22, 2020 23:00:00"), 2, 13),
-    Event("Client 1", new Date(today + 3600000), new Date(today + 3600000 * 2), 2, 14),
-    Event("Client 2", new Date(today + 3600000 * 3), new Date(today + 3600000 * 4), 2, 15),
-    Event("Client 3", new Date(today + 3600000 * 6), new Date(today + 3600000 * 7), 2, 16),
-    Event("Client 4", new Date(today + 3600000 * 8), new Date(today + 3600000 * 10), 2, 17),
-];
-
-const trainerAvailability = [
-    Availability(new Date("February 22, 2020 21:00:00"), new Date("February 22, 2020 23:00:00"), 2, "weekly"),
-];
-
-export const placeholderTemplates = [
-    {
-        name: "Template 1",
-        id: 1,
-        exercises: [
-            { exercise: exercise1, days: ["Monday", "Wednesday", "Friday"] },
-            { exercise: exercise2, days: ["Monday", "Wednesday", "Friday"] },
-            { exercise: exercise3, days: ["Monday", "Wednesday", "Friday"] },
-            { exercise: exercise4, days: ["Tuesday", "Thursday", "Saturday"] },
-        ],
-    },
-    {
-        name: "Template 2",
-        id: 2,
-        exercises: [
-            { exercise: exercise4, days: ["Monday", "Wednesday", "Friday"] },
-            { exercise: exercise2, days: ["Tuesday", "Thursday", "Saturday"] },
-            { exercise: exercise1, days: ["Monday", "Wednesday", "Friday"] },
-            { exercise: exercise3, days: ["Tuesday", "Thursday", "Saturday"] },
-        ],
-    },
-];
-
-export const clientCalendar = new Calendar(clientEvents, [], 1);
-export const trainerCalendar = new Calendar(trainerEvents, trainerAvailability, 2);
-export const client2Calendar = new Calendar(client2Events, [], 3);
-export const client3Calendar = new Calendar(client3Events, [], 4);
-export const client4Calendar = new Calendar(client4Events, [], 5);
 
 
 export const testWorkout = new Workout(11, "Test Workout", 1, [{ exercise: exercise2, params: { name: "reps", value: 10 } }]);

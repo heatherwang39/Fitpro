@@ -6,8 +6,7 @@ import {
 } from "semantic-ui-react";
 import DatePicker from "react-datepicker";
 import TimeInput from "material-ui-time-picker";
-import { User } from "../../types/user";
-import { Calendar as CalendarType } from "../../types/calendar";
+import { CalendarEvent, User } from "../../types";
 import API from "../../api";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -286,16 +285,9 @@ const EditEventModal = ({
 EditEventModal.propTypes = {
     calendar: PropTypes.shape(
         {
-            userCalendar: PropTypes.instanceOf(CalendarType),
+            myEvents: [PropTypes.instanceOf(CalendarEvent)],
             gettingCalendar: PropTypes.bool,
-            clientCalendars: PropTypes.arrayOf(
-                PropTypes.shape({
-                    id: PropTypes.number,
-                    firstname: PropTypes.string,
-                    lastname: PropTypes.string,
-                    calendar: PropTypes.instanceOf(CalendarType),
-                }),
-            ),
+            clientEvents: [PropTypes.instanceOf(CalendarEvent)],
         },
     ).isRequired,
     user: PropTypes.instanceOf(User).isRequired,

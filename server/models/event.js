@@ -6,16 +6,30 @@ const schema = mongoose.Schema({
         type: String,
         required: true,
     },
-    ownerId: {
+    owner: {
         type: mongoose.ObjectId,
         ref: "user",
+        required: true,
+    },
+    start: {
+        type: Date,
+        required: true,
+    },
+    end: {
+        type: Date,
+        required: true,
     },
     description: String,
-    clientId: {
+    client: {
         type: mongoose.ObjectId,
         ref: "user",
     },
-    datetime: Number,
+    workouts: [
+        {
+            type: mongoose.ObjectId,
+            ref: "workout",
+        },
+    ],
 });
 
 schema.plugin(mongoosePaginate);

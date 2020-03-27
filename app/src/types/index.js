@@ -1,3 +1,3 @@
 export { User } from "./user";
-export { Calendar } from "./calendar";
 export { Exercise } from "./exercise";
+export { CalendarEvent } from "./calendar_event";

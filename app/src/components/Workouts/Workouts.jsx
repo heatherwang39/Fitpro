@@ -8,7 +8,7 @@ import {
 } from "semantic-ui-react";
 import { User } from "../../types/user";
 import "./style.css";
-import API from "../../api";
+import API from "../../api/api";
 
 const workoutListItem = (w) => (
     <Segment key={w._id}>
@@ -122,7 +122,11 @@ const mapStateToProps = (state) => ({
 });
 
 WorkoutsComponent.propTypes = {
-    user: PropTypes.instanceOf(User).isRequired,
+    user: PropTypes.instanceOf(User),
+};
+
+WorkoutsComponent.defaultProps = {
+    user: null,
 };
 
 

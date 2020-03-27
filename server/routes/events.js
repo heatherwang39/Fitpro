@@ -21,13 +21,16 @@ router.post("/", (req, res) => {
         return;
     }
 
-    const { title, description, clientId, datetime } = req.body;
-    const event = new Event({ 
+    const {
+        title, description, client, start, end,
+    } = req.body;
+    const event = new Event({
         title,
         description,
-        clientId,
-        datetime,  
-        ownerId: req.user._id,
+        client,
+        start,
+        end,
+        owner: req.user._id,
     });
     event.save((err) => {
         if (err) {
@@ -56,7 +59,7 @@ router.get("/", (req, res) => {
             res.status(400).send("Invalid ID");
             return;
         }
-        Event.findOne({ _id: ObjectId(req.query.id) }).populate("events.event").exec((err, event) => {
+        Event.findOne({ _id: ObjectId(req.query.id) }).exec((err, event) => {
             if (err) {
                 console.log("Error in GET /events by id", err);
                 res.status(500).send();
@@ -72,14 +75,14 @@ router.get("/", (req, res) => {
         });
         return;
     }
-    const { minDate, maxDate, page } = req.query
+    const { minDate, maxDate, page } = req.query;
     Event.paginate({
-        ownerId: req.user._id,
+        owner: req.user._id,
         datetime: {
             $lte: maxDate,
-            $gte: minDate
-        }
-    }, { populate: { path: "events.event", limit: 3 }, page }).then((events) => {
+            $gte: minDate,
+        },
+    }, { page }).then((events) => {
         res.setHeader("Content-Type", "application/json");
         res.status(200);
         res.json(events);
@@ -93,23 +96,34 @@ router.get("/trainer", (req, res) => {
     }
     const { userId, page } = req.query;
     Event.paginate({
-        ownerId: userId
-    }, { populate: { path: "events.event", limit: 3 }, page }).then((events) => {
+        owner: userId,
+    }, { page }).then((events) => {
         res.setHeader("Content-Type", "application/json");
         res.status(200);
         res.json(events);
     });
 });
 
-router.get("/client", (req, res) => {
-    if (!req.query) {
-        res.status(400).send();
+router.get("/mine", (req, res) => {
+    if (!req.user) {
+        res.status(401).send();
         return;
     }
+    const { page } = req.query;
+    Event.paginate({
+        owner: req.user._id,
+    }, { page }).then((workouts) => {
+        res.setHeader("Content-Type", "application/json");
+        res.status(200);
+        res.json(workouts);
+    });
+});
+
+router.get("/clients", (req, res) => {
     const { userId, page } = req.query;
     Event.paginate({
-        clientId: userId
-    }, { populate: { path: "events.event", limit: 3 }, page }).then((events) => {
+        client: userId,
+    }, { page }).then((events) => {
         res.setHeader("Content-Type", "application/json");
         res.status(200);
         res.json(events);
@@ -123,9 +137,9 @@ router.get("/all", (req, res) => {
     }
     const { userId, page } = req.query;
     Event.paginate({
-        $or: [ {clientId: userId}, {owner: userId}]
-        
-    }, { populate: { path: "events.event", limit: 3 }, page }).then((events) => {
+        $or: [{ client: userId }, { owner: userId }],
+
+    }, { page }).then((events) => {
         res.setHeader("Content-Type", "application/json");
         res.status(200);
         res.json(events);
@@ -147,11 +161,11 @@ router.patch("/", async (req, res) => {
     try {
         event = await Event.findOneAndUpdate({
             _id: id,
-        }, changes, { new: true })
+        }, changes, { new: true });
     } catch (e) {
-        res.status(400).send()
+        res.status(400).send();
     }
-    res.json(event)
+    res.json(event);
 });
 
 
