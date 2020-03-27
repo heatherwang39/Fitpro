@@ -1,9 +1,9 @@
 // Simulated API calls that read static data from data.js
 
 import {
-    clientUser, client2User, trainerUser, clientCalendar, client2Calendar, trainerCalendar,
+    clientUser, client2User, trainerUser,
     trainerUser1, trainerUser2, trainerUser3, trainerUser4, exercise1, exercise2, exercise3,
-    exercise4, client3User, client4User, placeholderTemplates, client3Calendar, client4Calendar,
+    exercise4, client3User, client4User,
 } from "./test_data";
 
 let lastEventId = 10;
@@ -156,67 +156,67 @@ export const TestAPI = {
         }
     },
 
-    getUserCalendar: async (id, token) => {
-        (() => {
-        })(token);
-        switch (id) {
-        case 1:
-            return { success: true, userCalendar: clientCalendar };
-        case 2:
-            return {
-                success: true,
-                userCalendar: trainerCalendar,
-                clientCalendars: [
-                    {
-                        id: 1,
-                        firstname: clientUser.firstname,
-                        lastname: clientUser.lastname,
-                        calendar: clientCalendar,
-                    },
-                    {
-                        id: 3,
-                        firstname: client2User.firstname,
-                        lastname: client2User.lastname,
-                        calendar: client2Calendar,
-                    },
-                    {
-                        id: 4,
-                        firstname: client3User.firstname,
-                        lastname: client3User.lastname,
-                        calendar: client3Calendar,
-                    },
-                    {
-                        id: 5,
-                        firstname: client4User.firstname,
-                        lastname: client4User.lastname,
-                        calendar: client4Calendar,
-                    },
-                ],
-            };
-        case 3:
-            return { success: true, userCalendar: client2Calendar };
-        case 4:
-            return { success: true, userCalendar: client3Calendar };
-        case 5:
-            return { success: true, userCalendar: client4Calendar };
-        default:
-            console.log(`User ID ${id} HAS NO CALENDAR`);
-            return { success: false };
-        }
-    },
-
-    deleteCalendarEvent: async (event, calendar) => ({
-        success: true,
-        calendar: calendarWithoutEvent(calendar, event),
-    }),
-
-    createCalendarEvent: async (event, calendar) => ({
-        success: true,
-        calendar: calendarWithNewEvent(calendar, event),
-    }),
+    // getUserCalendar: async (id, token) => {
+    // (() => {
+    // })(token);
+    // switch (id) {
+    // case 1:
+    // return { success: true, userCalendar: clientCalendar };
+    // case 2:
+    // return {
+    // success: true,
+    // userCalendar: trainerCalendar,
+    // clientCalendars: [
+    // {
+    // id: 1,
+    // firstname: clientUser.firstname,
+    // lastname: clientUser.lastname,
+    // calendar: clientCalendar,
+    // },
+    // {
+    // id: 3,
+    // firstname: client2User.firstname,
+    // lastname: client2User.lastname,
+    // calendar: client2Calendar,
+    // },
+    // {
+    // id: 4,
+    // firstname: client3User.firstname,
+    // lastname: client3User.lastname,
+    // calendar: client3Calendar,
+    // },
+    // {
+    // id: 5,
+    // firstname: client4User.firstname,
+    // lastname: client4User.lastname,
+    // calendar: client4Calendar,
+    // },
+    // ],
+    // };
+    // case 3:
+    // return { success: true, userCalendar: client2Calendar };
+    // case 4:
+    // return { success: true, userCalendar: client3Calendar };
+    // case 5:
+    // return { success: true, userCalendar: client4Calendar };
+    // default:
+    // console.log(`User ID ${id} HAS NO CALENDAR`);
+    // return { success: false };
+    // }
+    // },
+    //
+    // deleteCalendarEvent: async (event, calendar) => ({
+    // success: true,
+    // calendar: calendarWithoutEvent(calendar, event),
+    // }),
+    //
+    // createCalendarEvent: async (event, calendar) => ({
+    // success: true,
+    // calendar: calendarWithNewEvent(calendar, event),
+    // }),
 
     registerUser: async (userInfo) => {
-        console.log(userInfo)
+        console.log(userInfo);
         /*
         switch (userInfo.accountType) {
         case "Client":

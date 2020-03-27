@@ -1,15 +1,42 @@
-import { loginFailure } from "../actions/authActions";
+import { store } from "../store";
+import { loggedOut } from "../actions/userActions";
 
 const BASE_API_URL = "https://localhost:3333";
 const apiUrl = (l) => `${BASE_API_URL + (!l || !l.length ? "" : (l[0] === "/" ? l : `/${l}`))}`;
 
-const nextPage = {
-    events: null,
+/*
+ * Wrapper around fetch API to send requests to BASE_API_URL/path with options options
+ * If body is set to an object then it is converted to JSON and headers are set for JSON
+ * Logs out user if request is made with invalid token
+ *
+ * path is a URL or a path relative to BASE_API_URL
+ * options are fetch API options
+ */
+const apiFetch = async (path, options) => {
+    const reqOptions = { ...options, credentials: "include" };
+    if (options && options.body && typeof options.body !== "string") {
+        reqOptions.body = JSON.stringify(options.body);
+        reqOptions.headers = { "Content-type": "application/json; charset=UTF-8" };
+    }
+    const res = await fetch(path.startsWith("http") ? path : apiUrl(path), reqOptions);
+    if (res.status === 401) {
+        const valid = await fetch(apiUrl("auth/validate"), { credentials: "include" });
+        console.log(valid, valid.status);
+        if (valid.status === 401) {
+            store.dispatch(loggedOut());
+        }
+    }
+    return res;
+};
+
+const parseJsonWithDates = (json) => {
+    const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/;
+    return JSON.parse(json, (_, v) => (typeof v === "string" && dateRegex.test(v) ? new Date(v) : v));
 };
 
 export const API = {
     async getWorkout(id) {
-        return (await fetch(apiUrl(`workouts?id=${id}`))).json();
+        return (await apiFetch(`workouts?id=${id}`)).json();
     },
     async getWorkouts(filters, page) {
         let endpoint = "workouts";
@@ -22,8 +49,7 @@ export const API = {
             endpoint += `${addedParam ? "&" : "?"}name=${filters.name}`;
             addedParam = true;
         }
-
-        const res = await fetch(apiUrl(endpoint));
+        const res = await apiFetch(endpoint);
         if (res.status !== 200) {
             return {
                 status: res.status,
@@ -32,24 +58,41 @@ export const API = {
         return res.json();
     },
     async updateWorkout(newWorkout) {
-        const res = await fetch(apiUrl("workouts"), {
-            method: "PATCH",
-            body: JSON.stringify(newWorkout),
-            headers: { "Content-type": "application/json; charset=UTF-8" },
-            credentials: "include",
-        });
+        const res = await apiFetch("workouts", { method: "PATCH", body: newWorkout });
         if (res.status !== 200) return { status: res.status };
         return res.json();
     },
     async login(username, password) {
-        const res = await fetch(apiUrl("auth/login"), {
+        const res = await apiFetch("auth/login", {
             method: "POST",
-            body: JSON.stringify({ username, password }),
-            headers: { "Content-type": "application/json; charset=UTF-8" },
-            credentials: "include",
+            body: { username, password },
         });
         if (res.status !== 200) return { status: res.status };
         return { status: "success", user: await res.json() };
+    },
+    async getProfile(id) {
+        const res = await apiFetch(`users/${id}`);
+        if (res.status !== 200) {
+            return { success: false, error: res.status === 404 ? "Invalid user" : `Server returned ${res.status}` };
+        }
+        return { success: true, profile: await res.json() };
+    },
+    async getUserCalendar(user) {
+        let res = await apiFetch("events/mine");
+        if (res.status !== 200) {
+            return { success: false, error: `Server responded with ${res.status}` };
+        }
+        // TODO handle pagination of events
+        const calendar = { myEvents: parseJsonWithDates(await res.text()).docs, clientEvents: {}, success: true };
+        if (user.isTrainer) {
+            res = await apiFetch("events/clients");
+            if (res.status !== 200) {
+                return { success: false, error: `Server responded with ${res.status} when getting client events` };
+            }
+            const events = (await res.json()).docs;
+            events.forEach((e) => (calendar.clientEvents[e.client] ? calendar.clientEvents[e].push(e) : [e]));
+        }
+        return calendar;
     },
 };
 

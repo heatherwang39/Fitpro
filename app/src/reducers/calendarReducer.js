@@ -3,9 +3,9 @@ import {
 } from "../actions/actionTypes";
 
 const defaultState = {
-    userCalendar: null,
+    myEvents: null, //  Events for this user
+    clientEvents: {}, // Events for clients of this user by client id
     gettingCalendar: false,
-    clientCalendars: null,
 };
 
 
@@ -17,19 +17,11 @@ export default (state = defaultState, action) => {
             gettingCalendar: true,
         };
     case GOT_USER_CALENDAR:
-        if (action.payload.clientCalendars) {
-            return {
-                ...state,
-                gettingCalendar: false,
-                userCalendar: action.payload.userCalendar,
-                clientCalendars: action.payload.clientCalendars,
-            };
-        }
         return {
             ...state,
-            userCalendar: action.payload.userCalendar,
             gettingCalendar: false,
-            clientCalendars: [],
+            myEvents: action.payload.myEvents,
+            clientEvents: action.payload.clientEvents ? action.payload.clientEvents : {},
         };
     case UPDATED_CALENDAR: {
         if (action.payload.userId === state.userCalendar.userId) {

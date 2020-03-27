@@ -9,7 +9,6 @@ import { User } from "../../types/user";
 import TrainerSearchComponent from "./TrainerSearch/TrainerSearchComponent";
 
 const _Home = (props) => {
-    (() => {})(props); // Shut eslint up
     const { user } = props;
     return (
         <div className={styles.container}>

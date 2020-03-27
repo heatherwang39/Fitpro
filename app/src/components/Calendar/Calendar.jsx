@@ -14,13 +14,10 @@ import {
     gotUserCalendar as gotUserCalendarAction,
     updatedCalendar as updatedCalendarAction,
 } from "../../actions/calendarActions";
-import { User } from "../../types/user";
-import { Calendar as CalendarType } from "../../types/calendar";
-import API from "../../api";
+import { User, CalendarEvent } from "../../types";
+import API from "../../api/api";
 import EditEventModal from "./EditEventModal";
 import "./style.css";
-
-// import { allWorkouts } from "../../api/test_data";
 
 const ALL_EVENT_COLOURS = [
     "orange",
@@ -63,7 +60,6 @@ const combineClientEvents = (clientCalendars) => {
 
 
 const _Calendar = ({
-    auth,
     location, calendar, user,
     getUserCalendar, gotUserCalendar,
     updatedCalendar,
@@ -72,14 +68,16 @@ const _Calendar = ({
         return (<div className="center">Log in to view your calendar</div>);
     }
     // Load Calendar from server
-    if (calendar.userCalendar == null) {
+    console.log(calendar);
+    if (calendar.myEvents == null) {
         if (!calendar.gettingCalendar) {
             getUserCalendar(user.id);
-            API.getUserCalendar(user.id, auth.token).then((response) => {
+            API.getUserCalendar(user).then((response) => {
                 // TODO handle failure
                 if (!response.success) {
                     console.log("ERROR loading calendar");
                 }
+                console.log(response);
                 gotUserCalendar(response);
             });
         }
@@ -88,7 +86,7 @@ const _Calendar = ({
 
     // Local state
     const [modalOpen, setModalOpen] = React.useState(false);
-    const [visibleEvents, setVisibleEvents] = React.useState(calendar.userCalendar.events);
+    const [visibleEvents, setVisibleEvents] = React.useState(calendar.myEvents);
     const [calendarType, setCalendarTypeState] = React.useState("default");
     const [availableColours, setAvailableColours] = React.useState(ALL_EVENT_COLOURS);
     const [uidColours, setUidColours] = React.useState(new Map());
@@ -108,19 +106,19 @@ const _Calendar = ({
     const setCalendarType = (type) => {
         setCalendarTypeState(type);
         switch (type) {
-        case "overview": {
-            setVisibleEvents(combineClientEvents(calendar.clientCalendars).concat(calendar.userCalendar.events));
+        case "overview":
+            setVisibleEvents(calendar.clientEvents.concat(calendar.myEvents));
             break;
-        }
         case "me":
-            setVisibleEvents(calendar.userCalendar.events);
+            setVisibleEvents(calendar.myEvents);
             break;
         case "availability":
-            setVisibleEvents(calendar.userCalendar.availability);
+            // TODO
+            // setVisibleEvents(calendar.userCalendar.availability);
             break;
         case "client":
             if (selectedClient === null) setVisibleEvents([]);
-            setVisibleEvents(selectedClient.calendar.events);
+            setVisibleEvents(calendar.clientEvents[selectedClient]);
             break;
         // no default
         }
@@ -128,16 +126,10 @@ const _Calendar = ({
 
     // Select the client that was passed with location if they are a client of this trainer
     if (location != null && user.isTrainer && typeof location.state !== "undefined" && selectedClient === null) {
-        let found = false;
-        for (let i = 0; i < calendar.clientCalendars.length; i++) {
-            if (calendar.clientCalendars[i].id === location.state.userId) {
-                setSelectedClient(calendar.clientCalendars[i]);
-                found = true;
-                setChangeToClient(true);
-                break;
-            }
-        }
-        if (!found) {
+        if (calendar.clientEvents[location.state.userId]) {
+            setSelectedClient(location.state.userId);
+            setChangeToClient(true);
+        } else {
             console.log(`Invalid client calendar id ${location.state.userId}`);
         }
     }
@@ -164,33 +156,26 @@ const _Calendar = ({
 
     // Open modal and prepare to edit an existing event
     const openModalEditing = (event) => {
-        // TODO clientCalendars should probably be a Map of userId->Calendar instead of Array
-        let newCurEvent = Object.create(event);
-        if (!user.isTrainer || event.userId === user.id) {
-            for (let i = 0; i < calendar.userCalendar.events.length; i++) {
-                if (calendar.userCalendar.events[i].id === event.id) {
-                    newCurEvent = calendar.userCalendar.events[i];
-                    newCurEvent.client = user.id;
-                    break;
-                }
-            }
+        let newCurEvent = null;
+        if (!user.isTrainer || event.owner === user.id) {
+            newCurEvent = calendar.myEvents.find((e) => (e._id === event._id));
         } else {
-            for (let i = 0; i < calendar.clientCalendars.length; i++) {
-                if (calendar.clientCalendars[i].id === event.userId) {
-                    for (let j = 0; j < calendar.clientCalendars[i].calendar.events.length; j++) {
-                        if (calendar.clientCalendars[i].calendar.events[j].id === event.id) {
-                            newCurEvent = calendar.clientCalendars[i].calendar.events[j];
-                            newCurEvent.client = calendar.clientCalendars[i].id;
-                            break;
-                        }
+            const keys = Object.keys(calendar.clientEvents);
+            for (let i = 0; i < keys.length; i++) {
+                for (let j = 0; j < calendar.clientEvents[i].length; j++) {
+                    if (calendar.clientEvents[keys[i]][j]._id === event._id) {
+                        newCurEvent = calendar.clientEvents[keys[i]][j];
+                        newCurEvent.client = keys[i];
+                        break;
                     }
-                    if (newCurEvent != null) break;
                 }
+                if (newCurEvent) break;
             }
         }
         if (newCurEvent == null) {
             // TODO show error to user (this shouldn't ever happen though)
             console.log("ERROR couldn't find event ", event.id);
+            return;
         }
         newCurEvent.duration = Math.floor((Math.abs(newCurEvent.end - newCurEvent.start) / 1000) / 60); // Minutes
         newCurEvent.durationStr = newCurEvent.duration.toString();
@@ -287,18 +272,16 @@ const _Calendar = ({
                                     />
                                     <Dropdown
                                         selection
-                                        options={calendar.clientCalendars.map(
+                                        options={calendar.clientEvents.map(
                                             (cal) => ({
-                                                key: cal.id,
+                                                key: cal._id,
                                                 text: `${cal.firstname} ${cal.lastname}`,
-                                                value: cal.id,
+                                                value: cal._id,
                                             }),
                                         )}
                                         value={selectedClient === null ? "" : selectedClient.id}
                                         onChange={(_, v) => {
-                                            setSelectedClient(calendar.clientCalendars.filter(
-                                                (c) => c.id === v.value,
-                                            )[0]);
+                                            setSelectedClient(v.value);
                                         }}
                                     />
                                 </Form.Field>
@@ -356,7 +339,6 @@ const _Calendar = ({
 const mapStateToProps = (state) => ({
     calendar: state.calendarReducer,
     user: state.userReducer,
-    auth: state.authReducer,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -375,24 +357,12 @@ _Calendar.propTypes = {
     ),
     calendar: PropTypes.shape(
         {
-            userCalendar: PropTypes.instanceOf(CalendarType),
+            myEvents: PropTypes.arrayOf(PropTypes.instanceOf(CalendarEvent)),
             gettingCalendar: PropTypes.bool,
-            clientCalendars: PropTypes.arrayOf(
-                PropTypes.shape({
-                    id: PropTypes.number,
-                    firstname: PropTypes.string,
-                    lastname: PropTypes.string,
-                    calendar: PropTypes.instanceOf(CalendarType),
-                }),
-            ),
+            clientEvents: PropTypes.object,
         },
     ).isRequired,
     user: PropTypes.instanceOf(User),
-    auth: PropTypes.shape(
-        {
-            token: PropTypes.string,
-        },
-    ).isRequired,
     getUserCalendar: PropTypes.func.isRequired,
     gotUserCalendar: PropTypes.func.isRequired,
     updatedCalendar: PropTypes.func.isRequired,

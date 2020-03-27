@@ -9,7 +9,7 @@ import {
 import { User } from "../../types/user";
 import { gotUserInfo as gotUserInfoAction } from "../../actions/userActions";
 import { testReviews, testOffers } from "../../api/test_data";
-import API from "../../api";
+import API from "../../api/api";
 import "./style.css";
 
 const profileFormFields = ["firstname", "lastname", "phone", "email", "location", "height", "weight"];
@@ -29,7 +29,7 @@ const errorComponent = (errorMessage) => (
 
 const reviewsColumn = () => (
     <Grid.Column>
-        <Container id="profile-reviews" divided>
+        <Container id="profile-reviews">
             <h4 id="profile-reviews-header">Reviews</h4>
             {testReviews.map((review) => (
                 <Segment className="profile-review">
@@ -53,7 +53,7 @@ const reviewsColumn = () => (
 
 const offersColumn = () => (
     <Grid.Column>
-        <Container id="profile-offers" divided>
+        <Container id="profile-offers">
             <h4 id="profile-offers-header">Specials</h4>
             {testOffers.map((offer) => (
                 <Segment className="profile-offer">
@@ -70,26 +70,24 @@ const offersColumn = () => (
 const _Profile = ({
     match, user, gotUserInfo,
 }) => {
-    console.log(user);
-    const id = parseInt(match.params.id, 10);
     const [profile, setProfile] = React.useState(null);
     const [fetchingProfile, setFetchingProfile] = React.useState(false);
     const [error, setError] = React.useState(null);
     const [editing, setEditing] = React.useState(false);
     const [uneditedProfile, setUneditedProfile] = React.useState(null);
 
+    if (!match.params.id || match.params.id.length !== 24) {
+        setError("Invalid user id");
+        return errorComponent("Invalid user");
+    }
+
     // Show error message
     if (error != null) return errorComponent(error);
-
-    if (Number.isNaN(id)) {
-        setError("Invalid user id");
-        return errorComponent(error);
-    }
 
     // Fetch profile
     if (profile == null) {
         if (!fetchingProfile) {
-            API.getProfile(id).then(
+            API.getProfile(match.params.id).then(
                 (response) => {
                     if (!response.success) {
                         const errorMessage = typeof response.error !== "undefined"

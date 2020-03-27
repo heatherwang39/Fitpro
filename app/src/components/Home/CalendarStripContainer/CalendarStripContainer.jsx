@@ -2,13 +2,12 @@ import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { PropTypes } from "prop-types";
 import CalendarStripComponent from "./CalendarStripComponent";
-import { Calendar as CalendarType } from "../../../types/calendar";
 import {
     getUserCalendar as getUserCalendarAction,
     gotUserCalendar as gotUserCalendarAction,
 } from "../../../actions/calendarActions";
-import { User } from "../../../types";
-import API from "../../../api";
+import { CalendarEvent, User } from "../../../types";
+import API from "../../../api/api";
 
 const CalendarStripContainer = ({
     user, calendar, getUserCalendar, gotUserCalendar,
@@ -33,11 +32,11 @@ const CalendarStripContainer = ({
         if (calendar.calendar != null) return;
         if (!calendar.gettingCalendar) {
             getUserCalendar(calUserId);
-            API.getUserCalendar(calUserId).then((response) => {
+            API.getUserCalendar(user).then((response) => {
                 if (!response.success) console.log("Error getting user calendar, got response ", response);
                 // TODO handle failure
                 gotUserCalendar(response);
-                setFilteredEvents(formatEventsListToObject(response.userCalendar.events));
+                setFilteredEvents(formatEventsListToObject(response.myEvents));
             });
         }
     }, []);
@@ -59,7 +58,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 CalendarStripContainer.propTypes = {
     calendar: PropTypes.shape(
-        { calendar: PropTypes.instanceOf(CalendarType), gettingCalendar: PropTypes.bool },
+        { calendar: PropTypes.arrayOf(PropTypes.instanceOf(CalendarEvent)), gettingCalendar: PropTypes.bool },
     ).isRequired,
     getUserCalendar: PropTypes.func.isRequired,
     gotUserCalendar: PropTypes.func.isRequired,
