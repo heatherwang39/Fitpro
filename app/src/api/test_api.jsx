@@ -216,6 +216,8 @@ export const TestAPI = {
     }),
 
     registerUser: async (userInfo) => {
+        console.log(userInfo)
+        /*
         switch (userInfo.accountType) {
         case "Client":
             return { success: true, user: clientUser };
@@ -223,7 +225,7 @@ export const TestAPI = {
             return { success: true, user: trainerUser };
         default:
             return { success: true, user: clientUser };
-        }
+        } */
     },
 
     getRelationships: async (userInfo) => {

@@ -10,7 +10,10 @@ import { gotUserInfo } from "../../actions/userActions";
 import UsernameInput from "./UsernameInput";
 import PasswordInput from "./PasswordInput";
 import UserInfoInput from "./UserInfoInput";
-import API from "../../api";
+import registerAPI from "../../api/register_api";
+import {
+    useHistory,
+} from "react-router-dom";
 
 const styles = {
     RegisterContainer: {
@@ -41,6 +44,7 @@ const RegisterContainer = (props) => {
     const { classes, _loginSuccess, _gotUserInfo } = props;
     const [currentView, setCurrentView] = useState(0);
     const [userInfo, setUserInfo] = useState({ accountType: "Client" });
+    const history = useHistory();
 
     const updateUserInfo = (newInfo) => {
         setUserInfo({
@@ -60,11 +64,12 @@ const RegisterContainer = (props) => {
     };
 
     const registerUser = async () => {
-        console.log(userInfo);
-        const res = await API.registerUser(userInfo);
-        if (!res.success) return;
-        _loginSuccess(res.user);
-        _gotUserInfo(res.user);
+        const res = await registerAPI(userInfo);
+        
+        if (res.status !== 201) return;
+        _loginSuccess(res.data);
+        _gotUserInfo(res.data);
+        history.push("/");
     };
 
     const views = [
