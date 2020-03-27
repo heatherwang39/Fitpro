@@ -28,6 +28,8 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(auth);
 
+//app.use(express.static(path.join(__dirname, "../app/build")));
+
 // Database
 const dbUrl = process.env.DB_URL || "mongodb://localhost/fitpro";
 mongoose.connect(dbUrl, {
