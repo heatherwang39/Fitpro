@@ -73,7 +73,6 @@ router.get("/", (req, res) => {
         return;
     }
     const { minDate, maxDate, page } = req.query
-    console.log(req.user._id)
     Event.paginate({
         ownerId: req.user._id,
         datetime: {
@@ -135,7 +134,24 @@ router.get("/all", (req, res) => {
 
 // Update event
 router.patch("/", async (req, res) => {
-    
+    if (!req.body) {
+        res.status(400).send();
+        return;
+    }
+    if (!req.user) {
+        res.status(401).send();
+        return;
+    }
+    const { id, ...changes } = req.body;
+    let event;
+    try {
+        event = await Event.findOneAndUpdate({
+            _id: id,
+        }, changes, { new: true })
+    } catch (e) {
+        res.status(400).send()
+    }
+    res.json(event)
 });
 
 

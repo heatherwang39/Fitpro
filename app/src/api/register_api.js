@@ -14,9 +14,7 @@ export default async (userInfo) => {
             goalType: userInfo.goalType,
             gender: "male"
         }
-        console.log(_user)
         const res = await api.post('https://localhost:3333/users', _user)
-        console.log(res)
         const user = res.data;
         return {
             status: res.status,
