@@ -97,10 +97,10 @@ router.get("/trainer", (req, res) => {
     const { userId, page } = req.query;
     Event.paginate({
         owner: userId,
-    }, { page }).then((workouts) => {
+    }, { page }).then((events) => {
         res.setHeader("Content-Type", "application/json");
         res.status(200);
-        res.json(workouts);
+        res.json(events);
     });
 });
 
@@ -123,10 +123,10 @@ router.get("/clients", (req, res) => {
     const { userId, page } = req.query;
     Event.paginate({
         client: userId,
-    }, { page }).then((workouts) => {
+    }, { page }).then((events) => {
         res.setHeader("Content-Type", "application/json");
         res.status(200);
-        res.json(workouts);
+        res.json(events);
     });
 });
 
@@ -139,10 +139,10 @@ router.get("/all", (req, res) => {
     Event.paginate({
         $or: [{ client: userId }, { owner: userId }],
 
-    }, { populate: { path: "events.event", limit: 3 }, page }).then((workouts) => {
+    }, { page }).then((events) => {
         res.setHeader("Content-Type", "application/json");
         res.status(200);
-        res.json(workouts);
+        res.json(events);
     });
 });
 

@@ -14,6 +14,7 @@ const authRouter = require("./routes/auth");
 const workoutsRouter = require("./routes/workouts");
 const eventsRouter = require("./routes/events")
 const trainersRouter = require("./routes/trainers");
+const mailRouter = require("./routes/mail");
 
 const app = express();
 // Middleware
@@ -45,6 +46,7 @@ app.use("/auth", authRouter);
 app.use("/workouts", workoutsRouter);
 app.use("/events", eventsRouter);
 app.use("/trainers", trainersRouter);
+app.use("/mail", mailRouter);
 
 const port = process.env.PORT || 3333;
 
