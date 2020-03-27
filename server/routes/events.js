@@ -93,11 +93,11 @@ router.get("/trainer", (req, res) => {
     }
     const { userId, page } = req.query;
     Event.paginate({
-        owner: userId
-    }, { populate: { path: "events.event", limit: 3 }, page }).then((workouts) => {
+        ownerId: userId
+    }, { populate: { path: "events.event", limit: 3 }, page }).then((events) => {
         res.setHeader("Content-Type", "application/json");
         res.status(200);
-        res.json(workouts);
+        res.json(events);
     });
 });
 
@@ -109,10 +109,10 @@ router.get("/client", (req, res) => {
     const { userId, page } = req.query;
     Event.paginate({
         clientId: userId
-    }, { populate: { path: "events.event", limit: 3 }, page }).then((workouts) => {
+    }, { populate: { path: "events.event", limit: 3 }, page }).then((events) => {
         res.setHeader("Content-Type", "application/json");
         res.status(200);
-        res.json(workouts);
+        res.json(events);
     });
 });
 
@@ -125,10 +125,10 @@ router.get("/all", (req, res) => {
     Event.paginate({
         $or: [ {clientId: userId}, {owner: userId}]
         
-    }, { populate: { path: "events.event", limit: 3 }, page }).then((workouts) => {
+    }, { populate: { path: "events.event", limit: 3 }, page }).then((events) => {
         res.setHeader("Content-Type", "application/json");
         res.status(200);
-        res.json(workouts);
+        res.json(events);
     });
 });
 
