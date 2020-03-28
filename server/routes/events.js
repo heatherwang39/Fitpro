@@ -36,11 +36,9 @@ router.post("/", (req, res) => {
         if (err) {
             console.log("error in POST /events", err);
             res.status(err.name === "ValidationError" ? 400 : 500).send();
-            return;
+        } else {
+            res.status(201).send(event);
         }
-        event.populate("event.event").execPopulate().then(
-            () => res.status(201).send(event),
-        );
     });
 });
 

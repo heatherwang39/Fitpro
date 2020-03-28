@@ -30,35 +30,6 @@ const ALL_EVENT_COLOURS = [
 
 const localizer = momentLocalizer(moment);
 
-const blankEvent = (user) => ({
-    title: "",
-    start: new Date(),
-    userId: user.id,
-    duration: 60,
-    durationStr: "60",
-    repeat: false,
-    repeatFreq: "1",
-    repeatUnits: "days",
-    client: user.id.toString(),
-    id: -1,
-});
-
-
-const combineClientEvents = (clientCalendars) => {
-    const events = [];
-    for (let i = 0; i < clientCalendars.length; i++) {
-        for (let j = 0; j < clientCalendars[i].calendar.events.length; j++) {
-            events.push({
-                ...clientCalendars[i].calendar.events[j],
-                title: `${clientCalendars[i].firstname} - ${clientCalendars[i].calendar.events[j].title}`,
-                client: clientCalendars[i].id,
-            });
-        }
-    }
-    return events;
-};
-
-
 const _Calendar = ({
     location, calendar, user,
     getUserCalendar, gotUserCalendar,
@@ -68,7 +39,6 @@ const _Calendar = ({
         return (<div className="center">Log in to view your calendar</div>);
     }
     // Load Calendar from server
-    console.log(calendar);
     if (calendar.myEvents == null) {
         if (!calendar.gettingCalendar) {
             getUserCalendar(user.id);
@@ -77,7 +47,6 @@ const _Calendar = ({
                 if (!response.success) {
                     console.log("ERROR loading calendar");
                 }
-                console.log(response);
                 gotUserCalendar(response);
             });
         }
@@ -101,13 +70,13 @@ const _Calendar = ({
     });
 
     // Properties of event currently being created/modified
-    const [curEvent, setCurEvent] = React.useState(blankEvent(user));
+    const [modalEvent, setModalEvent] = React.useState(null);
 
     const setCalendarType = (type) => {
         setCalendarTypeState(type);
         switch (type) {
         case "overview":
-            setVisibleEvents(calendar.clientEvents.concat(calendar.myEvents));
+            setVisibleEvents(calendar.myEvents.concat(calendar.clientEventsList));
             break;
         case "me":
             setVisibleEvents(calendar.myEvents);
@@ -139,50 +108,22 @@ const _Calendar = ({
             setCalendarType("client");
             setChangeToClient(false);
         }
-        setCurEvent(curEvent);
-    }, [changeToClient, user, curEvent]);
+        setModalEvent(modalEvent);
+    }, [changeToClient, user, modalEvent]);
 
-    // Open modal and prepare to make a new event
-    const openModalAdding = (event) => {
-        let { duration } = curEvent;
-        if (event.end && event.end !== event.start) {
-            duration = Math.floor((Math.abs(event.end - event.start) / 1000) / 60); // Minutes
-        }
-        setCurEvent({
-            ...curEvent, start: event.start, duration,
-        });
-        setModalOpen(true);
-    };
-
-    // Open modal and prepare to edit an existing event
-    const openModalEditing = (event) => {
-        let newCurEvent = null;
-        if (!user.isTrainer || event.owner === user.id) {
-            newCurEvent = calendar.myEvents.find((e) => (e._id === event._id));
+    const openModal = (event) => {
+        if (event.id) {
+            setModalEvent(event);
         } else {
-            const keys = Object.keys(calendar.clientEvents);
-            for (let i = 0; i < keys.length; i++) {
-                for (let j = 0; j < calendar.clientEvents[i].length; j++) {
-                    if (calendar.clientEvents[keys[i]][j]._id === event._id) {
-                        newCurEvent = calendar.clientEvents[keys[i]][j];
-                        newCurEvent.client = keys[i];
-                        break;
-                    }
-                }
-                if (newCurEvent) break;
-            }
+            setModalEvent(new CalendarEvent({
+                title: "",
+                start: event.start,
+                end: event.end,
+                client: selectedClient ? selectedClient.id : undefined,
+            }));
         }
-        if (newCurEvent == null) {
-            // TODO show error to user (this shouldn't ever happen though)
-            console.log("ERROR couldn't find event ", event.id);
-            return;
-        }
-        newCurEvent.duration = Math.floor((Math.abs(newCurEvent.end - newCurEvent.start) / 1000) / 60); // Minutes
-        newCurEvent.durationStr = newCurEvent.duration.toString();
-        setCurEvent(newCurEvent);
         setModalOpen(true);
     };
-
 
     // Workout options removed for phase 1 since we have no Manage Workouts view yet
     //
@@ -203,8 +144,43 @@ const _Calendar = ({
     // }
     // };
 
-    const modalUpdatedEvent = (event) => {
-        setCurEvent(event);
+    const modalUpdatedEvent = ({ event, deleted }) => {
+        console.log(event, user);
+        if (event.owner === user.id) {
+            if (deleted) {
+                updatedCalendar({ ...calendar, myEvents: calendar.myEvents.filter((e) => e.id !== event.id) });
+            } else {
+                for (let i = 0; i < calendar.myEvents.length; i++) {
+                    if (calendar.myEvents[i].id === event.id) {
+                        updatedCalendar({
+                            ...calendar,
+                            myEvents: [event]
+                                .concat(calendar.myEvents.slice(0, i))
+                                .concat(calendar.myEvents.slice(i + 1)),
+                        });
+                        break;
+                    }
+                }
+            }
+        } else {
+            const newClientEvents = calendar.clientEvents;
+            if (deleted) {
+                newClientEvents[event.client] = newClientEvents[event.client].filter((e) => e.id !== event.id);
+            } else {
+                for (let i = 0; i < calendar.clientEvents[event.client].length; i++) {
+                    if (calendar.clientEvents[event.client][i].id === event.id) {
+                        newClientEvents[event.client] = newClientEvents[event.client].filter((e) => e.id !== event.id);
+                        break;
+                    }
+                }
+            }
+            // Don't pass {...calendar} so clientEventsList argument is undefined and therefore generated automatically
+            updatedCalendar({
+                myEvents: calendar.myEvents,
+                gettingCalendar: calendar.gettingCalendar,
+                clientEvents: newClientEvents,
+            });
+        }
         setCalendarType(calendarType);
     };
 
@@ -272,11 +248,11 @@ const _Calendar = ({
                                     />
                                     <Dropdown
                                         selection
-                                        options={calendar.clientEvents.map(
-                                            (cal) => ({
-                                                key: cal._id,
-                                                text: `${cal.firstname} ${cal.lastname}`,
-                                                value: cal._id,
+                                        options={Object.keys(calendar.clientEvents).map(
+                                            (c) => ({
+                                                key: c._id,
+                                                text: `${c.firstname} ${c.lastname}`,
+                                                value: c._id,
                                             }),
                                         )}
                                         value={selectedClient === null ? "" : selectedClient.id}
@@ -295,11 +271,11 @@ const _Calendar = ({
                 <BigCalendar
                     localizer={localizer}
                     events={visibleEvents}
-                    onSelectSlot={openModalAdding}
-                    onSelectEvent={openModalEditing}
+                    onSelectSlot={openModal}
+                    onSelectEvent={openModal}
                     startAccessor="start"
                     endAccessor="end"
-                    style={{ height: 500 }} // TODO move this to css
+                    style={{ height: 500 }}
                     selectable
                     views={["month", "week", "day"]}
                     popup
@@ -314,7 +290,7 @@ const _Calendar = ({
                             return {
                                 className: "event-default",
                                 style: {
-                                    backgroundColor: eventColorByUserId(event.userId),
+                                    backgroundColor: eventColorByUserId(event.client ? event.client.id : event.owner.id),
                                 },
                             };
                         }
@@ -325,11 +301,10 @@ const _Calendar = ({
                 <EditEventModal
                     user={user}
                     calendar={calendar}
-                    event={curEvent}
+                    event={modalEvent}
                     modalOpen={modalOpen}
                     setModalOpen={setModalOpen}
                     updatedEvent={modalUpdatedEvent}
-                    updatedCalendar={updatedCalendar}
                 />
             )}
         </div>
@@ -360,6 +335,7 @@ _Calendar.propTypes = {
             myEvents: PropTypes.arrayOf(PropTypes.instanceOf(CalendarEvent)),
             gettingCalendar: PropTypes.bool,
             clientEvents: PropTypes.object,
+            clientEventsList: PropTypes.arrayOf(PropTypes.object),
         },
     ).isRequired,
     user: PropTypes.instanceOf(User),

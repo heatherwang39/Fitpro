@@ -28,7 +28,7 @@ const LoginContainer = (props) => {
                 const success = checkLoginSuccess(response);
                 if (success) {
                     props.loginSuccess(response.user);
-                    props.gotUserInfo(User.fromJSON(response.user));
+                    props.gotUserInfo(new User({ ...response.user }));
                     history.push("/");
                 } else {
                     props.loginFailure();

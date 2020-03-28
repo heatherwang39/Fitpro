@@ -16,7 +16,7 @@ router.post("/", async (req, res) => {
     }
 
     const user = new User(req.body);
-    const { password, ...resUser } = user._doc; // Don't include password in response
+    const { password, tokens, ...resUser } = user._doc; // Don't include password in response
     try {
         await user.save();
         res.status(201).send(resUser);
@@ -39,7 +39,7 @@ router.get("/:id", async (req, res) => {
         if (!user) {
             return res.status(404).send();
         }
-        const { password, ...resUser } = user._doc; // Don't include password in response
+        const { password, tokens, ...resUser } = user._doc; // Don't include password in response
         res.setHeader("Content-Type", "application/json");
         res.status(200);
         res.json(resUser);
@@ -85,7 +85,7 @@ router.patch("/:id", async (req, res) => {
 
     try {
         const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        const { password, ...resUser } = user._doc;
+        const { password, tokens, ...resUser } = user._doc;
         if (!user) {
             return res.status(404).send();
         }

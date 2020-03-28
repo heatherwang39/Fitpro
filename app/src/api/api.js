@@ -68,14 +68,17 @@ export const API = {
             body: { username, password },
         });
         if (res.status !== 200) return { status: res.status };
-        return { status: "success", user: await res.json() };
+        const user = await res.json();
+        return { status: "success", user };
     },
     async getProfile(id) {
         const res = await apiFetch(`users/${id}`);
         if (res.status !== 200) {
             return { success: false, error: res.status === 404 ? "Invalid user" : `Server returned ${res.status}` };
         }
-        return { success: true, profile: await res.json() };
+        const r = { success: true, profile: await res.json() };
+        console.log(r);
+        return r;
     },
     async getUserCalendar(user) {
         let res = await apiFetch("events/mine");
@@ -89,10 +92,23 @@ export const API = {
             if (res.status !== 200) {
                 return { success: false, error: `Server responded with ${res.status} when getting client events` };
             }
-            const events = (await res.json()).docs;
-            events.forEach((e) => (calendar.clientEvents[e.client] ? calendar.clientEvents[e].push(e) : [e]));
+            calendar.clientEventsList = (await res.json()).docs;
+            calendar.clientEventsList.forEach((e) => {
+                if (calendar.clientEvents[e.client]) {
+                    calendar.clientEvents[e.client].push(e);
+                } else {
+                    calendar.clientEvents[e.client] = [e];
+                }
+            });
         }
         return calendar;
+    },
+    async createEvent(event) {
+        const res = await apiFetch("events", { method: "POST", body: event });
+        if (res.status !== 201) {
+            return { success: false, error: `Server responded with ${res.status}` };
+        }
+        return { success: true, event: await res.json() };
     },
 };
 

@@ -7,19 +7,23 @@ import {
 import DatePicker from "react-datepicker";
 import TimeInput from "material-ui-time-picker";
 import { CalendarEvent, User } from "../../types";
-import API from "../../api";
+import API from "../../api/api";
 import "react-datepicker/dist/react-datepicker.css";
 
-// List of client calendars by name to be used in Dropdown
+const TIME_REGEX = /^(\d?\d):(\d\d) (am|pm)$/;
+
+// List of clients by name to be used in Dropdown
 // Includes current user as top option
-const clientCalendarOptions = (calendar, user) => {
-    const items = calendar.clientCalendars.map(
-        (cal) => ({
-            key: cal.id,
-            text: `${cal.firstname} ${cal.lastname}`,
-            value: cal.id.toString(),
-        }),
-    );
+const clientCalendarOptions = (user) => {
+    const items = user.clients
+        ? user.clients.map(
+            (cal) => ({
+                key: cal.id,
+                text: `${cal.firstname} ${cal.lastname}`,
+                value: cal.id.toString(),
+            }),
+        )
+        : [];
     items.unshift({ key: user.id, text: `${user.firstname} ${user.lastname}`, value: user.id.toString() });
     return items;
 };
@@ -40,20 +44,22 @@ const repeatUnitOptions = [
     { key: 3, text: "Months", value: "months" },
 ];
 
+
 const EditEventModal = ({
-    calendar, user, event, modalOpen, setModalOpen, updatedCalendar, updatedEvent,
+    user, event, modalOpen, setModalOpen, updatedEvent,
 }) => {
-    const [duration, setDuration] = React.useState(event.duration);
     const [repeat, setRepeat] = React.useState(event.repeat === undefined ? false : event.repeat);
+    const [duration, setDuration] = React.useState(event.end && event.end !== event.start
+        ? Math.floor((Math.abs(event.end - event.start) / 1000) / 60).toString() // Minutes
+        : 60);
     const [startDate, setStartDate] = React.useState(event.start);
     const [formErrors, setFormErrors] = React.useState([]);
-    const [selectedClient, setSelectedClient] = React.useState(event.userId.toString());
+    const [selectedClient, setSelectedClient] = React.useState(event.client);
 
     React.useEffect(() => {
-        setDuration(event.duration);
         setRepeat(event.repeat === undefined ? false : event.repeat);
         setStartDate(event.start);
-        setSelectedClient(event.userId.toString());
+        setSelectedClient(event.client ? event.client.toString() : null);
     }, [event]);
 
     if (!modalOpen) return (<div />);
@@ -61,20 +67,18 @@ const EditEventModal = ({
     const existingEvent = event.id !== undefined;
 
     // Returns an Object representing the errors in the target form
-    // Note that errors should only have attributes for actual errors because
-    // we check whether the attributes exist not whether they are truthy
     const getFormErrors = (target) => {
         const errors = {};
         // Duration
         if (duration === 0) errors.duration = true;
         // Date
-        if (startDate < Date.now() || target[1].value.match(/^\d\d?\/\d\d?\/\d\d\d\d$/) === null) errors.date = true;
+        if (startDate < Date.now() || target.date.value.match(/^\d\d?\/\d\d?\/\d\d\d\d$/) === null) errors.date = true;
         // Time
-        if (target[2].value.match(/^\d\d:\d\d (am|pm)$/) === null) errors.time = true;
+        if (target.time.value.match(TIME_REGEX) === null) errors.time = true;
         // Repeat
-        if (target[4].checked) {
-            if (target[5].value === "") errors.repeatFreq = true;
-            if (target[6].value === "") errors.repeatUntis = true;
+        if (target.repeat.checked) {
+            if (target.repeatFreq.value === "") errors.repeatFreq = true;
+            if (target.repeatUnits.value === "") errors.repeatUnits = true;
         }
         // Client
         if (selectedClient === "") errors.client = false;
@@ -82,76 +86,52 @@ const EditEventModal = ({
     };
 
     const eventFromForm = (target) => {
-        const newEvent = { ...event };
-        newEvent.duration = duration;
-        newEvent.start = startDate;
-        const timeMatch = target[2].value.match(/^(\d\d):(\d\d) (am|pm)$/);
+        const newEvent = {
+            ...event, title: target.title.value, start: startDate, repeat,
+        };
+        const timeMatch = target.time.value.match(TIME_REGEX);
         newEvent.start.setHours(timeMatch[3] === "pm" && timeMatch[1] !== "12"
             ? parseInt(timeMatch[1], 10) + 12 : parseInt(timeMatch[1], 10));
         newEvent.start.setMinutes(parseInt(timeMatch[2], 10));
-        newEvent.title = target[0].value;
-        newEvent.repeat = repeat;
         newEvent.end = new Date(newEvent.start.getTime() + duration * 60000);
         if (repeat) {
-            newEvent.repeatFreq = target[5].value;
-            newEvent.repeatUnits = target[6].value;
+            newEvent.repeatFreq = target.repeatFreq.value;
+            newEvent.repeatUnits = target.repeatUnits.value;
         }
         return newEvent;
     };
 
     const submitForm = (e) => {
         e.preventDefault();
-        const newEvent = eventFromForm(e.target);
         const errors = getFormErrors(e.target);
         setFormErrors(errors);
         if (Object.entries(errors).length !== 0) return;
-        const selectedCalendar = calendar.clientCalendars.length === 0 || selectedClient === user.id.toString()
-            ? calendar.userCalendar
-            : calendar.clientCalendars.find((c) => c.userId === selectedClient.id).calendar;
-        newEvent.userId = selectedCalendar.userId;
-        newEvent.personalEvent = newEvent.userId === user.id;
-        API.createCalendarEvent(newEvent, selectedCalendar).then(
+        const newEvent = eventFromForm(e.target);
+        API.createEvent(newEvent).then(
             (response) => {
                 if (!response.success) {
                     console.log("Error creating event. Got response", response);
                 }
-                updatedCalendar(response.calendar);
-                if (newEvent.id !== -1) {
-                    updatedEvent(response.calendar.events.find((ev) => ev.id === newEvent.id));
-                } else {
-                    updatedEvent(response.calendar.events.find(
-                        (ev) => ev.title === newEvent.title
-                        && ev.start === newEvent.start
-                        && ev.userId === newEvent.userId,
-                    ));
-                }
+                updatedEvent({ event: response.event, deleted: false });
                 setModalOpen(false);
             },
         );
     };
 
     const deleteEvent = () => {
-        const selectedCalendar = calendar.clientCalendars.length === 0 || selectedClient === user.id.toString()
-            ? calendar.userCalendar
-            : calendar.clientCalendars.find((c) => c.userId === selectedClient.id).calendar;
-        if (event.id === -1) { // Should never happen
-            console.log("Tried to delete new event");
-            return;
-        }
-        API.deleteCalendarEvent(event, selectedCalendar).then(
+        API.deleteCalendarEvent(event).then(
             (response) => {
                 if (!response.success) {
                     console.log("Error deleting event. Got response ", response);
                     return;
                 }
-                updatedCalendar(response.calendar);
-                updatedEvent(event);
+                updatedEvent({ event: response.event, delete: true });
                 setModalOpen(false);
             },
         );
     };
 
-    const clientOptions = clientCalendarOptions(calendar, user);
+    const clientOptions = clientCalendarOptions(user);
 
     return (
         <Modal
@@ -167,6 +147,7 @@ const EditEventModal = ({
             <Modal.Content>
                 <Form.Group inline>
                     <Input
+                        id="title"
                         label="Title"
                         required
                         type="text"
@@ -193,6 +174,7 @@ const EditEventModal = ({
                 </Form.Group>
                 <Form.Group inline>
                     <DatePicker
+                        id="date"
                         selected={startDate}
                         onChange={(date) => setStartDate(date)}
                         minDate={Date.now()}
@@ -200,6 +182,7 @@ const EditEventModal = ({
                         error={formErrors.date}
                     />
                     <TimeInput
+                        id="time"
                         mode="12h"
                         initialTime={event.start}
                         autoOk
@@ -207,8 +190,9 @@ const EditEventModal = ({
                         error={formErrors.time}
                     />
                     <Input
+                        id="duration"
                         type="text"
-                        defaultValue={event.duration}
+                        defaultValue={duration}
                         onChange={(_, v) => { setDuration(parseMinutesDuration(v.value)); }}
                         label="Duration"
                         required
@@ -221,16 +205,19 @@ const EditEventModal = ({
                 </Form.Group>
                 <Form.Group inline>
                     <Checkbox
+                        id="repeat"
                         checked={repeat}
                         onChange={() => setRepeat(!repeat)}
                     />
                         &nbsp;Repeat every&nbsp;
                     <Input
+                        id="repeatFreq"
                         defaultValue={event.repeatFreq}
                         disabled={!repeat}
                         error={formErrors.repeatFreq}
                     />
                     <Dropdown
+                        id="repeatUnits"
                         inline
                         selection
                         options={repeatUnitOptions}
@@ -238,10 +225,11 @@ const EditEventModal = ({
                         error={formErrors.repeatUnits}
                     />
                 </Form.Group>
-                {calendar.clientCalendars.length > 0 && (
+                {user.isTrainer && user.clients.length > 0 && (
                     <Form.Group inline>
                         For&nbsp;
                         <Dropdown
+                            id="for"
                             selection
                             options={clientOptions}
                             error={formErrors.client}
@@ -285,25 +273,16 @@ const EditEventModal = ({
 EditEventModal.propTypes = {
     calendar: PropTypes.shape(
         {
-            myEvents: [PropTypes.instanceOf(CalendarEvent)],
+            myEvents: PropTypes.arrayOf(PropTypes.instanceOf(CalendarEvent)),
             gettingCalendar: PropTypes.bool,
-            clientEvents: [PropTypes.instanceOf(CalendarEvent)],
+            clientEvents: PropTypes.object,
+            clientEventsList: PropTypes.arrayOf(PropTypes.object),
         },
     ).isRequired,
     user: PropTypes.instanceOf(User).isRequired,
-    event: PropTypes.shape({
-        id: PropTypes.number,
-        title: PropTypes.string,
-        start: PropTypes.instanceOf(Date),
-        duration: PropTypes.number,
-        repeat: PropTypes.bool,
-        repeatFreq: PropTypes.string,
-        repeatUnits: PropTypes.string,
-        userId: PropTypes.number,
-    }).isRequired,
+    event: PropTypes.object.isRequired,
     modalOpen: PropTypes.bool.isRequired,
     setModalOpen: PropTypes.func.isRequired,
-    updatedCalendar: PropTypes.func.isRequired,
     updatedEvent: PropTypes.func.isRequired,
 };
 

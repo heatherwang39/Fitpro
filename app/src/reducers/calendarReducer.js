@@ -5,6 +5,7 @@ import {
 const defaultState = {
     myEvents: null, //  Events for this user
     clientEvents: {}, // Events for clients of this user by client id
+    clientEventsList: [], // All values in clientEvents for every client
     gettingCalendar: false,
 };
 
@@ -22,35 +23,28 @@ export default (state = defaultState, action) => {
             gettingCalendar: false,
             myEvents: action.payload.myEvents,
             clientEvents: action.payload.clientEvents ? action.payload.clientEvents : {},
+            clientEventsList: action.payload.clientEventsList
+                ? action.payload.clientEventsList
+                : (action.payload.clientEvents
+                    ? Object.keys(action.payload.clientEvents).map(
+                        (c) => ({ ...action.payload.clientEvents[c], client: c }),
+                    )
+                    : []),
         };
-    case UPDATED_CALENDAR: {
-        if (action.payload.userId === state.userCalendar.userId) {
-            return {
-                ...state,
-                userCalendar: action.payload,
-            };
-        }
-        // Find the correct user id calendar in clientCalendars and update it
-        const newCalendars = state.clientCalendars;
-        let waitingAdd = true;
-        for (let i = 0; i < newCalendars.length; i++) {
-            if (newCalendars[i].id === action.payload.userId) {
-                newCalendars[i].calendar = action.payload;
-                waitingAdd = false;
-            }
-        }
-        // If we didn't find a matching client calendar just push this as a new one
-        // Probably should never happen though
-        if (waitingAdd) {
-            console.log("Warning: UPDATED_CALENDAR got a calendar which is not in clientCalendars ",
-                "Adding this calendar as a new user's calendar");
-            newCalendars.push(action.payload);
-        }
+    case UPDATED_CALENDAR:
         return {
             ...state,
-            clientCalendars: newCalendars,
+            myEvents: action.payload.myEvents,
+            clientEvents: action.payload.clientEvents ? action.payload.clientEvents : {},
+            clientEventsList: action.payload.clientEventsList
+                ? action.payload.clientEventsList
+                : (action.payload.clientEvents
+                    ? Object.keys(action.payload.clientEvents).map(
+                        (c) => ({ ...action.payload.clientEvents[c], client: c }),
+                    )
+                    : []),
         };
-    }
+
     default:
         return state;
     }

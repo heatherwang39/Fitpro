@@ -5,7 +5,7 @@ import { User } from "../types";
 const savedUser = () => {
     const unparsed = localStorage.getItem("savedUser");
     if (!unparsed) return null;
-    return User.fromJSON(JSON.parse(unparsed));
+    return new User({ ...(JSON.parse(unparsed)) });
 };
 
 let user = savedUser();
@@ -26,7 +26,7 @@ store.subscribe(() => {
         localStorage.removeItem("savedUser");
     } else {
         localStorage.setItem("savedUser", JSON.stringify(userReducer));
-        user = User.fromJSON(userReducer);
+        user = new User({ ...userReducer });
     }
 });
 

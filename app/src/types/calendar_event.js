@@ -1,5 +1,7 @@
 export class CalendarEvent {
-    constructor(title, owner, description, client, start, end, workouts) {
+    constructor({
+        title, owner, description, client, start, end, workouts,
+    }) {
         this.title = title;
         this.owner = owner;
         this.description = description;
