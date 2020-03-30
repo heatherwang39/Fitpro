@@ -13,7 +13,6 @@ import { User } from "../../types";
 const checkLoginSuccess = (response) => response.status === "success";
 
 const LoginContainer = (props) => {
-    // TODO validate username/password
     const userInfo = (username, password) => ({ username, password });
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -23,12 +22,14 @@ const LoginContainer = (props) => {
         const info = userInfo(username, password);
         // Begin action to login the user
         props.loginUser(info);
+        console.log(info);
         API.login(info.username, info.password).then(
             (response) => {
                 const success = checkLoginSuccess(response);
                 if (success) {
+                    console.log(response.user);
                     props.loginSuccess(response.user);
-                    props.gotUserInfo(new User({ ...response.user }));
+                    props.gotUserInfo(response.user);
                     history.push("/");
                 } else {
                     props.loginFailure();

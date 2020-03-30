@@ -38,14 +38,19 @@ const _Calendar = ({
     if (user == null) {
         return (<div className="center">Log in to view your calendar</div>);
     }
+
+    const [error, setError] = React.useState(false);
+
     // Load Calendar from server
     if (calendar.myEvents == null) {
+        if (error) return (<div>Error</div>);
         if (!calendar.gettingCalendar) {
             getUserCalendar(user.id);
             API.getUserCalendar(user).then((response) => {
                 // TODO handle failure
                 if (!response.success) {
                     console.log("ERROR loading calendar");
+                    setError(true);
                 }
                 gotUserCalendar(response);
             });

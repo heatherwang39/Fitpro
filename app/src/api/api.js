@@ -1,5 +1,7 @@
 import { store } from "../store";
 import { loggedOut } from "../actions/userActions";
+import { CalendarEvent, User } from "../types";
+import { LOGOUT_USER } from "../actions/actionTypes";
 
 const BASE_API_URL = "https://localhost:3333";
 const apiUrl = (l) => `${BASE_API_URL + (!l || !l.length ? "" : (l[0] === "/" ? l : `/${l}`))}`;
@@ -69,7 +71,10 @@ export const API = {
         });
         if (res.status !== 200) return { status: res.status };
         const user = await res.json();
-        return { status: "success", user };
+        return { status: "success", user: new User({ id: user._id, ...user }) };
+    },
+    async logout() {
+        return apiFetch("auth/logout");
     },
     async getProfile(id) {
         const res = await apiFetch(`users/${id}`);
@@ -77,7 +82,6 @@ export const API = {
             return { success: false, error: res.status === 404 ? "Invalid user" : `Server returned ${res.status}` };
         }
         const r = { success: true, profile: await res.json() };
-        console.log(r);
         return r;
     },
     async getUserCalendar(user) {
@@ -86,21 +90,28 @@ export const API = {
             return { success: false, error: `Server responded with ${res.status}` };
         }
         // TODO handle pagination of events
-        const calendar = { myEvents: parseJsonWithDates(await res.text()).docs, clientEvents: {}, success: true };
+        const calendar = {
+            myEvents: parseJsonWithDates(await res.text()).docs.map((e) => (new CalendarEvent({ ...e }))),
+            clientEvents: {},
+            success: true,
+        };
         if (user.isTrainer) {
             res = await apiFetch("events/clients");
             if (res.status !== 200) {
                 return { success: false, error: `Server responded with ${res.status} when getting client events` };
             }
-            calendar.clientEventsList = (await res.json()).docs;
-            calendar.clientEventsList.forEach((e) => {
-                if (calendar.clientEvents[e.client]) {
-                    calendar.clientEvents[e.client].push(e);
-                } else {
-                    calendar.clientEvents[e.client] = [e];
-                }
-            });
+            // calendar.clientEvents = (await res.json()).docs.map((c) => {
+            //     if (calendar.clientEvents[c.client]) {
+
+            //     }
+            // });
+            // console.log(calendar.clientEvents);
+            calendar.clientEventsList = (await res.json()).docs.map((c) => (calendar.clientEvents[c.client]
+                ? calendar.clientEvents[c.client][calendar.clientEvents[c.client].push(new CalendarEvent({ ...c }))]
+                : (calendar.clientEvents[c.client] = [new CalendarEvent({ ...c })])
+            ));
         }
+        console.log(calendar);
         return calendar;
     },
     async createEvent(event) {

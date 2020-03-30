@@ -107,13 +107,14 @@ router.get("/mine", (req, res) => {
         res.status(401).send();
         return;
     }
-    const { page } = req.query;
+    const page = req.query.page ? req.query.page : 1;
     Event.paginate({
         owner: req.user._id,
-    }, { page }).then((workouts) => {
+    }, { page }).then((events) => {
+        console.log(events);
         res.setHeader("Content-Type", "application/json");
         res.status(200);
-        res.json(workouts);
+        res.json(events);
     });
 });
 
@@ -124,7 +125,9 @@ router.get("/clients", (req, res) => {
     }, { page }).then((events) => {
         res.setHeader("Content-Type", "application/json");
         res.status(200);
-        res.json(events);
+        const r = { ...events, docs: events.docs.map((e) => ({ ...e, client: (e.client ? e.client : e.owner) })) };
+        // console.log(r);
+        res.json(r);
     });
 });
 

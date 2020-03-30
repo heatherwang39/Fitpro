@@ -38,34 +38,32 @@ router.post("/login", (req, res) => {
                 res.sendStatus(401);
                 return;
             }
-            // Issue token
-            const resUser = {
-                email: user.email,
-                id: user._id,
-                firstname: user.firstname,
-                lastname: user.lastname,
-                username: user.username,
-                isTrainer: user.isTrainer,
+            // Issue token containing only essential info about the user and metadata
+            const { password: o, tokens, ...resUser } = { ...user._doc };
+            resUser.id = user._id;
+            resUser._id = user._id;
+            const tokenUser = {
+                id: resUser.id,
+                username: resUser.username,
+                isTrainer: resUser.isTrainer,
+                firstname: resUser.firstname,
+                lastname: resUser.lastname,
                 tokenIssued: Date.now() / 1000,
                 remember: !!req.body.remember,
             };
-            const token = jwt.sign(resUser,
+            const token = jwt.sign(tokenUser,
                 jwtSecret + user.password,
                 resUser.remember ? undefined : { expiresIn: "1h" });
-
             user.tokens.push(token);
-            user.save();
-
             res.cookie("token", token, {
                 // 2147483647000 = epoch + 2^31 - 1 (Jan 2038)
-                expires: new Date(resUser.remember ? 2147483647000 : Date.now() + 3.6e6),
+                expires: new Date(tokenUser.remember ? 2147483647000 : Date.now() + 3.6e6),
                 httpOnly: true,
                 secure: true,
             });
             res.setHeader("Content-Type", "application/json");
             res.status(200);
             res.json(resUser);
-            res.send();
         });
     });
 });

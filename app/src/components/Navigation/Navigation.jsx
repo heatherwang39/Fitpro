@@ -14,6 +14,7 @@ import { PropTypes } from "prop-types";
 import { User } from "../../types/user";
 import { loggedOut as loggedOutAction } from "../../actions/userActions";
 import "./style.css";
+import API from "../../api/api";
 
 const userMenuOptions = [{ key: 1, value: "profile", text: "Me" }, { key: 2, value: "logout", text: "Log Out" }];
 
@@ -32,6 +33,10 @@ function _Navigation({ user, loggedOut, location }) {
         return options;
     };
 
+    const logout = () => (API.logout().then(() => {
+        loggedOut();
+        history.push("/");
+    }));
 
     return (
         <Menu inverted attached>
@@ -101,7 +106,7 @@ function _Navigation({ user, loggedOut, location }) {
                             simple
                             options={userMenuOptions}
                             onChange={(_, v) => (v.value === "logout"
-                                ? loggedOut() && history.push("/") : history.push(`/user/${user.id}`))}
+                                ? logout() : history.push(`/user/${user.id}`))} // Only possible values are logout and go to profile
                         />
                     )
                 /* eslint-enable */
