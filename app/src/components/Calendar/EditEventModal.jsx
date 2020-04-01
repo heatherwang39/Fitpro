@@ -17,10 +17,10 @@ const TIME_REGEX = /^(\d?\d):(\d\d) (am|pm)$/;
 const clientCalendarOptions = (user) => {
     const items = user.clients
         ? user.clients.map(
-            (cal) => ({
-                key: cal.id,
-                text: `${cal.firstname} ${cal.lastname}`,
-                value: cal.id.toString(),
+            (c) => ({
+                key: c._id,
+                text: `${c.firstname} ${c.lastname}`,
+                value: c._id,
             }),
         )
         : [];
@@ -87,7 +87,7 @@ const EditEventModal = ({
 
     const eventFromForm = (target) => {
         const newEvent = {
-            ...event, title: target.title.value, start: startDate, repeat,
+            ...event, title: target.title.value, start: startDate, repeat, client: selectedClient,
         };
         const timeMatch = target.time.value.match(TIME_REGEX);
         newEvent.start.setHours(timeMatch[3] === "pm" && timeMatch[1] !== "12"
@@ -107,25 +107,26 @@ const EditEventModal = ({
         setFormErrors(errors);
         if (Object.entries(errors).length !== 0) return;
         const newEvent = eventFromForm(e.target);
+        console.log("new", newEvent);
         API.createEvent(newEvent).then(
             (response) => {
                 if (!response.success) {
                     console.log("Error creating event. Got response", response);
                 }
-                updatedEvent({ event: response.event, deleted: false });
+                updatedEvent({ event: new CalendarEvent(response.event), deleted: false });
                 setModalOpen(false);
             },
         );
     };
 
     const deleteEvent = () => {
-        API.deleteCalendarEvent(event).then(
+        API.deleteEvent(event).then(
             (response) => {
                 if (!response.success) {
                     console.log("Error deleting event. Got response ", response);
                     return;
                 }
-                updatedEvent({ event: response.event, delete: true });
+                updatedEvent({ event: response.event, deleted: true });
                 setModalOpen(false);
             },
         );

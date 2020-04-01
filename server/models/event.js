@@ -34,4 +34,13 @@ const schema = mongoose.Schema({
 
 schema.plugin(mongoosePaginate);
 
+schema.pre("save", function (next) { /* eslint-disable-line func-names */
+    if (this.isNew || this.isModified("client")) {
+        if (this.client === this.owner) {
+            this.client = null;
+        }
+        next();
+    } else next();
+    // TODO update correspoding clients/trainers if trainers/clients changed
+});
 module.exports = mongoose.model("event", schema);

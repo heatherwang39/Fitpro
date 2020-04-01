@@ -1,7 +1,6 @@
 import { store } from "../store";
 import { loggedOut } from "../actions/userActions";
 import { CalendarEvent, User } from "../types";
-import { LOGOUT_USER } from "../actions/actionTypes";
 
 const BASE_API_URL = "https://localhost:3333";
 const apiUrl = (l) => `${BASE_API_URL + (!l || !l.length ? "" : (l[0] === "/" ? l : `/${l}`))}`;
@@ -100,26 +99,27 @@ export const API = {
             if (res.status !== 200) {
                 return { success: false, error: `Server responded with ${res.status} when getting client events` };
             }
-            // calendar.clientEvents = (await res.json()).docs.map((c) => {
-            //     if (calendar.clientEvents[c.client]) {
-
-            //     }
-            // });
-            // console.log(calendar.clientEvents);
-            calendar.clientEventsList = (await res.json()).docs.map((c) => (calendar.clientEvents[c.client]
-                ? calendar.clientEvents[c.client][calendar.clientEvents[c.client].push(new CalendarEvent({ ...c }))]
+            calendar.clientEventsList = parseJsonWithDates(await res.text()).docs.map((c) => (calendar.clientEvents[c.client]
+                ? calendar.clientEvents[c.client].concat([new CalendarEvent({ ...c })])
                 : (calendar.clientEvents[c.client] = [new CalendarEvent({ ...c })])
             ));
         }
-        console.log(calendar);
-        return calendar;
+        return { success: true, calendar };
     },
     async createEvent(event) {
         const res = await apiFetch("events", { method: "POST", body: event });
         if (res.status !== 201) {
             return { success: false, error: `Server responded with ${res.status}` };
         }
-        return { success: true, event: await res.json() };
+        return { success: true, event: new CalendarEvent(parseJsonWithDates(await res.text())) };
+    },
+    async deleteEvent(event) {
+        if (!event.id) return { success: false, error: "No event id" };
+        const res = await apiFetch("events", { method: "DELETE", body: event });
+        if (res.status !== 200) {
+            return { success: false, error: `Server responded with ${res.status}` };
+        }
+        return { success: true, event: new CalendarEvent(parseJsonWithDates(await res.text())) };
     },
 };
 

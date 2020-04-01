@@ -1,0 +1,41 @@
+[
+    {
+        "username": "user",
+        "password": "user",
+        "email": "user@mail.com",
+        "isTrainer": false,
+        "gender": "male",
+        "firstname": "Client",
+        "lastname": "User",
+        "phone": "555-555-5555",
+        "height": "6'1\"",
+        "weight": "200 lbs",
+        "rating": 4.3
+    },
+    {
+        "username": "user2",
+        "password": "user2",
+        "email": "user2@mail.com",
+        "isTrainer": true,
+        "gender": "male",
+        "firstname": "Trainer",
+        "lastname": "User",
+        "phone": "555-555-5555",
+        "height": "6'2\"",
+        "weight": "210 lbs",
+        "rating": 4.3
+    },
+    {
+        "username": "user3",
+        "password": "user3",
+        "email": "user3@mail.com",
+        "isTrainer": true,
+        "gender": "female",
+        "firstname": "Lucy",
+        "lastname": "Persson",
+        "phone": "555-555-5555",
+        "height": "5'8\"",
+        "weight": "150 lbs",
+        "rating": 4.3
+    }
+]

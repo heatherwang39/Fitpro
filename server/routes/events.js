@@ -20,7 +20,6 @@ router.post("/", (req, res) => {
         res.status(400).send();
         return;
     }
-
     const {
         title, description, client, start, end,
     } = req.body;
@@ -111,7 +110,6 @@ router.get("/mine", (req, res) => {
     Event.paginate({
         owner: req.user._id,
     }, { page }).then((events) => {
-        console.log(events);
         res.setHeader("Content-Type", "application/json");
         res.status(200);
         res.json(events);
@@ -119,15 +117,13 @@ router.get("/mine", (req, res) => {
 });
 
 router.get("/clients", (req, res) => {
-    const { userId, page } = req.query;
+    const page = req.query.page ? req.query.page : 1;
     Event.paginate({
-        client: userId,
+        client: req.user._id,
     }, { page }).then((events) => {
         res.setHeader("Content-Type", "application/json");
         res.status(200);
-        const r = { ...events, docs: events.docs.map((e) => ({ ...e, client: (e.client ? e.client : e.owner) })) };
-        // console.log(r);
-        res.json(r);
+        res.json(events);
     });
 });
 
@@ -165,6 +161,35 @@ router.patch("/", async (req, res) => {
         }, changes, { new: true });
     } catch (e) {
         res.status(400).send();
+    }
+    res.json(event);
+});
+
+router.delete("/", async (req, res) => {
+    if (!req.body) {
+        res.status(400).send();
+        return;
+    }
+    if (!req.user) {
+        res.status(401).send();
+        return;
+    }
+    let event;
+    try {
+        event = await Event.findById(req.body.id);
+    } catch (e) {
+        res.status(400).send();
+        return;
+    }
+    if (event.owner.toString() !== req.user._id || (req.user._id && req.user._id === event.client)) {
+        res.status(401).send();
+        return;
+    }
+    try {
+        await event.delete();
+    } catch (e) {
+        res.status(500).send();
+        return;
     }
     res.json(event);
 });

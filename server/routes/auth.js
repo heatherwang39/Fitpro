@@ -18,7 +18,7 @@ router.post("/login", (req, res) => {
         return;
     }
     const { username, password } = req.body;
-    User.findOne({ username }, (err, user) => {
+    User.findOne({ username }).populate("clients trainers").exec((err, user) => {
         if (err) {
             console.log(`Error trying to log in ${username}: ${err.toString()}`);
             res.status(500).send();
@@ -42,6 +42,8 @@ router.post("/login", (req, res) => {
             const { password: o, tokens, ...resUser } = { ...user._doc };
             resUser.id = user._id;
             resUser._id = user._id;
+            resUser.clients = user.clients;
+            resUser.trainers = user.trainers;
             const tokenUser = {
                 id: resUser.id,
                 username: resUser.username,
@@ -54,7 +56,9 @@ router.post("/login", (req, res) => {
             const token = jwt.sign(tokenUser,
                 jwtSecret + user.password,
                 resUser.remember ? undefined : { expiresIn: "1h" });
-            user.tokens.push(token);
+            if (!user.tokens.indexOf(token)) {
+                user.tokens.push(token);
+            }
             res.cookie("token", token, {
                 // 2147483647000 = epoch + 2^31 - 1 (Jan 2038)
                 expires: new Date(tokenUser.remember ? 2147483647000 : Date.now() + 3.6e6),

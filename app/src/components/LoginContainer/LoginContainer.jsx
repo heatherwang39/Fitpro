@@ -22,12 +22,10 @@ const LoginContainer = (props) => {
         const info = userInfo(username, password);
         // Begin action to login the user
         props.loginUser(info);
-        console.log(info);
         API.login(info.username, info.password).then(
             (response) => {
                 const success = checkLoginSuccess(response);
                 if (success) {
-                    console.log(response.user);
                     props.loginSuccess(response.user);
                     props.gotUserInfo(response.user);
                     history.push("/");

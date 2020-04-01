@@ -21,13 +21,13 @@ export default (state = defaultState, action) => {
         return {
             ...state,
             gettingCalendar: false,
-            myEvents: action.payload.myEvents,
+            myEvents: action.payload.myEvents ? action.payload.myEvents : [],
             clientEvents: action.payload.clientEvents ? action.payload.clientEvents : {},
             clientEventsList: action.payload.clientEventsList
                 ? action.payload.clientEventsList
                 : (action.payload.clientEvents
-                    ? Object.keys(action.payload.clientEvents).map(
-                        (c) => ({ ...action.payload.clientEvents[c], client: c }),
+                    ? Object.keys(action.payload.clientEvents).reduce(
+                        (acc, c) => (acc.concat([{ ...(action.payload.clientEvents[c]), client: c }])),
                     )
                     : []),
         };
@@ -39,8 +39,8 @@ export default (state = defaultState, action) => {
             clientEventsList: action.payload.clientEventsList
                 ? action.payload.clientEventsList
                 : (action.payload.clientEvents
-                    ? Object.keys(action.payload.clientEvents).map(
-                        (c) => ({ ...action.payload.clientEvents[c], client: c }),
+                    ? Object.keys(action.payload.clientEvents).reduce(
+                        (acc, c) => ([...acc, ...c]),
                     )
                     : []),
         };

@@ -99,6 +99,10 @@
                     ]
                 }
             }
+        ],
+        "no-return-assign": [
+            "error",
+            "except-parens"
         ]
     }
 }

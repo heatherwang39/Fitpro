@@ -12,7 +12,6 @@ import useStateWithCallback from "use-state-with-callback";
 import {
     getUserCalendar as getUserCalendarAction,
     gotUserCalendar as gotUserCalendarAction,
-    updatedCalendar as updatedCalendarAction,
 } from "../../actions/calendarActions";
 import { User, CalendarEvent } from "../../types";
 import API from "../../api/api";
@@ -33,35 +32,18 @@ const localizer = momentLocalizer(moment);
 const _Calendar = ({
     location, calendar, user,
     getUserCalendar, gotUserCalendar,
-    updatedCalendar,
 }) => {
     if (user == null) {
         return (<div className="center">Log in to view your calendar</div>);
     }
 
+    // const [fetched, setFetched] = React.useState(false);
     const [error, setError] = React.useState(false);
-
-    // Load Calendar from server
-    if (calendar.myEvents == null) {
-        if (error) return (<div>Error</div>);
-        if (!calendar.gettingCalendar) {
-            getUserCalendar(user.id);
-            API.getUserCalendar(user).then((response) => {
-                // TODO handle failure
-                if (!response.success) {
-                    console.log("ERROR loading calendar");
-                    setError(true);
-                }
-                gotUserCalendar(response);
-            });
-        }
-        return (<div className="center">Loading</div>);
-    }
 
     // Local state
     const [modalOpen, setModalOpen] = React.useState(false);
-    const [visibleEvents, setVisibleEvents] = React.useState(calendar.myEvents);
-    const [calendarType, setCalendarTypeState] = React.useState("default");
+    // const [visibleEvents, setVisibleEvents] = React.useState(calendar.myEvents);
+    const [calendarType, setCalendarType] = React.useState("default");
     const [availableColours, setAvailableColours] = React.useState(ALL_EVENT_COLOURS);
     const [uidColours, setUidColours] = React.useState(new Map());
     const [changeToClient, setChangeToClient] = React.useState(false);
@@ -77,25 +59,23 @@ const _Calendar = ({
     // Properties of event currently being created/modified
     const [modalEvent, setModalEvent] = React.useState(null);
 
-    const setCalendarType = (type) => {
-        setCalendarTypeState(type);
-        switch (type) {
+    const selectedEvents = () => {
+        switch (calendarType) {
         case "overview":
-            setVisibleEvents(calendar.myEvents.concat(calendar.clientEventsList));
-            break;
+            return [...calendar.myEvents, ...calendar.clientEventsList];
         case "me":
-            setVisibleEvents(calendar.myEvents);
-            break;
+            return calendar.myEvents;
         case "availability":
             // TODO
-            // setVisibleEvents(calendar.userCalendar.availability);
+            // return calendar.userCalendar.availability
             break;
         case "client":
-            if (selectedClient === null) setVisibleEvents([]);
-            setVisibleEvents(calendar.clientEvents[selectedClient]);
-            break;
+            if (selectedClient === null) return [];
+            return calendar.clientEvents[selectedClient] ? calendar.clientEvents[selectedClient] : [];
+        // returning outside switch default makes eslint happy about consistent return
         // no default
         }
+        return [];
     };
 
     // Select the client that was passed with location if they are a client of this trainer
@@ -114,8 +94,26 @@ const _Calendar = ({
             setChangeToClient(false);
         }
         setModalEvent(modalEvent);
-    }, [changeToClient, user, modalEvent]);
-
+        // console.log("ef", calendar);
+        // setCalendarTypeState(calendarType);
+    }, [changeToClient, user, modalEvent, calendar]);
+    console.log(calendar);
+    // Load Calendar from server
+    if (calendar.myEvents == null) {
+        if (error) return (<div>Error</div>);
+        if (!calendar.gettingCalendar) {
+            getUserCalendar(user.id);
+            API.getUserCalendar(user).then((response) => {
+                // TODO handle failure
+                if (!response.success) {
+                    console.log("ERROR loading calendar");
+                    setError(true);
+                }
+                gotUserCalendar(response.calendar);
+            });
+        }
+        return (<div className="center">Loading</div>);
+    }
     const openModal = (event) => {
         if (event.id) {
             setModalEvent(event);
@@ -150,43 +148,53 @@ const _Calendar = ({
     // };
 
     const modalUpdatedEvent = ({ event, deleted }) => {
-        console.log(event, user);
-        if (event.owner === user.id) {
+        if (!user.isTrainer || !event.client || event.client === user.id) {
             if (deleted) {
-                updatedCalendar({ ...calendar, myEvents: calendar.myEvents.filter((e) => e.id !== event.id) });
-            } else {
+                gotUserCalendar({ ...calendar, myEvents: calendar.myEvents.filter((e) => e.id !== event.id) });
+            } else if (calendar.myEvents) {
+                let newEvent = true;
                 for (let i = 0; i < calendar.myEvents.length; i++) {
                     if (calendar.myEvents[i].id === event.id) {
-                        updatedCalendar({
+                        gotUserCalendar({
                             ...calendar,
                             myEvents: [event]
                                 .concat(calendar.myEvents.slice(0, i))
                                 .concat(calendar.myEvents.slice(i + 1)),
                         });
+                        newEvent = false;
                         break;
                     }
+                }
+                if (newEvent) {
+                    gotUserCalendar({
+                        ...calendar,
+                        myEvents: [...calendar.myEvents, event],
+                    });
                 }
             }
         } else {
-            const newClientEvents = calendar.clientEvents;
+            const newClientEvents = calendar.clientEvents ? calendar.clientEvents : {};
             if (deleted) {
                 newClientEvents[event.client] = newClientEvents[event.client].filter((e) => e.id !== event.id);
-            } else {
-                for (let i = 0; i < calendar.clientEvents[event.client].length; i++) {
-                    if (calendar.clientEvents[event.client][i].id === event.id) {
-                        newClientEvents[event.client] = newClientEvents[event.client].filter((e) => e.id !== event.id);
-                        break;
+            } else if (calendar.clientEvents) {
+                if (calendar.clientEvents[event.client]) {
+                    for (let i = 0; i < calendar.clientEvents[event.client].length; i++) {
+                        if (calendar.clientEvents[event.client][i].id === event.id) {
+                            newClientEvents[event.client] = newClientEvents[event.client].filter((e) => e.id !== event.id);
+                            break;
+                        }
                     }
+                } else {
+                    newClientEvents[event.client] = [event.client];
                 }
             }
             // Don't pass {...calendar} so clientEventsList argument is undefined and therefore generated automatically
-            updatedCalendar({
+            gotUserCalendar({
                 myEvents: calendar.myEvents,
                 gettingCalendar: calendar.gettingCalendar,
                 clientEvents: newClientEvents,
             });
         }
-        setCalendarType(calendarType);
     };
 
     const getNewColour = () => {
@@ -275,7 +283,7 @@ const _Calendar = ({
             <div className="calendar-container">
                 <BigCalendar
                     localizer={localizer}
-                    events={visibleEvents}
+                    events={selectedEvents(calendar)}
                     onSelectSlot={openModal}
                     onSelectEvent={openModal}
                     startAccessor="start"
@@ -295,7 +303,8 @@ const _Calendar = ({
                             return {
                                 className: "event-default",
                                 style: {
-                                    backgroundColor: eventColorByUserId(event.client ? event.client.id : event.owner.id),
+                                    backgroundColor:
+                                    eventColorByUserId(event.client ? event.client.id : event.owner.id),
                                 },
                             };
                         }
@@ -324,7 +333,6 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
     getUserCalendar: (id) => dispatch(getUserCalendarAction(id)),
     gotUserCalendar: (calendar) => dispatch(gotUserCalendarAction(calendar)),
-    updatedCalendar: (event) => dispatch(updatedCalendarAction(event)),
 });
 
 _Calendar.propTypes = {
@@ -346,7 +354,6 @@ _Calendar.propTypes = {
     user: PropTypes.instanceOf(User),
     getUserCalendar: PropTypes.func.isRequired,
     gotUserCalendar: PropTypes.func.isRequired,
-    updatedCalendar: PropTypes.func.isRequired,
 };
 
 _Calendar.defaultProps = {
