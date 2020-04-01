@@ -35,10 +35,8 @@ class Filter extends Component {
             this.setState({ maxPriceError: false });
             if (newMaxPrice.length === 0) return;
             setFilters({ ...filters, maxPrice: newMaxPrice });
-            console.log(newMaxPrice);
         };
 
-        console.log(filters);
         return (
             <Card id="filter-container">
                 {hasFilter(filters) && (

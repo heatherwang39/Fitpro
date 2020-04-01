@@ -20,7 +20,6 @@ class SearchTrainer extends Component {
 
     render() {
         const { searchedName, filters } = this.state;
-        console.log(filters);
         return (
             <div id="search-container">
                 <Grid>

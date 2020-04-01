@@ -3,9 +3,8 @@ import {
 } from "../actions/actionTypes";
 
 const defaultState = {
-    myEvents: null, //  Events for this user
-    clientEvents: {}, // Events for clients of this user by client id
-    clientEventsList: [], // All values in clientEvents for every client
+    myEvents: null, //  Events where this user is owner
+    myClientEvents: [], // Events where this user is a client
     gettingCalendar: false,
 };
 
@@ -22,27 +21,13 @@ export default (state = defaultState, action) => {
             ...state,
             gettingCalendar: false,
             myEvents: action.payload.myEvents ? action.payload.myEvents : [],
-            clientEvents: action.payload.clientEvents ? action.payload.clientEvents : {},
-            clientEventsList: action.payload.clientEventsList
-                ? action.payload.clientEventsList
-                : (action.payload.clientEvents
-                    ? Object.keys(action.payload.clientEvents).reduce(
-                        (acc, c) => (acc.concat([{ ...(action.payload.clientEvents[c]), client: c }])),
-                    )
-                    : []),
+            myClientEvents: action.payload.myClientEvents ? action.payload.myClientEvents : [],
         };
     case UPDATED_CALENDAR:
         return {
             ...state,
             myEvents: action.payload.myEvents,
-            clientEvents: action.payload.clientEvents ? action.payload.clientEvents : {},
-            clientEventsList: action.payload.clientEventsList
-                ? action.payload.clientEventsList
-                : (action.payload.clientEvents
-                    ? Object.keys(action.payload.clientEvents).reduce(
-                        (acc, c) => ([...acc, ...c]),
-                    )
-                    : []),
+            myClientEvents: action.payload.myClientEvents ? action.payload.myClientEvents : [],
         };
 
     default:

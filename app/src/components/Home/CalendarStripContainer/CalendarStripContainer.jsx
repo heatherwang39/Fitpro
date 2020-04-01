@@ -14,6 +14,7 @@ const CalendarStripContainer = ({
 }) => {
     const calUserId = user.id;
     const [filteredEvents, setFilteredEvents] = useState([]);
+    const [gotEvents, setGotEvents] = useState(false);
 
     const formatEventsListToObject = (events) => {
         const oneWeekFromNow = new Date();
@@ -23,23 +24,29 @@ const CalendarStripContainer = ({
             const newDate = start.toLocaleDateString();
             if (start.getTime() > oneWeekFromNow.getTime() || start.getTime() < (new Date()).getTime()) return false;
             // Remove the following line if you want events that occur for the next week
-            return (new Date(newDate)).getDate() === (new Date()).getDate();
+            // return (new Date(newDate)).getDate() === (new Date()).getDate();
+            return true; // Events for next week, uncomment line above for only today
         });
         return eventsList;
     };
 
     useEffect(() => {
-        if (calendar.calendar != null) return;
-        if (!calendar.gettingCalendar) {
+        if (calendar.gettingCalendar) return;
+        if (calendar.myEvents === null) {
             getUserCalendar(calUserId);
             API.getUserCalendar(user).then((response) => {
                 if (!response.success) console.log("Error getting user calendar, got response ", response);
                 // TODO handle failure
-                gotUserCalendar(response);
-                setFilteredEvents(formatEventsListToObject(response.myEvents));
+                gotUserCalendar(response.calendar);
+                setGotEvents(true);
             });
+        } else if (gotEvents) {
+            let events = calendar.myEvents ? calendar.myEvents : [];
+            events = events.concat(calendar.myClientEvents ? calendar.myClientEvents : []);
+            setFilteredEvents(formatEventsListToObject(events));
+            setGotEvents(false);
         }
-    }, []);
+    }, [calendar, gotEvents]);
 
     return (
         <CalendarStripComponent events={filteredEvents} />
@@ -58,7 +65,11 @@ const mapDispatchToProps = (dispatch) => ({
 
 CalendarStripContainer.propTypes = {
     calendar: PropTypes.shape(
-        { calendar: PropTypes.arrayOf(PropTypes.instanceOf(CalendarEvent)), gettingCalendar: PropTypes.bool },
+        {
+            myEvents: PropTypes.arrayOf(PropTypes.instanceOf(CalendarEvent)),
+            gettingCalendar: PropTypes.bool,
+            myClientEvents: PropTypes.arrayOf(PropTypes.instanceOf(CalendarEvent)),
+        },
     ).isRequired,
     getUserCalendar: PropTypes.func.isRequired,
     gotUserCalendar: PropTypes.func.isRequired,

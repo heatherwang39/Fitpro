@@ -107,11 +107,11 @@ const EditEventModal = ({
         setFormErrors(errors);
         if (Object.entries(errors).length !== 0) return;
         const newEvent = eventFromForm(e.target);
-        console.log("new", newEvent);
         API.createEvent(newEvent).then(
             (response) => {
                 if (!response.success) {
                     console.log("Error creating event. Got response", response);
+                    return;
                 }
                 updatedEvent({ event: new CalendarEvent(response.event), deleted: false });
                 setModalOpen(false);
@@ -276,8 +276,7 @@ EditEventModal.propTypes = {
         {
             myEvents: PropTypes.arrayOf(PropTypes.instanceOf(CalendarEvent)),
             gettingCalendar: PropTypes.bool,
-            clientEvents: PropTypes.object,
-            clientEventsList: PropTypes.arrayOf(PropTypes.object),
+            myClientEvents: PropTypes.object,
         },
     ).isRequired,
     user: PropTypes.instanceOf(User).isRequired,

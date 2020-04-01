@@ -62,7 +62,7 @@ const _Calendar = ({
     const selectedEvents = () => {
         switch (calendarType) {
         case "overview":
-            return [...calendar.myEvents, ...calendar.clientEventsList];
+            return [...calendar.myEvents, ...calendar.myClientEvents];
         case "me":
             return calendar.myEvents;
         case "availability":
@@ -71,7 +71,9 @@ const _Calendar = ({
             break;
         case "client":
             if (selectedClient === null) return [];
-            return calendar.clientEvents[selectedClient] ? calendar.clientEvents[selectedClient] : [];
+            // TODO
+            // return calendar.clientEvents[selectedClient] ? calendar.clientEvents[selectedClient] : [];
+            return [];
         // returning outside switch default makes eslint happy about consistent return
         // no default
         }
@@ -80,7 +82,7 @@ const _Calendar = ({
 
     // Select the client that was passed with location if they are a client of this trainer
     if (location != null && user.isTrainer && typeof location.state !== "undefined" && selectedClient === null) {
-        if (calendar.clientEvents[location.state.userId]) {
+        if (user.clients.includes(location.state.userId)) { // TODO support populated clients list
             setSelectedClient(location.state.userId);
             setChangeToClient(true);
         } else {
@@ -94,10 +96,8 @@ const _Calendar = ({
             setChangeToClient(false);
         }
         setModalEvent(modalEvent);
-        // console.log("ef", calendar);
-        // setCalendarTypeState(calendarType);
     }, [changeToClient, user, modalEvent, calendar]);
-    console.log(calendar);
+
     // Load Calendar from server
     if (calendar.myEvents == null) {
         if (error) return (<div>Error</div>);
@@ -147,8 +147,9 @@ const _Calendar = ({
     // }
     // };
 
+    // Called by EditEventModal when Create/Save/Delete is clicked after validating event
     const modalUpdatedEvent = ({ event, deleted }) => {
-        if (!user.isTrainer || !event.client || event.client === user.id) {
+        if (event.owner === user.id || (event.owner === undefined && (!event.client || event.client === user.id))) {
             if (deleted) {
                 gotUserCalendar({ ...calendar, myEvents: calendar.myEvents.filter((e) => e.id !== event.id) });
             } else if (calendar.myEvents) {
@@ -171,28 +172,38 @@ const _Calendar = ({
                         myEvents: [...calendar.myEvents, event],
                     });
                 }
+            } else {
+                gotUserCalendar({
+                    ...calendar,
+                    myEvents: [event],
+                });
             }
-        } else {
-            const newClientEvents = calendar.clientEvents ? calendar.clientEvents : {};
-            if (deleted) {
-                newClientEvents[event.client] = newClientEvents[event.client].filter((e) => e.id !== event.id);
-            } else if (calendar.clientEvents) {
-                if (calendar.clientEvents[event.client]) {
-                    for (let i = 0; i < calendar.clientEvents[event.client].length; i++) {
-                        if (calendar.clientEvents[event.client][i].id === event.id) {
-                            newClientEvents[event.client] = newClientEvents[event.client].filter((e) => e.id !== event.id);
-                            break;
-                        }
-                    }
-                } else {
-                    newClientEvents[event.client] = [event.client];
+        } else if (deleted) {
+            gotUserCalendar({ ...calendar, myClientEvents: calendar.myClientEvents.filter((e) => e.id !== event.id) });
+        } else if (calendar.myClientEvents) {
+            let newEvent = true;
+            for (let i = 0; i < calendar.myClientEvents.length; i++) {
+                if (calendar.myClientEvents[i].id === event.id) {
+                    gotUserCalendar({
+                        ...calendar,
+                        myClientEvents: [event]
+                            .concat(calendar.myClientEvents.slice(0, i))
+                            .concat(calendar.myClientEvents.slice(i + 1)),
+                    });
+                    newEvent = false;
+                    break;
                 }
             }
-            // Don't pass {...calendar} so clientEventsList argument is undefined and therefore generated automatically
+            if (newEvent) {
+                gotUserCalendar({
+                    ...calendar,
+                    myClientEvents: [...calendar.myClientEvents, event],
+                });
+            }
+        } else {
             gotUserCalendar({
-                myEvents: calendar.myEvents,
-                gettingCalendar: calendar.gettingCalendar,
-                clientEvents: newClientEvents,
+                ...calendar,
+                myClientEvents: [event],
             });
         }
     };
@@ -261,7 +272,7 @@ const _Calendar = ({
                                     />
                                     <Dropdown
                                         selection
-                                        options={Object.keys(calendar.clientEvents).map(
+                                        options={Object.keys(user.clients).map(
                                             (c) => ({
                                                 key: c._id,
                                                 text: `${c.firstname} ${c.lastname}`,
@@ -347,8 +358,7 @@ _Calendar.propTypes = {
         {
             myEvents: PropTypes.arrayOf(PropTypes.instanceOf(CalendarEvent)),
             gettingCalendar: PropTypes.bool,
-            clientEvents: PropTypes.object,
-            clientEventsList: PropTypes.arrayOf(PropTypes.object),
+            myClientEvents: PropTypes.arrayOf(PropTypes.instanceOf(CalendarEvent)),
         },
     ).isRequired,
     user: PropTypes.instanceOf(User),

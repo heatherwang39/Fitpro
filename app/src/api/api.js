@@ -22,7 +22,6 @@ const apiFetch = async (path, options) => {
     const res = await fetch(path.startsWith("http") ? path : apiUrl(path), reqOptions);
     if (res.status === 401) {
         const valid = await fetch(apiUrl("auth/validate"), { credentials: "include" });
-        console.log(valid, valid.status);
         if (valid.status === 401) {
             store.dispatch(loggedOut());
         }
@@ -91,18 +90,15 @@ export const API = {
         // TODO handle pagination of events
         const calendar = {
             myEvents: parseJsonWithDates(await res.text()).docs.map((e) => (new CalendarEvent({ ...e }))),
-            clientEvents: {},
+            myClientEvents: [],
             success: true,
         };
-        if (user.isTrainer) {
+        if (!user.isTrainer) {
             res = await apiFetch("events/clients");
             if (res.status !== 200) {
                 return { success: false, error: `Server responded with ${res.status} when getting client events` };
             }
-            calendar.clientEventsList = parseJsonWithDates(await res.text()).docs.map((c) => (calendar.clientEvents[c.client]
-                ? calendar.clientEvents[c.client].concat([new CalendarEvent({ ...c })])
-                : (calendar.clientEvents[c.client] = [new CalendarEvent({ ...c })])
-            ));
+            calendar.myClientEvents = parseJsonWithDates(await res.text()).docs;
         }
         return { success: true, calendar };
     },
