@@ -12,7 +12,7 @@ const auth = require("./auth");
 const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
 const workoutsRouter = require("./routes/workouts");
-const eventsRouter = require("./routes/events")
+const eventsRouter = require("./routes/events");
 const trainersRouter = require("./routes/trainers");
 const mailRouter = require("./routes/mail");
 
@@ -25,10 +25,9 @@ app.use(bodyParser.urlencoded({
     extended: true,
 }));
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "public")));
 app.use(auth);
 
-//app.use(express.static(path.join(__dirname, "../app/build")));
+app.use(express.static(path.join(__dirname, "../app/dist")));
 
 // Database
 const dbUrl = process.env.DB_URL || "mongodb://localhost/fitpro";

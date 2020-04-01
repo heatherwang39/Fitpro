@@ -4,8 +4,7 @@
   "description": "Personal trainer website",
   "main": "index.js",
   "scripts": {
-    "test": "echo TODO set up tests",
-    "build": "webpack -p",
+    "build": "webpack -p && (cp ./index.html ./dist/ || copy index.html dist)",
     "start": "webpack-dev-server --open",
     "lint": "eslint \"./**/*.js\" \"./**/*.jsx\"",
     "lint-fix": "eslint \"./**/*.js\" \"./**/*.jsx\" --fix"
