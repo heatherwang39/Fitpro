@@ -2,9 +2,8 @@ import { connect } from "react-redux";
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { PropTypes } from "prop-types";
-
 import {
-    Button, Checkbox, Container, Dropdown, Form, Grid, Label, Segment, Rail, List, Input, Image,
+    Form, Grid, Segment, List,
 } from "semantic-ui-react";
 import { User } from "../../types/user";
 import "./style.css";
@@ -22,15 +21,19 @@ const workoutListItem = (w) => (
                 </Grid.Row>
             </Grid.Column>
             <Grid.Column>
-                <List bulleted>
-                    {
-                        // Might have more than 3 exercises if another workout on this page has repeats
-                        w.exercises.slice(0, 3).map(
-                            (e) => (<List.Item key={e.exercise._id}>{e.exercise.name}</List.Item>),
-                        )
-                    }
-                </List>
-                {w.numExercises && w.numExercises > 3 && <Link to={`/workout/${w._id}`}>More...</Link>}
+                {w.numExercises
+                    ? (
+                        <List bulleted>
+                            {
+                                // Might have more than 3 exercises if another workout on this page has repeats
+                                w.exercises.slice(0, 3).map(
+                                    (e) => (<List.Item key={e.exercise._id}>{e.exercise.name}</List.Item>),
+                                )
+                            }
+                        </List>
+                    ) : "No exercises"}
+                {w.numExercises && w.numExercises > 3
+                    ? (<Link to={`/workout/${w._id}`}>More...</Link>) : <span />}
             </Grid.Column>
         </Grid>
     </Segment>
@@ -44,7 +47,7 @@ const usePrevious = (v) => {
     return ref.current;
 };
 
-const WorkoutsComponent = ({
+const WorkoutListComponent = ({
     user,
 }) => {
     const [filters, setFilters] = React.useState({ myWorkouts: false, name: "" });
@@ -63,42 +66,47 @@ const WorkoutsComponent = ({
         }
     }, [filters]);
 
-    if (loading) return (<div>Loading</div>);
+    if (loading) return (<Segment loading />);
 
     if (!workouts || workouts.length === undefined) {
         if (!loading) {
             setLoading(true);
             API.getWorkouts(filters).then(gotWorkouts);
         }
-        return (<div>Loading</div>);
+        return (<Segment loading />);
     }
 
     return (
         <Grid columns={2} centered padded>
             <Grid.Column>
                 <Grid.Row>
-                    <Segment id="search-header">
-                        <Form>
-                            <Form.Group inline>
-                                <Form.Checkbox
-                                    toggle
-                                    label="My Workouts"
-                                    disabled={!user}
-                                    checked={filters.myWorkouts}
-                                    onChange={(_, v) => {
-                                        setFilters({ ...filters, myWorkouts: v.checked });
-                                    }}
-                                />
-                                <Form.Input
-                                    icon="search"
-                                    placeholder="Search..."
-                                    id="search-input"
-                                    value={filters.name}
-                                    onChange={(_, v) => setFilters({ ...filters, name: v.value })}
-                                />
-                            </Form.Group>
-                        </Form>
-                    </Segment>
+                    <Grid container centered id="search-header">
+                        <Segment>
+                            <Form>
+                                <Form.Group inline>
+                                    <Form.Checkbox
+                                        toggle
+                                        label="My Workouts"
+                                        disabled={!user}
+                                        checked={filters.myWorkouts}
+                                        onChange={(_, v) => {
+                                            setFilters({ ...filters, myWorkouts: v.checked });
+                                        }}
+                                    />
+                                    <Form.Input
+                                        icon="search"
+                                        placeholder="Search..."
+                                        id="search-input"
+                                        value={filters.name}
+                                        onChange={(_, v) => setFilters({ ...filters, name: v.value })}
+                                    />
+                                    <Link to="/workout/new">
+                                        <Form.Button icon="add" id="add-workout" />
+                                    </Link>
+                                </Form.Group>
+                            </Form>
+                        </Segment>
+                    </Grid>
                 </Grid.Row>
                 <Grid.Row>
                     <Segment.Group>
@@ -121,15 +129,15 @@ const mapStateToProps = (state) => ({
     user: state.userReducer,
 });
 
-WorkoutsComponent.propTypes = {
+WorkoutListComponent.propTypes = {
     user: PropTypes.instanceOf(User),
 };
 
-WorkoutsComponent.defaultProps = {
+WorkoutListComponent.defaultProps = {
     user: null,
 };
 
 
-export const Workouts = connect(mapStateToProps)(WorkoutsComponent);
+export const WorkoutList = connect(mapStateToProps)(WorkoutListComponent);
 
-export default Workouts;
+export default WorkoutList;
