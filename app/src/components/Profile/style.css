@@ -64,7 +64,13 @@
 }
 
 .review-name {
-    margin-top: auto;
-    margin-bottom: auto;
     display: inline;
+}
+
+#submit-review-btn {
+    margin-left: 1em;
+}
+
+#user-review {
+    min-height: 5em;
 }

@@ -64,6 +64,10 @@ const schema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+    metric: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 schema.pre("save", function (next) { /* eslint-disable-line func-names */

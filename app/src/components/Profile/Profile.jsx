@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { PropTypes } from "prop-types";
 
 import {
-    Button, Container, Grid, Input, Label, Rating, Segment,
+    Button, Container, Grid, Input, Label, Rating, Segment, Form,
 } from "semantic-ui-react";
 import { User } from "../../types/user";
 import { gotUserInfo as gotUserInfoAction } from "../../actions/userActions";
@@ -67,6 +67,20 @@ const offersColumn = () => (
 
 );
 
+const reviewForm = (onSubmit, setRating) => (
+    <Segment>
+        <Form onSubmit={onSubmit}>
+            <Form.Field>
+                <Input placeholder="Write a review" id="review" />
+            </Form.Field>
+            <Form.Field>
+                <Rating icon="star" defaultRating={0} maxRating={10} id="rating" onRate={(e, { rating }) => setRating(rating)} />
+            </Form.Field>
+            <Button type="submit" id="submit-review-btn">Rate</Button>
+        </Form>
+    </Segment>
+);
+
 const _Profile = ({
     match, user, gotUserInfo,
 }) => {
@@ -75,6 +89,8 @@ const _Profile = ({
     const [error, setError] = React.useState(null);
     const [editing, setEditing] = React.useState(false);
     const [uneditedProfile, setUneditedProfile] = React.useState(null);
+    const [myRating, setMyRating] = React.useState(0);
+    const [showReviewForm, setShowReviewForm] = React.useState(null);
 
     if (!match.params.id || match.params.id.length !== 24) {
         setError("Invalid user id");
@@ -107,10 +123,17 @@ const _Profile = ({
     // Loading profile from server
     if (profile == null || fetchingProfile) {
         return (
-            <div className="center">
-                Loading...
-            </div>
+            <Segment loading />
         );
+    }
+
+    if (showReviewForm === null) {
+        if (match.params.id === user._id) setShowReviewForm(false);
+        else {
+            API.getRating({ trainer: profile._id }).then((r) => {
+                setShowReviewForm(r.rating === undefined);
+            });
+        }
     }
 
     const validProfileAttr = (attr) => {
@@ -156,6 +179,19 @@ const _Profile = ({
     const cancelEdits = () => {
         setProfile(uneditedProfile);
         setEditing(false);
+    };
+
+    const submitReview = (form) => {
+        const review = form.target.review.value;
+        API.setRating({ trainer: profile._id, review, rating: myRating }).then(
+            (r) => {
+                if (!r.success) {
+                    console.log("Error submitting review");
+                } else {
+                    setShowReviewForm(false);
+                }
+            },
+        );
     };
 
     // Got profile and currently editing
@@ -323,7 +359,12 @@ const _Profile = ({
                         </Grid.Row>
                     )}
                     <Grid.Row>
-                        <p>{`${profile.height} ${profile.weight}`}</p>
+                        <p>
+                            {user.metric
+                                ? `${profile.height} cm ${profile.weight} kg`
+                                : `${~~(profile.height * 2.54 / 12)}'${~~(profile.height * 2.54 % 12) ? `${~~(profile.height * 2.54 % 12)}"` : ""}\
+                                ${Math.round(profile.weight * 2.204)} lb`}
+                        </p>
                     </Grid.Row>
                     <Grid.Row>
                         <p>{profile.email}</p>
@@ -336,6 +377,7 @@ const _Profile = ({
                     </Grid.Row>
                     <Grid.Row>
                         <Rating icon="star" disabled maxRating={profile.rating} defaultRating={profile.rating} />
+                        {showReviewForm && reviewForm(submitReview, setMyRating)}
                     </Grid.Row>
                     <Grid.Row>
                         {user != null && profile.trainers.includes(user.id) && (
