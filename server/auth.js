@@ -65,7 +65,7 @@ const auth = (req, res, next) => {
             delete payload.nbf;
             delete payload.jti;
             const token = jwt.sign(payload, secret + user.password, { expiresIn: "1h" });
-            res.cookie("token", token, { expires: new Date(Date.now() + 3.6e6), secure: true });
+            res.cookie("token", token, { expires: new Date(Date.now() + 3.6e6) });
         }
         req.user = {
             _id: id,

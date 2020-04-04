@@ -2,7 +2,7 @@ import { store } from "../store";
 import { loggedOut } from "../actions/userActions";
 import { CalendarEvent, User } from "../types";
 
-const BASE_API_URL = "https://localhost:3333";
+const BASE_API_URL = "http://localhost:3333";
 const apiUrl = (l) => `${BASE_API_URL + (!l || !l.length ? "" : (l[0] === "/" ? l : `/${l}`))}`;
 
 /*
@@ -131,7 +131,7 @@ export const API = {
         return { success: true, exercises: await res.json() };
     },
     async getMail() {
-        const res = await apiFetch('mail');
+        const res = await apiFetch("mail");
         if (res.status !== 200) {
             return { success: false };
         }
@@ -142,12 +142,49 @@ export const API = {
             method: "POST",
             body: content,
         });
-        console.log(content)
         if (res.status !== 200) {
             return { success: false };
         }
         return { success: true };
-    }
+    },
+    async getRating({ exercise, trainer, workout }) {
+        let path;
+        if (exercise) {
+            path = `/ratings/exercise/${exercise}`;
+        } else if (trainer) {
+            path = `/ratings/trainer/${trainer}`;
+        } else {
+            path = `/ratings/workout/${workout}`;
+        }
+        const res = await apiFetch(path);
+        if (res.status === 200) return { rating: parseInt(await res.text(), 10) };
+        return {};
+    },
+    async setRating({
+        exercise, trainer, workout, rating, review,
+    }) {
+        let body;
+        if (exercise) {
+            body = { rating, exercise };
+        } else if (workout) {
+            body = { rating, workout };
+        } else if (review) {
+            body = { rating, review, trainer };
+        } else {
+            body = { rating, trainer };
+        }
+        const res = await apiFetch("ratings", { method: "POST", body });
+        if (res.status === 200) return { success: true };
+        return {};
+    },
+    async removeRating({
+        exercise, trainer, workout,
+    }) {
+        const body = { exercise, trainer, workout };
+        const res = await apiFetch("ratings", { method: "DELETE", body });
+        if (res.status === 200) return { success: true };
+        return {};
+    },
 };
 
 export default API;

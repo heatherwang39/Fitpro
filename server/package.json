@@ -4,8 +4,8 @@
   "description": "Backend server for FitPro",
   "main": "server.js",
   "scripts": {
-    "start-dev": "nodemon server.js",
-    "start": "cd ../app && npm run-script build && cd ../server && node server.js",
+    "start-app": "cd ../app && npm run-script build && cd ../server && node server.js",
+    "start": "nodemon server.js",
     "lint": "eslint \"./**/*.js\" --fix"
   },
   "cacheDirectories": [

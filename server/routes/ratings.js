@@ -14,45 +14,75 @@ const Rating = require("../models/rating");
 // Create
 router.post("/", (req, res) => {
     if (!req.user) {
+        console.log("invalid user");
         res.status(401).send();
         return;
     }
-    if (!req.query.rating) {
+    if (!req.body || req.body.rating === undefined) {
+        console.log("no body/rating");
         res.status(400).send();
         return;
     }
-    let query = { user: ObjectID(req.user._id), rating: req.query.rating };
-    if (req.query.workout) {
-        query = { ...query, workout: ObjectID(req.query.workout) };
-    } else if (req.query.exercise) {
-        query = { ...query, exercise: ObjectID(req.query.exercise) };
-    } else if (req.query.trainer) {
-        query = { ...query, trainer: ObjectID(req.query.trainer) };
+    let query = { user: ObjectID(req.user._id) };
+    if (req.body.workout) {
+        query = { ...query, workout: ObjectID(req.body.workout) };
+    } else if (req.body.exercise) {
+        query = { ...query, exercise: ObjectID(req.body.exercise) };
+    } else if (req.body.trainer) {
+        if (req.body.review) {
+            query = { ...query, trainer: ObjectID(req.body.trainer), review: req.body.review };
+        } else {
+            query = { ...query, trainer: ObjectID(req.body.trainer) };
+        }
     } else {
         res.status(400).send();
         return;
     }
-    Rating.findOne(query, (err, rating) => {
+    Rating.findOneAndUpdate(query, { ...query, rating: req.body.rating }, { new: true }, (err, rating) => {
         if (err) {
             res.status(500).send();
             return;
         }
         if (rating) {
-            rating = { ...rating, ...query };
-            rating.save();
             res.status(200).send();
             return;
         }
-        const newRating = new Rating(query);
+        const newRating = new Rating({ ...query, rating: req.body.rating });
         newRating.save((e) => {
-            res.status(e ? 500 : 200).send();
+            if (e) {
+                console.log(e);
+                res.status(500).send();
+            } else res.status(200).send();
         });
     });
 });
 
+router.delete("/", (req, res) => {
+    if (!req.user) {
+        res.status(401).send();
+        return;
+    }
+    if (!req.body) {
+        res.status(400).send();
+        return;
+    }
+    let query;
+    if (req.body.exercise) {
+        query = { user: ObjectID(req.user._id), exercise: ObjectID(req.body.exercise) };
+    } else if (req.body.workout) {
+        query = { user: ObjectID(req.user._id), workout: ObjectID(req.body.workout) };
+    } else if (req.body.trainer) {
+        query = { user: ObjectID(req.user._id), trainer: ObjectID(req.body.trainer) };
+    } else {
+        res.status(400).send();
+        return;
+    }
+    Rating.deleteOne(query, (e) => res.status(e ? 500 : 200).send());
+});
+
 // Returns 200 if user rated workout with id
 router.get("/workout/:id", (req, res) => {
-    if (!req.query || !req.query.id) {
+    if (!req.params || !req.params.id) {
         res.status(400).send();
         return;
     }
@@ -60,11 +90,11 @@ router.get("/workout/:id", (req, res) => {
         res.status(401).send();
         return;
     }
-    Rating.findOne({ user: ObjectID(req.user._id), workout: ObjectID(req.query.id) }, (err, like) => {
+    Rating.findOne({ user: ObjectID(req.user._id), workout: ObjectID(req.params.id) }, (err, rating) => {
         if (err) {
             res.status(500).send();
-        } else if (like) {
-            res.status(200).send();
+        } else if (rating) {
+            res.status(200).send(rating.rating.toString());
         } else {
             res.status(400).send();
         }
@@ -73,7 +103,7 @@ router.get("/workout/:id", (req, res) => {
 
 // Returns 200 if user rated exercise with id
 router.get("/exercise/:id", (req, res) => {
-    if (!req.query || !req.query.id) {
+    if (!req.params || !req.params.id) {
         res.status(400).send();
         return;
     }
@@ -81,11 +111,11 @@ router.get("/exercise/:id", (req, res) => {
         res.status(401).send();
         return;
     }
-    Rating.findOne({ user: ObjectID(req.user._id), exercise: ObjectID(req.query.id) }, (err, like) => {
+    Rating.findOne({ user: ObjectID(req.user._id), exercise: ObjectID(req.params.id) }, (err, rating) => {
         if (err) {
             res.status(500).send();
-        } else if (like) {
-            res.status(200).send();
+        } else if (rating || rating === 0) {
+            res.status(200).send(rating);
         } else {
             res.status(400).send();
         }
@@ -94,7 +124,7 @@ router.get("/exercise/:id", (req, res) => {
 
 // Returns 200 if user rated trainer with id
 router.get("/trainer/:id", (req, res) => {
-    if (!req.query || !req.query.id) {
+    if (!req.params || !req.params.id) {
         res.status(400).send();
         return;
     }
@@ -102,11 +132,11 @@ router.get("/trainer/:id", (req, res) => {
         res.status(401).send();
         return;
     }
-    Rating.findOne({ user: ObjectID(req.user._id), trainer: ObjectID(req.query.id) }, (err, like) => {
+    Rating.findOne({ user: ObjectID(req.user._id), trainer: ObjectID(req.params.id) }, (err, rating) => {
         if (err) {
             res.status(500).send();
-        } else if (like) {
-            res.status(200).send();
+        } else if (rating || rating === 0) {
+            res.status(200).send(rating);
         } else {
             res.status(400).send();
         }

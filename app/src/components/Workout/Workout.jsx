@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import { PropTypes } from "prop-types";
+import useStateWithCallback from "use-state-with-callback";
 import {
     Button, Form, Grid, Modal, Segment, Image, Rating, Input,
 } from "semantic-ui-react";
@@ -53,29 +54,6 @@ const exerciseListItem = (e, editing, deleteExercise, deleted, undoDelete) => (d
     </Segment>
 ));
 
-const workoutInfoFixed = (workout, showEditButton, setEditing) => (
-    <Grid.Column width={4} id="workout-info-container">
-        <Grid.Row id="workout-name">
-            {workout.name}
-        </Grid.Row>
-        <Grid.Row id="workout-description">
-            {workout.description}
-        </Grid.Row>
-        <Grid.Row id="workout-rating">
-            {workout.rating || workout.rating === 0 ? (
-                <Rating rating={workout.rating} maxRating={10} />
-            ) : "No Ratings Yet"}
-        </Grid.Row>
-        <Grid.Row id="workout-level">
-            {workout.level}
-        </Grid.Row>
-        {showEditButton && (
-            <Grid.Row id="edit-btn-container">
-                <Button onClick={() => setEditing(true)} id="edit-btn">Edit</Button>
-            </Grid.Row>
-        )}
-    </Grid.Column>
-);
 
 const workoutInfoEditing = (workout, saveEdit, cancelEdit) => (
     <Grid.Column width={4} id="workout-info-container">
@@ -94,6 +72,21 @@ const workoutInfoEditing = (workout, saveEdit, cancelEdit) => (
     </Grid.Column>
 );
 
+const ratingContainer = (rating, removeRating, updateRating) => (
+    <Grid.Row id="rating-container">
+        <Button
+            icon="thumbs up"
+            active={rating === 10}
+            onClick={() => (rating === 10 ? removeRating() : updateRating(10))}
+        />
+        <Button
+            icon="thumbs down"
+            active={rating === 0}
+            onClick={() => (rating === 0 ? removeRating() : updateRating(0))}
+        />
+    </Grid.Row>
+);
+
 const WorkoutComponent = ({
     user, match,
 }) => {
@@ -103,12 +96,18 @@ const WorkoutComponent = ({
     const [newExercises, setNewExercises] = React.useState({});
     const [toDelete, setToDelete] = React.useState({});
     const [addingExercise, setAddingExercise] = React.useState(false);
+    const [rating, setRating] = React.useState(null);
 
     const isNew = match.params.id === "new";
 
     const gotWorkout = (w) => {
         setWorkout(w);
         setLoading(false);
+        API.getRating({ workout: w._id }).then((r) => {
+            if (r.rating) {
+                setRating(r.rating);
+            }
+        });
     };
 
     if (workout === null) {
@@ -122,6 +121,50 @@ const WorkoutComponent = ({
         return (<Segment loading />);
     }
 
+    const updateRating = (newRating) => {
+        API.setRating({ workout: workout._id, rating: newRating }).then((r) => {
+            if (!r.success) {
+                console.log("Error rating");
+                return;
+            }
+            setRating(newRating);
+        });
+    };
+
+    const removeRating = () => {
+        API.removeRating({ workout: workout._id }).then((r) => {
+            if (!r.success) {
+                console.log("Error deleting rating");
+                return;
+            }
+            setRating(null);
+        });
+    };
+
+    const workoutInfoFixed = (showEditButton) => (
+        <Grid.Column width={4} id="workout-info-container">
+            <Grid.Row id="workout-name">
+                {workout.name}
+            </Grid.Row>
+            <Grid.Row id="workout-description">
+                {workout.description}
+            </Grid.Row>
+            <Grid.Row id="workout-rating">
+                {workout.rating || workout.rating === 0 ? (
+                    <Rating rating={workout.rating} maxRating={10} />
+                ) : "No Ratings Yet"}
+            </Grid.Row>
+            <Grid.Row id="workout-level">
+                {workout.level}
+            </Grid.Row>
+            {!showEditButton && ratingContainer(rating, removeRating, updateRating)}
+            {showEditButton && (
+                <Grid.Row id="edit-btn-container">
+                    <Button onClick={() => setEditing(true)} id="edit-btn">Edit</Button>
+                </Grid.Row>
+            )}
+        </Grid.Column>
+    );
     const deleteExercise = (e) => {
         setToDelete({ ...toDelete, [e._id]: true });
     };
@@ -177,9 +220,7 @@ const WorkoutComponent = ({
                 {editing
                     ? workoutInfoEditing(workout, saveEdit, cancelEdit)
                     : workoutInfoFixed(
-                        workout,
                         user && (match.params.id === "new" || (workout.owner && user.id === workout.owner)),
-                        setEditing,
                     )}
                 <Grid.Column width={12}>
                     {(!workout.exercises || !workout.exercises.length)
