@@ -9,7 +9,7 @@ import {
 import { User } from "../../types/user";
 import "./style.css";
 import API from "../../api";
-import { exercises as allExercises } from "../../api/test_exercises_data";
+import { exercises as allExercises } from "../../api/Exercise_data";
 
 
 const templateDropdownOptions = (templates) => {

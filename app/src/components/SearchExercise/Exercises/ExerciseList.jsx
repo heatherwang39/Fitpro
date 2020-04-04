@@ -15,6 +15,12 @@ const style = {
         height: 500,
         overflowY: "auto",
     },
+    PaperResult: {
+        padding: 20,
+        marginBottom: 10,
+        height: 200,
+        overflowY: "auto",
+    },
     Font: {
         textTransform: "capitalize",
     },
@@ -25,12 +31,43 @@ const ExerciseList = ({
     category,
     onSelect,
     exercise: {
-        id,
-        title = "Welcome!",
+        _id,
+        name = "Welcome!",
         description = "Please seelect an exercise from the list on the left!",
+        benefits = [],
+        type,
+        muscle,
+        equipment,
+        level,
+        rating,
+        images = [],
     },
+    filteredExercises,
 }) => (
     <Grid container>
+        <Grid item xs={12}>
+            <Typography
+                variant="h5"
+                style={style.Font}
+            >
+                Search Results:
+            </Typography>
+        </Grid>
+        <Grid item xs={12}>
+            <Paper style={style.PaperResult}>
+                {filteredExercises.map(({ _id, name }) => (
+                    <List component="ul">
+                        <ListItem
+                            key={_id}
+                            button
+                            onClick={() => onSelect(_id)}
+                        >
+                            <ListItemText primary={name} />
+                        </ListItem>
+                    </List>
+                ))}
+            </Paper>
+        </Grid>
         <Grid item sm>
             <Paper style={style.Paper}>
                 {exercises.map(([group, exercises]) => (!category || category === group
@@ -43,13 +80,13 @@ const ExerciseList = ({
                                 {group}
                             </Typography>
                             <List component="ul">
-                                {exercises.map(({ id, title }) => (
+                                {exercises.map(({ _id, name }) => (
                                     <ListItem
-                                        key={id}
+                                        key={_id}
                                         button
-                                        onClick={() => onSelect(id)}
+                                        onClick={() => onSelect(_id)}
                                     >
-                                        <ListItemText primary={title} />
+                                        <ListItemText primary={name} />
                                     </ListItem>
                                 ))}
                             </List>
@@ -61,23 +98,79 @@ const ExerciseList = ({
         <Grid item sm>
             <Paper style={style.Paper}>
                 <Typography variant="h2">
-                    {title}
+                    {name}
                 </Typography>
-                <Typography variant="subtitle1">
-                    {description}
-                </Typography>
+                <img
+                    src={images[0]}
+                    display="block"
+                    margin-left="200px"
+                    margin-right="auto"
+                    width="50%"
+                    alt=""
+                />
+                <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                        <Paper className={style.Paper}>
+                            <Typography variant="subtitle1">
+                                {description}
+                            </Typography>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Paper className={style.paper}>
+                            Benefits:
+                            {benefits.map((benefit) => (
+                                <Typography variant="subtitle1">
+                                    {benefit}
+                                </Typography>
+                            ))}
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <Paper className={style.paper}>
+                            <Typography variant="subtitle1">
+                                Type of Exercise:
+                                {type}
+                            </Typography>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <Paper className={style.paper}>
+                            <Typography variant="subtitle1">
+                                Muscles used:
+                                {muscle}
+                            </Typography>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <Paper className={style.paper}>
+                            <Typography variant="subtitle1">
+                                Equipment:
+                                {equipment}
+                            </Typography>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <Paper className={style.paper}>
+                            <Typography variant="subtitle1">
+                                Level:
+                                {level}
+                            </Typography>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <Paper className={style.paper}>
+                            <Typography variant="subtitle1">
+                                Rating:
+                                {rating}
+                            </Typography>
+                        </Paper>
+                    </Grid>
+                </Grid>
             </Paper>
         </Grid>
-
     </Grid>
 );
-
-ExerciseList.propTypes = {
-    exercises: PropTypes.array.isRequired,
-    category: PropTypes.any.isRequired,
-    onSelect: PropTypes.func.isRequired,
-    exercise: PropTypes.array.isRequired,
-};
 
 export default ExerciseList;
 // class ExerciseList extends Component{

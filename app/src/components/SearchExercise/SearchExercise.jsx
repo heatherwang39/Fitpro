@@ -1,11 +1,23 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import axios from "axios";
 import Filter from "./Layouts/Filter";
 import Exercises from "./Exercises/ExerciseList";
-import { muscles, exercises } from "../../api/test_exercises_data";
+import { muscle } from "../../api/Exercise_data";
 // import TrainerDetail from './TrainerDetail';
 import { searchedExercise } from "../../actions/exerciseActions";
+// import API from "../../api/api";
 
+const style = {
+    Input: {
+        padding: 10,
+        marginTop: 10,
+        marginBottom: 10,
+        marginLeft: 50,
+        width: 500,
+        height: 30,
+    },
+};
 
 class SearchExercise extends Component {
     // onFormSubmit(e) {
@@ -14,17 +26,26 @@ class SearchExercise extends Component {
     // }
 
     state={
-        exercises,
+        exercises: [],
         exercise: [],
+        search: "",
+    }
+
+    componentDidMount() {
+        axios.get("http://localhost:3333/exercises").then((res) => {
+            this.setState( { exercises: res.data });
+        }).catch((error) => {
+            console.log(error);
+        })
     }
 
     getExercisesByMuscles() {
         return Object.entries(
             this.state.exercises.reduce((exercises, exercise) => {
-                const { muscles } = exercise;
+                const { muscle } = exercise;
 
-                exercises[muscles] = exercises[muscles]
-                    ? [...exercises[muscles], exercise]
+                exercises[muscle] = exercises[muscle]
+                    ? [...exercises[muscle], exercise]
                     : [exercise];
 
                 return exercises;
@@ -38,21 +59,40 @@ class SearchExercise extends Component {
         });
     }
 
-    handleExerciseSelected = (id) => {
+    handleExerciseSelected = (_id) => {
         this.setState(({ exercises }) => ({
-            exercise: exercises.find((ex) => ex.id === id),
+            exercise: exercises.find((ex) => ex._id === _id),
         }));
+    }
+
+    onChange = (e) => {
+        this.setState({ search: e.target.value });
     }
 
     render() {
         const exerciseArray = this.getExercisesByMuscles();
-        const { category, exercise } = this.state;
+        const { exercises, category, exercise, search } = this.state;
+
+        const filteredExercises = exercises.filter((exercise) => {
+            return exercise.name.toLowerCase().indexOf(search.toLowerCase()) !== -1;
+        });
 
         return (
             <>
+                <form onSubmit={(e) => { this.onFormSubmit(e); }}>
+                    <div className="field">
+                        <h3>Search Exercise:</h3>
+                        <input
+                            type="text"
+                            placeholder="please enter..."
+                            style={style.Input}
+                            onChange={this.onChange}
+                        />
+                    </div>
+                </form>
                 <Filter
                     category={category}
-                    muscles={muscles}
+                    muscles={muscle}
                     onSelect={this.handleCategorySelected}
                 />
 
@@ -61,6 +101,7 @@ class SearchExercise extends Component {
                     exercises={exerciseArray}
                     onSelect={this.handleExerciseSelected}
                     exercise={exercise}
+                    filteredExercises={filteredExercises}
                 />
             </>
         );

@@ -18,19 +18,14 @@ const Filter = ({ muscles, category, onSelect }) => {
                 onChange={onIndexSelect}
                 indicatorColor="primary"
                 textColor="primary"
-                centered
+                variant="scrollable"
+                scrollButtons="auto"
             >
                 <Tab label="All" />
                 {muscles.map((group) => <Tab key={group} label={group} />)}
             </Tabs>
         </Paper>
     );
-};
-
-Filter.propTypes = {
-    muscles: PropTypes.array.isRequired,
-    category: PropTypes.any.isRequired,
-    onSelect: PropTypes.func.isRequired,
 };
 
 export default Filter;
