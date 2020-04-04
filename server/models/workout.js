@@ -35,7 +35,14 @@ const schema = mongoose.Schema({
     ],
     description: String,
     level: String,
-    rating: Number,
+    rating: {
+        type: Number,
+        default: 0,
+    },
+    numRatings: {
+        type: Number,
+        default: 0,
+    },
     avgExerciseRating: Number,
     numExercises: Number,
 });

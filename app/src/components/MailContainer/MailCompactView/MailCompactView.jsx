@@ -10,6 +10,7 @@ const styles = {
         "&:hover": {
             backgroundColor: "grey",
         },
+        borderBottom: "1px grey solid",
     },
     buttonWrapper: {
         width: "100%",
@@ -77,9 +78,6 @@ const MailCompactView = (props) => {
                 </div>
                 <div className={classes.date}>
                     {dateString}
-                </div>
-                <div className={classes.content}>
-                    {content}
                 </div>
             </button>
         </div>

@@ -10,24 +10,24 @@ import { addClient } from "../../actions/relationshipActions";
 const ViewClientsContainer = (props) => {
     const { relationships, user } = props;
     const { clients } = relationships;
-    const [filteredClients, updateFilteredClients] = useState(user.clients);
+    let users = user.clients
     const history = useHistory();
+    if (history.location.pathname == '/my_trainers') {
+        users = user.trainers
+    }
+    const [filteredClients, updateFilteredClients] = useState(users);
+    
     const onChangeSearchValue = (e) => {
         const { value } = e.target;
         updateFilteredClients(clients.filter((client) => client.firstname.toLowerCase().includes(value)));
     };
 
     const onClickExpand = (userObject) => () => {
-        if (user.isTrainer) {
-            history.push({
-                pathname: "/client",
-                state: { user: userObject },
-            });
-        } else {
-            history.push({
-                pathname: `/user/${userObject.id}`,
-            });
-        }
+        console.log(userObject)
+        history.push({
+            pathname: `/user/${userObject._id}`,
+            state: { user: userObject },
+        });
     };
 
     const onClickCalendar = (userObject) => () => {
@@ -36,7 +36,6 @@ const ViewClientsContainer = (props) => {
             state: { userId: userObject.id },
         });
     };
-
     return (
         <ViewClientsComponent
             clients={filteredClients}

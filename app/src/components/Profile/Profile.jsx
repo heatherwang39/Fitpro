@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { PropTypes } from "prop-types";
 
 import {
-    Button, Container, Grid, Input, Label, Rating, Segment,
+    Button, Container, Grid, Input, Label, Rating, Segment, Form,
 } from "semantic-ui-react";
 import { User } from "../../types/user";
 import { gotUserInfo as gotUserInfoAction } from "../../actions/userActions";
@@ -27,44 +27,44 @@ const errorComponent = (errorMessage) => (
 );
 
 
-const reviewsColumn = () => (
-    <Grid.Column>
+const reviewsSegment = (reviews) => (
+    <Segment>
         <Container id="profile-reviews">
             <h4 id="profile-reviews-header">Reviews</h4>
-            {testReviews.map((review) => (
+            {reviews && reviews.length ? reviews.map((review) => (
                 <Segment className="profile-review">
-                    <div className="review-body">
-                        {review.review}
-                        <br />
-                        <Rating
-                            className="review-rating"
-                            disabled
-                            icon="star"
-                            maxRating={review.rating}
-                            defaultRating={review.rating}
-                        />
-                    </div>
-                    <div className="review-name">{`— ${review.name}`}</div>
+                    <Grid centered>
+                        <div className="review-body">
+                            {review.review}
+                            <br />
+                            <Rating
+                                className="review-rating"
+                                disabled
+                                icon="star"
+                                maxRating={review.rating}
+                                defaultRating={review.rating}
+                            />
+                        </div>
+                        <div className="review-name">{`— ${review.user.firstname} ${review.user.lastname}`}</div>
+                    </Grid>
                 </Segment>
-            ))}
+            )) : <Grid centered>This trainer has no reviews</Grid>}
         </Container>
-    </Grid.Column>
+    </Segment>
 );
 
-const offersColumn = () => (
-    <Grid.Column>
-        <Container id="profile-offers">
-            <h4 id="profile-offers-header">Specials</h4>
-            {testOffers.map((offer) => (
-                <Segment className="profile-offer">
-                    <div className="offer-title"><h5>{offer.title}</h5></div>
-                    <div className="offer-body">{offer.details}</div>
-                    <div className="offer-price">{offer.price}</div>
-                </Segment>
-            ))}
-        </Container>
-    </Grid.Column>
-
+const reviewForm = (onSubmit, setRating) => (
+    <Segment>
+        <Form onSubmit={onSubmit}>
+            <Form.Field>
+                <Input placeholder="Write a review" id="review" />
+            </Form.Field>
+            <Form.Field>
+                <Rating icon="star" defaultRating={0} maxRating={10} id="rating" onRate={(e, { rating }) => setRating(rating)} />
+            </Form.Field>
+            <Button type="submit" id="submit-review-btn">Rate</Button>
+        </Form>
+    </Segment>
 );
 
 const _Profile = ({
@@ -75,6 +75,10 @@ const _Profile = ({
     const [error, setError] = React.useState(null);
     const [editing, setEditing] = React.useState(false);
     const [uneditedProfile, setUneditedProfile] = React.useState(null);
+    const [myRating, setMyRating] = React.useState(0);
+    const [showReviewForm, setShowReviewForm] = React.useState(null);
+    const [reviews, setReviews] = React.useState(null);
+    const [gotReviews, setGotReviews] = React.useState(false);
 
     if (!match.params.id || match.params.id.length !== 24) {
         setError("Invalid user id");
@@ -104,13 +108,34 @@ const _Profile = ({
         return errorComponent("Invalid user");
     }
 
+    if (reviews === null) {
+        if (!gotReviews) {
+            setGotReviews(true);
+            API.getReviews(match.params.id).then((r) => {
+                if (!r.success) {
+                    console.log("Error getting reviews");
+                    setReviews([]);
+                } else {
+                    setReviews(r.reviews);
+                }
+            });
+        }
+    }
+
     // Loading profile from server
     if (profile == null || fetchingProfile) {
         return (
-            <div className="center">
-                Loading...
-            </div>
+            <Segment loading />
         );
+    }
+
+    if (showReviewForm === null) {
+        if (match.params.id === user._id) setShowReviewForm(false);
+        else {
+            API.getRating({ trainer: profile._id }).then((r) => {
+                setShowReviewForm(r.rating === undefined);
+            });
+        }
     }
 
     const validProfileAttr = (attr) => {
@@ -156,6 +181,19 @@ const _Profile = ({
     const cancelEdits = () => {
         setProfile(uneditedProfile);
         setEditing(false);
+    };
+
+    const submitReview = (form) => {
+        const review = form.target.review.value;
+        API.setRating({ trainer: profile._id, review, rating: myRating }).then(
+            (r) => {
+                if (!r.success) {
+                    console.log("Error submitting review");
+                } else {
+                    setShowReviewForm(false);
+                }
+            },
+        );
     };
 
     // Got profile and currently editing
@@ -293,7 +331,6 @@ const _Profile = ({
             </Container>
         );
     }
-
     // Got profile and viewing
     return (
         <Container>
@@ -323,7 +360,12 @@ const _Profile = ({
                         </Grid.Row>
                     )}
                     <Grid.Row>
-                        <p>{`${profile.height} ${profile.weight}`}</p>
+                        <p>
+                            {user.metric
+                                ? `${profile.height} cm ${profile.weight} kg`
+                                : `${~~(profile.height * 2.54 / 12)}'${~~(profile.height * 2.54 % 12) ? `${~~(profile.height * 2.54 % 12)}"` : ""}\
+                                ${Math.round(profile.weight * 2.204)} lb`}
+                        </p>
                     </Grid.Row>
                     <Grid.Row>
                         <p>{profile.email}</p>
@@ -335,7 +377,26 @@ const _Profile = ({
                         <p>{profile.location}</p>
                     </Grid.Row>
                     <Grid.Row>
-                        <Rating icon="star" disabled maxRating={profile.rating} defaultRating={profile.rating} />
+                        {user != null && profile._id !== user.id && profile.isTrainer && (
+                            <Button id="submit-review-btn" onClick={() => API.requestTraining(profile.username, user)}>Request training</Button>
+                        )}
+                    </Grid.Row>
+                    <Grid.Row>
+                        { profile.numRatings
+                            ? (
+                                <span id="profile-ratings">
+                                    <Rating icon="star" disabled maxRating={profile.rating} defaultRating={profile.rating} />
+                                    <br />
+                                    (
+                                    {profile.numRatings}
+                                    {" "}
+                                    review
+                                    {profile.numRatings === 1 ? "" : "s"}
+                                    )
+                                </span>
+                            )
+                            : <span />}
+                        {showReviewForm && reviewForm(submitReview, setMyRating)}
                     </Grid.Row>
                     <Grid.Row>
                         {user != null && profile.trainers.includes(user.id) && (
@@ -350,9 +411,8 @@ const _Profile = ({
             </Grid>
             {profile.isTrainer && (
                 <Grid>
-                    <Grid.Row columns={2}>
-                        {offersColumn()}
-                        {reviewsColumn()}
+                    <Grid.Row columns={1}>
+                        {reviews ? reviewsSegment(reviews) : (<Segment loading />)}
                     </Grid.Row>
                 </Grid>
             )}

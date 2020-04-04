@@ -1,12 +1,15 @@
 import React from "react";
+import { connect } from "react-redux";
 import { withStyles } from "@material-ui/core/styles";
 import PropTypes from "prop-types";
 import MailHeader from "./MailHeader";
+import { Button } from "@material-ui/core";
+import API from "../../../api/api";
+import { gotUserInfo } from "../../../actions/userActions";
 
 const styles = {
     container: {
-        borderLeftWidth: 2,
-        borderLeftColor: "grey",
+        borderLeft: "1px solid grey",
         width: "100%",
     },
     contentContainer: {
@@ -31,11 +34,14 @@ const styles = {
         float: "right",
         marginRight: 100,
     },
+    acceptRequestContainer: {
+        marginTop: 15,
+    }
 };
 
 const MailExpandedView = (props) => {
-    const {
-        classes, title, owner, content, sentDate
+    let {
+        classes, title, owner, content, sentDate, user, gotUserInfo
     } = props;
 
     const d = (new Date(sentDate));
@@ -52,6 +58,13 @@ const MailExpandedView = (props) => {
             </div>
         )
     }
+
+    // If content has certain key words format it differently.
+    let hasTrainingRequest = false;
+    if (content.includes("TrainingRequest")) {
+        content = content.replace("TrainingRequest", "")
+        hasTrainingRequest = true;
+    }
     return (
         <div className={classes.container}>
             <MailHeader />
@@ -66,10 +79,30 @@ const MailExpandedView = (props) => {
             </div>
             <div className={classes.contentContainer}>
                 {content}
+                {hasTrainingRequest && (
+                    <div className={classes.acceptRequestContainer}>
+                        <Button variant="contained" color="primary" size="large" onClick={async () => {
+                            const res = await API.addClient(owner._id);
+                            const userRes = await API.getUser(user.id);
+                            if (userRes.success) gotUserInfo(userRes.user)
+                        }}>
+                            Accept
+                        </Button>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
+
+const mapStateToProps = (state) => ({
+    user: state.userReducer,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+    gotUserInfo: (userInfo) => dispatch(gotUserInfo(userInfo)),
+});
+
 
 MailExpandedView.propTypes = {
     title: PropTypes.string,
@@ -79,4 +112,4 @@ MailExpandedView.propTypes = {
     classes: PropTypes.objectOf(PropTypes.string).isRequired,
 };
 
-export default withStyles(styles)(MailExpandedView);
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(MailExpandedView));

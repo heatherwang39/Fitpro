@@ -4,8 +4,6 @@ const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
-const fs = require("fs");
-const https = require("https");
 const cors = require("cors");
 
 const auth = require("./auth");
@@ -16,8 +14,10 @@ const eventsRouter = require("./routes/events");
 const trainersRouter = require("./routes/trainers");
 const mailRouter = require("./routes/mail");
 const exercisesRouter = require("./routes/exercises");
+const ratingsRouter = require("./routes/ratings");
 
 const app = express();
+
 // Middleware
 app.use(logger("dev"));
 app.use(cors({ origin: "http://localhost:8080", credentials: true }));
@@ -28,7 +28,8 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 app.use(auth);
 
-app.use(express.static(path.join(__dirname, "../app/dist")));
+// app.use(express.static(path.join(__dirname, "../app/dist")));
+//app.use(express.static(path.join(__dirname, "../public")));
 
 // Database
 const dbUrl = process.env.DB_URL || "mongodb://localhost/fitpro";
@@ -50,13 +51,7 @@ app.use("/events", eventsRouter);
 app.use("/trainers", trainersRouter);
 app.use("/mail", mailRouter);
 app.use("/exercises", exercisesRouter);
+app.use("/ratings", ratingsRouter);
 
 const port = process.env.PORT || 3333;
-
-const httpsOptions = {
-    key: fs.readFileSync("./keys/key.pem"),
-    cert: fs.readFileSync("./keys/cert.pem"),
-};
-
-// https.createServer(httpsOptions, app).listen(port, () => console.log(`Started on port ${port}`));
 app.listen(port, () => console.log(`Started on port ${port}`));

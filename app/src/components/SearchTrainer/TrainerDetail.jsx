@@ -24,7 +24,7 @@ const TrainerDetail = ({ selectedTrainer }) => {
                     Location:&nbsp;
                     {selectedTrainer.location}
                     <div className="profile-btn">
-                        <Button color="black" as={Link} to={`/user/${selectedTrainer.id}`}>
+                        <Button color="black" as={Link} to={`/user/${selectedTrainer._id}`}>
                             Profile
                         </Button>
                     </div>
@@ -41,7 +41,7 @@ TrainerDetail.propTypes = {
         email: PropTypes.string,
         phone: PropTypes.string,
         location: PropTypes.string,
-        id: PropTypes.number,
+        _id: PropTypes.string,
     }),
 };
 

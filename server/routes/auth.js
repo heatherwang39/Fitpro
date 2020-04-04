@@ -63,7 +63,6 @@ router.post("/login", (req, res) => {
                 // 2147483647000 = epoch + 2^31 - 1 (Jan 2038)
                 expires: new Date(tokenUser.remember ? 2147483647000 : Date.now() + 3.6e6),
                 httpOnly: true,
-                secure: true,
             });
             res.setHeader("Content-Type", "application/json");
             res.status(200);

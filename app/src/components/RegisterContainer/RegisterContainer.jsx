@@ -14,6 +14,7 @@ import registerAPI from "../../api/register_api";
 import {
     useHistory,
 } from "react-router-dom";
+import API from "../../api/api";
 
 const styles = {
     RegisterContainer: {
@@ -64,11 +65,22 @@ const RegisterContainer = (props) => {
     };
 
     const registerUser = async () => {
-        const res = await registerAPI(userInfo);
-        
+        console.log({
+            ...userInfo,
+            weight: parseInt(userInfo.weight),
+            height: parseInt(userInfo.height)
+        })
+        const res = await registerAPI({
+            ...userInfo,
+            weight: parseInt(userInfo.weight),
+            height: parseInt(userInfo.height)
+        });
+        console.log(res)
         if (res.status !== 201) return;
-        _loginSuccess(res.data);
-        _gotUserInfo(res.data);
+        const loginRes = await API.login(userInfo.username, userInfo.password);
+        console.log(loginRes)
+        _loginSuccess(loginRes.user);
+        _gotUserInfo(loginRes.user);
         history.push("/");
     };
 
