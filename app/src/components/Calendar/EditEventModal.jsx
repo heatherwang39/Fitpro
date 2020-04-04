@@ -53,8 +53,10 @@ const EditEventModal = ({
         ? Math.floor((Math.abs(event.end - event.start) / 1000) / 60).toString() // Minutes
         : 60);
     const [startDate, setStartDate] = React.useState(event.start);
+    const [repeatEnd, setRepeatEnd] = React.useState(event.start);
     const [formErrors, setFormErrors] = React.useState([]);
     const [selectedClient, setSelectedClient] = React.useState(event.client);
+    const [repeatUnits, setRepeatUnits] = React.useState("");
 
     React.useEffect(() => {
         setRepeat(event.repeat === undefined ? false : event.repeat);
@@ -78,10 +80,11 @@ const EditEventModal = ({
         // Repeat
         if (target.repeat.checked) {
             if (target.repeatFreq.value === "") errors.repeatFreq = true;
-            if (target.repeatUnits.value === "") errors.repeatUnits = true;
+            if (repeatUnits === "") errors.repeatUnits = true;
         }
         // Client
         if (selectedClient === "") errors.client = false;
+        if (repeatEnd < startDate || target.repeatEnd.value.match(/^\d\d?\/\d\d?\/\d\d\d\d$/) === null) errors.repeatDate = true;
         return errors;
     };
 
@@ -95,8 +98,10 @@ const EditEventModal = ({
         newEvent.start.setMinutes(parseInt(timeMatch[2], 10));
         newEvent.end = new Date(newEvent.start.getTime() + duration * 60000);
         if (repeat) {
+            console.log(target);
             newEvent.repeatFreq = target.repeatFreq.value;
-            newEvent.repeatUnits = target.repeatUnits.value;
+            newEvent.repeatUnits = repeatUnits;
+            newEvent.repeatEnd = repeatEnd;
         }
         return newEvent;
     };
@@ -221,9 +226,18 @@ const EditEventModal = ({
                         id="repeatUnits"
                         inline
                         selection
+                        value={repeatUnits}
+                        onChange={(_, v) => setRepeatUnits(v.value)}
                         options={repeatUnitOptions}
                         disabled={!repeat}
                         error={formErrors.repeatUnits}
+                    />
+                    <DatePicker
+                        id="repeatEnd"
+                        selected={repeatEnd}
+                        onChange={(date) => setRepeatEnd(date)}
+                        minDate={startDate}
+                        error={formErrors.repeatEnd}
                     />
                 </Form.Group>
                 {user.isTrainer && user.clients.length > 0 && (

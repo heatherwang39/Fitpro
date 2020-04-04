@@ -16,7 +16,7 @@ export default async (userInfo) => {
             weight: userInfo.weight,
             height: userInfo.height,
         }
-        const res = await api.post('https://localhost:3333/users', _user)
+        const res = await api.post('http://localhost:3333/users', _user)
         const user = res.data;
         return {
             status: res.status,

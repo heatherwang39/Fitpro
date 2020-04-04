@@ -20,7 +20,7 @@ const ViewClientsContainer = (props) => {
     const onClickExpand = (userObject) => () => {
         if (user.isTrainer) {
             history.push({
-                pathname: "/client",
+                pathname: `/user/${userObject._id}`,
                 state: { user: userObject },
             });
         } else {
@@ -36,7 +36,6 @@ const ViewClientsContainer = (props) => {
             state: { userId: userObject.id },
         });
     };
-
     return (
         <ViewClientsComponent
             clients={filteredClients}
