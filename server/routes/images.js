@@ -21,8 +21,8 @@ cloudinary.config({
 
 
 // a POST route to *create* an image
-router.post("/images", multipartMiddleware, (req, res) => {
-
+router.post("/", multipartMiddleware, (req, res) => {
+    //console.log(req.files)
     // Use uploader.upload API to upload image to cloudinary server.
     cloudinary.uploader.upload(
         req.files.image.path, // req.files contains uploaded files
@@ -48,7 +48,7 @@ router.post("/images", multipartMiddleware, (req, res) => {
 });
 
 // a GET route to get all images
-router.get("/images", (req, res) => {
+router.get("/", (req, res) => {
     Image.find().then(
         images => {
             res.send({ images }); // can wrap in object if want to add more properties
@@ -60,7 +60,7 @@ router.get("/images", (req, res) => {
 });
 
 /// a DELETE route to remove an image by its id.
-router.delete("/images/:imageId", (req, res) => {
+router.delete("/:imageId", (req, res) => {
     const imageId = req.params.imageId;
 
     // Delete an image by its id (NOT the database ID, but its id on the cloudinary server)
