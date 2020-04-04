@@ -95,5 +95,36 @@ router.patch("/:id", async (req, res) => {
     }
 });
 
+router.post("/:id/client", async (req, res) => {
+    try {
+        const { clientId } = req.body;
+        const user = await User.findById(req.params.id);
+        if (!user.clients.includes(clientId)) user.clients.push(clientId)
+        const result = await User.findByIdAndUpdate(req.params.id, user, { new: true });
+        const { password, tokens, ...resUser } = result._doc;
+        res.status(200).send(resUser);
+    } catch (err) {
+        console.log("error in /users POST", err);
+        res.status(err.name === "ValidationError" ? 400 : 500).send();
+    }
+});
+
+router.delete("/:id/client", async (req, res) => {
+    try {
+        const { clientId } = req.body;
+        const user = await User.findById(req.params.id);
+        if (user.clients.includes(clientId)) {
+            const index = user.clients.indexOf(clientId);
+            user.clients.splice(index, 1);
+        }
+        const result = await User.findByIdAndUpdate(req.params.id, user, { new: true });
+        const { password, tokens, ...resUser } = result._doc;
+        res.status(200).send(resUser);
+    } catch (err) {
+        console.log("error in /users POST", err);
+        res.status(err.name === "ValidationError" ? 400 : 500).send();
+    }
+});
+
 
 module.exports = router;
