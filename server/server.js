@@ -15,6 +15,7 @@ const workoutsRouter = require("./routes/workouts");
 const eventsRouter = require("./routes/events");
 const trainersRouter = require("./routes/trainers");
 const mailRouter = require("./routes/mail");
+const exercisesRouter = require("./routes/exercises");
 
 const app = express();
 // Middleware
@@ -48,6 +49,7 @@ app.use("/workouts", workoutsRouter);
 app.use("/events", eventsRouter);
 app.use("/trainers", trainersRouter);
 app.use("/mail", mailRouter);
+app.use("/exercises", exercisesRouter);
 
 const port = process.env.PORT || 3333;
 

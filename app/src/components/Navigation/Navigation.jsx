@@ -16,7 +16,7 @@ import { loggedOut as loggedOutAction } from "../../actions/userActions";
 import "./style.css";
 import API from "../../api/api";
 
-const userMenuOptions = [{ key: 1, value: "profile", text: "Me" }, { key: 2, value: "logout", text: "Log Out" }];
+// const userMenuOptions = [{ key: 1, value: "profile", text: "Me" }, { key: 2, value: "logout", text: "Log Out" }];
 
 function _Navigation({ user, loggedOut, location }) {
     const currentPage = location.pathname;
@@ -100,14 +100,18 @@ function _Navigation({ user, loggedOut, location }) {
                 )}
                 {/* eslint-disable jsx-a11y/click-events-have-key-events */
                     user != null && (
-                        <Dropdown
-                            item
-                            text={user.firstname}
-                            simple
-                            options={userMenuOptions}
-                            onChange={(_, v) => (v.value === "logout"
-                                ? logout() : history.push(`/user/${user.id}`))} // Only possible values are logout and go to profile
-                        />
+                        // <Dropdown
+                    // item
+                    // text={user.firstname}
+                    // simple
+                    // options={userMenuOptions}
+                    // onChange={(_, v) => (v.value === "logout"
+                    // ? logout() : history.push(`/user/${user.id}`))} // Only possible values are logout and go to profile
+                        // />
+                        <div>
+                            <Button secondary onClick={() => history.push(`/user/${user.id}`)}>{user.firstname}</Button>
+                            <Button onClick={logout} secondary>Log Out</Button>
+                        </div>
                     )
                 /* eslint-enable */
                 }

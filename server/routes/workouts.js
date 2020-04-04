@@ -22,7 +22,7 @@ router.post("/", (req, res) => {
         return;
     }
     const workout = new Workout({
-        creator: req.user._id,
+        owner: req.user._id,
         // Copy editable workout fields from req.body
         ...EDITABLE_WORKOUT_FIELDS.reduce((acc, cur) => ({ ...acc, [cur]: req.body[cur] }), {}),
     });
@@ -72,7 +72,7 @@ router.get("/", (req, res) => {
                 res.status(400).send();
                 return;
             }
-            req.query.creator = req.user._id;
+            req.query.owner = req.user._id;
         }
         if (req.query.name !== undefined) {
             req.query.name = { $regex: req.query.name, $options: "i" };
@@ -98,19 +98,21 @@ router.patch("/", async (req, res) => {
     }
     const updated = { name: req.body.name, description: req.body.description };
     if (req.body.exercises && req.body.exercises.map) {
-        updated.exercises = req.body.exercises.map((e) => ObjectId(e));
+        updated.exercises = req.body.exercises.map(
+            (e) => ({ instructions: e.instructions, exercise: ObjectId(e.exercise._id) }),
+        );
     }
+    console.log(updated.exercises);
     let workout;
     try {
         workout = await Workout.findOneAndUpdate({
             _id: ObjectId(req.body._id),
-            creator: ObjectId(req.user._id),
-        }, updated, { new: true });
+            owner: ObjectId(req.user._id),
+        }, updated, { new: true }).populate("exercises.exercise");
     } catch (e) {
         console.log(e);
         res.status(400).send();
     }
-    console.log(workout);
     res.status(200).json(workout);
 });
 

@@ -62,30 +62,7 @@ if (!fs.existsSync("bbcom_exercises.json")) {
     if (getExercises.toLowerCase().includes("n")) {
         process.exit();
     }
-    console.log("");
-    const requirements = spawn("python3", ["-m", "pip", "install", "-r", "requirements.txt"]);
-    requirements.on("exit", (code) => {
-        if (!code || process.argv.includes("-np")) {
-            downloadExercises();
-            return;
-        }
-        const retry = readlineSync.question(
-            "Failed to install requirements for fetching data. Try again with sudo? [Y/n] ",
-        );
-        if (retry.toLowerCase().includes("n")) {
-            process.exit();
-        }
-        const sudoRequirements = spawn("sudo", ["python3", "-m", "pip", "install", "-r", "requirements.txt"]);
-        sudoRequirements.on("exit", (retryCode) => {
-            if (retryCode) {
-                console.log(
-                    "Failed to install requirements with sudo. Try manually installing requirements.txt or using a virtual environment and running with -np",
-                );
-                process.exit(1);
-            }
-            downloadExercises();
-        });
-    });
+    downloadExercises();
 }
 
 db.on("error", (e) => {

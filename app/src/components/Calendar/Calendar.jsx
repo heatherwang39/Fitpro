@@ -104,6 +104,7 @@ const _Calendar = ({
         if (!calendar.gettingCalendar) {
             getUserCalendar(user.id);
             API.getUserCalendar(user).then((response) => {
+                console.log(response);
                 // TODO handle failure
                 if (!response.success) {
                     console.log("ERROR loading calendar");

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const mongoosePaginate = require("mongoose-paginate-v2");
 
 const schema = mongoose.Schema({
     name: {
@@ -17,5 +18,7 @@ const schema = mongoose.Schema({
     rating: Number,
     images: [String],
 });
+
+schema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model("exercise", schema);
