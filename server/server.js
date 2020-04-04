@@ -18,6 +18,7 @@ const mailRouter = require("./routes/mail");
 const exercisesRouter = require("./routes/exercises");
 
 const app = express();
+
 // Middleware
 app.use(logger("dev"));
 app.use(cors({ origin: "http://localhost:8080", credentials: true }));

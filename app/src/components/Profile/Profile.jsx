@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { PropTypes } from "prop-types";
 
 import {
-    Button, Container, Grid, Input, Label, Rating, Segment,
+    Button, Container, Grid, Input, Label, Rating, Segment, Form,
 } from "semantic-ui-react";
 import { User } from "../../types/user";
 import { gotUserInfo as gotUserInfoAction } from "../../actions/userActions";
@@ -65,6 +65,20 @@ const offersColumn = () => (
         </Container>
     </Grid.Column>
 
+);
+
+const reviewForm = (onSubmit) => (
+    <Segment>
+        <Form onSubmit={onSubmit}>
+            <Form.Field>
+                <Input placeholder="Write a review" id="user-review" />
+            </Form.Field>
+            <Form.Field>
+                <Rating icon="start" defaultRating={0} maxRating={10} id="user-rating" />
+            </Form.Field>
+            <Button type="submit" id="submit-review-btn">Rate</Button>
+        </Form>
+    </Segment>
 );
 
 const _Profile = ({
@@ -157,6 +171,7 @@ const _Profile = ({
         setProfile(uneditedProfile);
         setEditing(false);
     };
+
 
     // Got profile and currently editing
     if (editing) {
@@ -323,7 +338,12 @@ const _Profile = ({
                         </Grid.Row>
                     )}
                     <Grid.Row>
-                        <p>{`${profile.height} ${profile.weight}`}</p>
+                        <p>
+                            {user.metric
+                                ? `${profile.height} cm ${profile.weight} kg`
+                                : `${~~(profile.height * 2.54 / 12)}'${~~(profile.height * 2.54 % 12) ? `${~~(profile.height * 2.54 % 12)}"` : ""}\
+                                ${Math.round(profile.weight * 2.204)} lb`}
+                        </p>
                     </Grid.Row>
                     <Grid.Row>
                         <p>{profile.email}</p>
@@ -336,6 +356,7 @@ const _Profile = ({
                     </Grid.Row>
                     <Grid.Row>
                         <Rating icon="star" disabled maxRating={profile.rating} defaultRating={profile.rating} />
+                        {reviewForm()}
                     </Grid.Row>
                     <Grid.Row>
                         {user != null && profile.trainers.includes(user.id) && (

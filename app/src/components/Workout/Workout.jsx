@@ -18,7 +18,7 @@ const emptyWorkout = {
 };
 
 const truncatedDescription = (desc, maxLength) => (
-    desc.length < (maxLength || 100)
+    !desc || desc.length < (maxLength || 100)
         ? desc
         : `${desc.slice(0, maxLength || 100)}...`
 );
