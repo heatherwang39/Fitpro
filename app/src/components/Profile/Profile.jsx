@@ -329,7 +329,6 @@ const _Profile = ({
             </Container>
         );
     }
-
     // Got profile and viewing
     return (
         <Container>
@@ -374,6 +373,11 @@ const _Profile = ({
                     </Grid.Row>
                     <Grid.Row>
                         <p>{profile.location}</p>
+                    </Grid.Row>
+                    <Grid.Row>
+                        {user != null && profile._id != user.id && profile.isTrainer && (
+                            <Button id="submit-review-btn" onClick={() => API.requestTraining(profile.username, user)}>Request training</Button>
+                        )}
                     </Grid.Row>
                     <Grid.Row>
                         <Rating icon="star" disabled maxRating={profile.rating} defaultRating={profile.rating} />

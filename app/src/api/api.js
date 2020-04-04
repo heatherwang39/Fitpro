@@ -199,6 +199,27 @@ export const API = {
         if (res.status === 200) return { success: true };
         return {};
     },
+    async requestTraining(trainerId, user) {
+        const res = await apiFetch("mail", { method: "POST", body: {
+            title: `${user.firstname} has requested to be your client.`,
+            receiver: trainerId,
+            content: `What is your response?\nTrainingRequest`
+        } });
+    },
+    async addClient(clientId, userId){
+        const res = await apiFetch(`/users/client`, { method: "POST", body: {
+            clientId
+        }});
+
+        if (res.status === 200) return { success: true };
+        return {success: true};
+    },
+    async getUser(userId){
+        const res = await apiFetch(`users/${userId}`);
+        if (res.status != 200) return { success: false };
+        const user = await res.json()
+        return {success: true, user: new User({ id: user._id, ...user })};
+    }
 };
 
 export default API;

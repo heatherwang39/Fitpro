@@ -51,12 +51,6 @@ const MailContainer = (props) => {
     const [isCreatingMail, setIsCreatingMail] = useState(false);
     const [mail, setMail] = useState([]);
     const { classes } = props;
-    const fetchMail = async (uid) => {
-        if (uid) {
-            return listOfMail;
-        }
-        return NaN;
-    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -87,7 +81,7 @@ const MailContainer = (props) => {
                 </div>
                 <ul className={classes.ul}>
                     {mail.map((m) => (
-                        <li key={m.title + m.from} className={classes.liWrapper}>
+                        <li key={m._id} className={classes.liWrapper}>
                             <MailCompactView
                                 onClick={() => setCurrentMail(m)}
                                 title={m.title}
