@@ -6,26 +6,12 @@ import {
 } from "react-router-dom";
 import ViewClientsComponent from "./ViewClientsComponent";
 import { addClient } from "../../actions/relationshipActions";
-import API from "../../api";
 
 const ViewClientsContainer = (props) => {
     const { relationships, user } = props;
     const { clients } = relationships;
-    const [filteredClients, updateFilteredClients] = useState([]);
+    const [filteredClients, updateFilteredClients] = useState(user.clients);
     const history = useHistory();
-
-    useEffect(() => {
-        try {
-            API.getRelationships(user).then((res) => {
-                if (!res.success) return;
-                props.addClient(res.clients);
-                updateFilteredClients(res.clients);
-            });
-        } catch (e) {
-            console.log(e);
-        }
-    }, []);
-
     const onChangeSearchValue = (e) => {
         const { value } = e.target;
         updateFilteredClients(clients.filter((client) => client.firstname.toLowerCase().includes(value)));
