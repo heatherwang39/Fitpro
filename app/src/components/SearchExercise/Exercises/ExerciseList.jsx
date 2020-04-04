@@ -1,10 +1,11 @@
-import React,{Component, Fragment} from 'react';
-import {connect} from 'react-redux';
-import { Grid, Paper, Typography, List } from '@material-ui/core';
-import { ListItem, ListItemText } from '@material-ui/core';
-//import {selectedTrainerInfo,searchedTrainer} from '../../actions/trainerActions';
-//import faker from "faker";
-//import API from "../../api";
+import React, { Fragment } from "react";
+import {
+    Grid, Paper, Typography, List, ListItem, ListItemText,
+} from "@material-ui/core";
+import PropTypes from "prop-types";
+// import {selectedTrainerInfo,searchedTrainer} from '../../actions/trainerActions';
+// import faker from "faker";
+// import API from "../../api";
 
 const style = {
     Paper: {
@@ -12,45 +13,49 @@ const style = {
         marginTop: 10,
         marginBottom: 10,
         height: 500,
-        overflowY: 'auto'
-    }
-}
+        overflowY: "auto",
+    },
+    Font: {
+        textTransform: "capitalize",
+    },
+};
 
-export default ({ 
-    exercises, 
-    category, 
-    onSelect, 
+const ExerciseList = ({
+    exercises,
+    category,
+    onSelect,
     exercise: {
-        id, 
-        title= 'Welcome!', 
-        description='Please seelect an exercise from the list on the left!'
-    } }) =>
+        id,
+        title = "Welcome!",
+        description = "Please seelect an exercise from the list on the left!",
+    },
+}) => (
     <Grid container>
         <Grid item sm>
             <Paper style={style.Paper}>
-                {exercises.map(([group, exercises]) => 
-                    !category || category === group 
-                        ?   <Fragment key={group} >
-                                <Typography
-                                    variant="h5"
-                                    style={{textTransform: 'capitalize'}}
-                                >
-                                    {group}
-                                </Typography>
-                                <List component="ul">
-                                    {exercises.map(({ id, title }) => 
-                                        <ListItem
-                                            key={id}
-                                            button
-                                            onClick={() => onSelect(id)}
-                                        >
-                                        <ListItemText primary={title}/>
-                                        </ListItem>
-                                    )}
-                                </List>
-                            </Fragment>
-                        : null
-                )}
+                {exercises.map(([group, exercises]) => (!category || category === group
+                    ? (
+                        <Fragment key={group}>
+                            <Typography
+                                variant="h5"
+                                style={style.Font}
+                            >
+                                {group}
+                            </Typography>
+                            <List component="ul">
+                                {exercises.map(({ id, title }) => (
+                                    <ListItem
+                                        key={id}
+                                        button
+                                        onClick={() => onSelect(id)}
+                                    >
+                                        <ListItemText primary={title} />
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </Fragment>
+                    )
+                    : null))}
             </Paper>
         </Grid>
         <Grid item sm>
@@ -65,8 +70,16 @@ export default ({
         </Grid>
 
     </Grid>
+);
 
+ExerciseList.propTypes = {
+    exercises: PropTypes.array.isRequired,
+    category: PropTypes.any.isRequired,
+    onSelect: PropTypes.func.isRequired,
+    exercise: PropTypes.array.isRequired,
+};
 
+export default ExerciseList;
 // class ExerciseList extends Component{
 //     render(){
 
@@ -74,7 +87,7 @@ export default ({
 //             return (
 //             <div >Show information of :
 //                 {this.props.searchedExercise}
-//             </div>         
+//             </div>
 //         )}
 //     }
 // }
