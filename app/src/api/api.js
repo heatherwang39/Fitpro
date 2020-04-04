@@ -43,12 +43,12 @@ const objectAsGetString = (obj) => {
 
 
 export const API = {
-    async searchTrainer({text,filters}){
-        const res = await apiFetch("trainers" + objectAsGetString({...filters,firstname: text}))
+    async searchTrainer({ text, filters }) {
+        const res = await apiFetch(`trainers${objectAsGetString({ ...filters, firstname: text })}`);
         if (res.status !== 200) return { status: res.status };
         return { success: true, results: await res.json() };
     },
-    
+
     async getWorkout(id) {
         return (await apiFetch(`workouts?id=${id}`)).json();
     },
@@ -106,9 +106,8 @@ export const API = {
         if (res.status !== 200) {
             return { success: false, error: `Server responded with ${res.status}` };
         }
-        // TODO handle pagination of events
         const calendar = {
-            myEvents: parseJsonWithDates(await res.text()).docs.map((e) => (new CalendarEvent({ ...e }))),
+            myEvents: parseJsonWithDates(await res.text()).map((e) => (new CalendarEvent({ ...e }))),
             myClientEvents: [],
             success: true,
         };
@@ -117,7 +116,7 @@ export const API = {
             if (res.status !== 200) {
                 return { success: false, error: `Server responded with ${res.status} when getting client events` };
             }
-            calendar.myClientEvents = parseJsonWithDates(await res.text()).docs;
+            calendar.myClientEvents = parseJsonWithDates(await res.text());
         }
         return { success: true, calendar };
     },

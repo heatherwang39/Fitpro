@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const mongoosePaginate = require("mongoose-paginate-v2");
 
 const schema = mongoose.Schema({
     title: {
@@ -31,8 +30,6 @@ const schema = mongoose.Schema({
         },
     ],
 });
-
-schema.plugin(mongoosePaginate);
 
 schema.pre("save", function (next) { /* eslint-disable-line func-names */
     if (this.isNew || this.isModified("client")) {
