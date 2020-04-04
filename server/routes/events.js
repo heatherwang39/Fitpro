@@ -9,6 +9,43 @@ const ObjectId = require("mongodb").ObjectID;
 require("../models/event");
 const Event = require("../models/event");
 
+const createRepeats = (event, repeatVal, repeatType, end) => {
+    let addToDate;
+    switch (repeatType) {
+    case "days":
+        addToDate = (date) => new Date(date.getTime() + repeatVal * 86400000);
+        break;
+    case "weeks":
+        addToDate = (date) => new Date(date.getTime() + repeatVal * 604800000);
+        break;
+    case "months":
+        addToDate = (date) => {
+            const newDate = new Date(date);
+            newDate.setMonth(date.getMonth() + parseInt(repeatVal, 10));
+            return newDate;
+        };
+        break;
+    default:
+        console.log("Invalid repeat frequency");
+        return undefined;
+    }
+    let {
+        _id, ...cur
+    } = event;
+    if (typeof cur.start !== "object") cur.start = new Date(Date.parse(cur.start));
+    if (typeof cur.end !== "object") cur.end = new Date(Date.parse(cur.end));
+    while (cur.start <= end) {
+        cur = {
+            ...cur,
+            start: addToDate(cur.start),
+            end: addToDate(cur.end),
+        };
+        const e = new Event(cur);
+        e.save((err) => {
+            console.log(err);
+        });
+    }
+};
 
 // Create
 router.post("/", (req, res) => {
@@ -21,8 +58,11 @@ router.post("/", (req, res) => {
         return;
     }
     const {
-        title, description, client, start, end,
+        title, description, client, start, end, repeatUnits, repeatFreq, repeatEnd,
     } = req.body;
+    if (repeatUnits && repeatFreq && repeatEnd) {
+        createRepeats({ ...req.body, owner: req.user._id }, repeatFreq, repeatUnits, Date.parse(repeatEnd));
+    }
     const event = new Event({
         title,
         description,
@@ -73,7 +113,7 @@ router.get("/", (req, res) => {
         return;
     }
     const { minDate, maxDate, page } = req.query;
-    Event.paginate({
+    Event.find({
         owner: req.user._id,
         datetime: {
             $lte: maxDate,
@@ -92,7 +132,7 @@ router.get("/trainer", (req, res) => {
         return;
     }
     const { userId, page } = req.query;
-    Event.paginate({
+    Event.find({
         owner: userId,
     }, { page }).then((events) => {
         res.setHeader("Content-Type", "application/json");
@@ -106,10 +146,9 @@ router.get("/mine", (req, res) => {
         res.status(401).send();
         return;
     }
-    const page = req.query.page ? req.query.page : 1;
-    Event.paginate({
+    Event.find({
         owner: req.user._id,
-    }, { page }).then((events) => {
+    }).then((events) => {
         res.setHeader("Content-Type", "application/json");
         res.status(200);
         res.json(events);
@@ -118,7 +157,7 @@ router.get("/mine", (req, res) => {
 
 router.get("/clients", (req, res) => {
     const page = req.query.page ? req.query.page : 1;
-    Event.paginate({
+    Event.find({
         client: req.user._id,
     }, { page }).then((events) => {
         res.setHeader("Content-Type", "application/json");
@@ -133,7 +172,7 @@ router.get("/all", (req, res) => {
         return;
     }
     const { userId, page } = req.query;
-    Event.paginate({
+    Event.find({
         $or: [{ client: userId }, { owner: userId }],
 
     }, { page }).then((events) => {

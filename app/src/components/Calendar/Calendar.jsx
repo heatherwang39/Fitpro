@@ -29,6 +29,13 @@ const ALL_EVENT_COLOURS = [
 
 const localizer = momentLocalizer(moment);
 
+const eventColor = (event) => {
+    const id = event.client ? event.client : event.owner;
+    const number = parseInt(id.replace(/[a-zA-Z]/g, ""), 10);
+    if (isNaN(number)) return ALL_EVENT_COLOURS[0];
+    return ALL_EVENT_COLOURS[number % (ALL_EVENT_COLOURS.length - 1)];
+};
+
 const _Calendar = ({
     location, calendar, user,
     getUserCalendar, gotUserCalendar,
@@ -44,8 +51,6 @@ const _Calendar = ({
     const [modalOpen, setModalOpen] = React.useState(false);
     // const [visibleEvents, setVisibleEvents] = React.useState(calendar.myEvents);
     const [calendarType, setCalendarType] = React.useState("default");
-    const [availableColours, setAvailableColours] = React.useState(ALL_EVENT_COLOURS);
-    const [uidColours, setUidColours] = React.useState(new Map());
     const [changeToClient, setChangeToClient] = React.useState(false);
     // const [selectedWorkout, setSelectedWorkout] = React.useState(null); // Unused in Phase 1
     const [lastSelectedClient, setLastSelectedClient] = React.useState(null);
@@ -56,6 +61,7 @@ const _Calendar = ({
         setLastSelectedClient(client);
     });
 
+
     // Properties of event currently being created/modified
     const [modalEvent, setModalEvent] = React.useState(null);
 
@@ -64,16 +70,13 @@ const _Calendar = ({
         case "overview":
             return [...calendar.myEvents, ...calendar.myClientEvents];
         case "me":
-            return calendar.myEvents;
+            return calendar.myEvents.filter((e) => !e.client);
         case "availability":
             // TODO
             // return calendar.userCalendar.availability
             break;
         case "client":
-            if (selectedClient === null) return [];
-            // TODO
-            // return calendar.clientEvents[selectedClient] ? calendar.clientEvents[selectedClient] : [];
-            return [];
+            return selectedClient ? calendar.myEvents.filter((e) => e.client === selectedClient) : [];
         // returning outside switch default makes eslint happy about consistent return
         // no default
         }
@@ -104,7 +107,6 @@ const _Calendar = ({
         if (!calendar.gettingCalendar) {
             getUserCalendar(user.id);
             API.getUserCalendar(user).then((response) => {
-                console.log(response);
                 // TODO handle failure
                 if (!response.success) {
                     console.log("ERROR loading calendar");
@@ -115,6 +117,7 @@ const _Calendar = ({
         }
         return (<div className="center">Loading</div>);
     }
+
     const openModal = (event) => {
         if (event.id) {
             setModalEvent(event);
@@ -150,7 +153,7 @@ const _Calendar = ({
 
     // Called by EditEventModal when Create/Save/Delete is clicked after validating event
     const modalUpdatedEvent = ({ event, deleted }) => {
-        if (event.owner === user.id || (event.owner === undefined && (!event.client || event.client === user.id))) {
+        if (event.owner === user.id || event.owner === undefined) {
             if (deleted) {
                 gotUserCalendar({ ...calendar, myEvents: calendar.myEvents.filter((e) => e.id !== event.id) });
             } else if (calendar.myEvents) {
@@ -209,25 +212,6 @@ const _Calendar = ({
         }
     };
 
-    const getNewColour = () => {
-        if (availableColours.length === 0) {
-            setAvailableColours(ALL_EVENT_COLOURS);
-        }
-        const colour = availableColours.pop();
-        setAvailableColours(availableColours);
-        return colour;
-    };
-
-    const eventColorByUserId = (id) => {
-        if (uidColours.has(id)) {
-            return uidColours.get(id);
-        }
-        const colour = getNewColour();
-        uidColours.set(id, colour);
-        setUidColours(uidColours);
-        return colour;
-    };
-
     if (user.isTrainer) {
         if (calendarType === "default") {
             setCalendarType("overview");
@@ -235,7 +219,6 @@ const _Calendar = ({
     } else if (calendarType !== "me") {
         setCalendarType("me");
     }
-
 
     return (
         <div className="page">
@@ -273,14 +256,14 @@ const _Calendar = ({
                                     />
                                     <Dropdown
                                         selection
-                                        options={Object.keys(user.clients).map(
+                                        options={user.clients.map(
                                             (c) => ({
                                                 key: c._id,
                                                 text: `${c.firstname} ${c.lastname}`,
                                                 value: c._id,
                                             }),
                                         )}
-                                        value={selectedClient === null ? "" : selectedClient.id}
+                                        value={selectedClient === null ? "" : selectedClient._id}
                                         onChange={(_, v) => {
                                             setSelectedClient(v.value);
                                         }}
@@ -315,8 +298,7 @@ const _Calendar = ({
                             return {
                                 className: "event-default",
                                 style: {
-                                    backgroundColor:
-                                    eventColorByUserId(event.client ? event.client.id : event.owner.id),
+                                    backgroundColor: eventColor(event),
                                 },
                             };
                         }
