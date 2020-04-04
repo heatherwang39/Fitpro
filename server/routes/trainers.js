@@ -13,7 +13,7 @@ const DB_SEARCH_PARAMS = ["gender"];
 const rangeQuery = (min, max) => {
     if (!min) {
         if (!max) return undefined;
-        return { $gt: max };
+        return { $lt: max };
     }
     if (!max) {
         if (!min) return undefined;
@@ -23,10 +23,12 @@ const rangeQuery = (min, max) => {
 };
 
 router.get("/", (req, res) => {
+    console.log(req.query)
     const query = { isTrainer: true, searchable: true };
     DB_SEARCH_PARAMS.forEach((p) => {
         if (req.query[p]) query[p] = req.query[p];
     });
+    if (req.query.firstname) query.firstname = {$regex: req.query.firstname, $options: "i"}
     const price = rangeQuery(req.query.minPrice, req.query.maxPrice);
     if (price) query.price = price;
     const rating = rangeQuery(req.query.minRating, req.query.maxRating);

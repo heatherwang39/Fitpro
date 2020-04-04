@@ -34,7 +34,21 @@ const parseJsonWithDates = (json) => {
     return JSON.parse(json, (_, v) => (typeof v === "string" && dateRegex.test(v) ? new Date(v) : v));
 };
 
+const objectAsGetString = (obj) => {
+    if (!obj) return "";
+    const keys = Object.keys(obj);
+    if (!keys.length) return "";
+    return `?${keys[0]}=${obj[keys[0]]}${keys.splice(1).reduce((acc, k) => (`${acc}&${k}=${obj[k]}`), "")}`;
+};
+
+
 export const API = {
+    async searchTrainer({text,filters}){
+        const res = await apiFetch("trainers" + objectAsGetString({...filters,firstname: text}))
+        if (res.status !== 200) return { status: res.status };
+        return { success: true, results: await res.json() };
+    },
+    
     async getWorkout(id) {
         return (await apiFetch(`workouts?id=${id}`)).json();
     },

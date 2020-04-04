@@ -3,7 +3,7 @@ import {
     Button, Container, Grid, Image, Item, Rating,
 } from "semantic-ui-react";
 import TrainerDetail from "./TrainerDetail";
-import API from "../../api";
+import API from "../../api/api";
 
 class TrainerList extends Component {
     constructor(props) {
@@ -28,7 +28,7 @@ class TrainerList extends Component {
                     console.log("Error searching, got response ", response);
                     return;
                 }
-                this.setState({ ...this.state, trainerList: response.results });
+                this.setState({ ...this.state, trainerList: response.results.docs });
             },
         );
     }
