@@ -17,22 +17,15 @@ const styles = {
 };
 
 const MailExpandedView = (props) => {
-    const { classes, deleteMail } = props;
+    const { classes } = props;
     return (
         <div className={classes.container}>
-            <button className={classes.button} type="button" onClick={deleteMail}>
-                Delete
-            </button>
-            <button className={classes.button} type="button">
-                Reply
-            </button>
         </div>
     );
 };
 
 MailExpandedView.propTypes = {
     classes: PropTypes.objectOf(PropTypes.string).isRequired,
-    deleteMail: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(MailExpandedView);

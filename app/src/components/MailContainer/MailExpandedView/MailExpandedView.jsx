@@ -25,6 +25,7 @@ const styles = {
     authorContainer: {
         fontWeight: "bold",
         paddingLeft: "72px",
+        marginRight: "20px"
     },
     dateContainer: {
         float: "right",
@@ -34,27 +35,33 @@ const styles = {
 
 const MailExpandedView = (props) => {
     const {
-        classes, title, from, content, date, deleteMail,
+        classes, title, owner, content, sentDate
     } = props;
 
-    const d = (new Date(date));
+    const d = (new Date(sentDate));
     const dateString = `${[d.getMonth() + 1,
         d.getDate(),
         d.getFullYear()].join("/")} ${
         [d.getHours(),
             d.getMinutes(),
             d.getSeconds()].join(":")}`;
-
+    if (!title) {
+        return (
+            <div className={classes.container}>
+                Select an item to view
+            </div>
+        )
+    }
     return (
         <div className={classes.container}>
-            <MailHeader deleteMail={deleteMail} />
+            <MailHeader />
             <div className={classes.metaContainer}>
                 <h2 className={classes.titleContainer}>
                     {title}
                 </h2>
                 <div>
-                    <span className={classes.authorContainer}>{from}</span>
-                    <span className={classes.dateContinear}>{dateString}</span>
+                    <span className={classes.authorContainer}>From: {owner.username}</span>
+                    <span className={classes.dateContinear}>Sent: {dateString}</span>
                 </div>
             </div>
             <div className={classes.contentContainer}>
@@ -65,12 +72,11 @@ const MailExpandedView = (props) => {
 };
 
 MailExpandedView.propTypes = {
-    title: PropTypes.string.isRequired,
-    from: PropTypes.string.isRequired,
-    content: PropTypes.string.isRequired,
-    date: PropTypes.number.isRequired,
+    title: PropTypes.string,
+    owner: PropTypes.objectOf(PropTypes.any),
+    content: PropTypes.string,
+    sentDate: PropTypes.number,
     classes: PropTypes.objectOf(PropTypes.string).isRequired,
-    deleteMail: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(MailExpandedView);

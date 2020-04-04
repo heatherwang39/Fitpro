@@ -21,7 +21,7 @@ const CreateMailContainer = (props) => {
                     defaultValue=""
                     variant="standard"
                     fullWidth
-                    onChange={setContent("receipient")}
+                    onChange={setContent("receiver")}
                 />
                 <TextField
                     label="Title"
@@ -37,7 +37,7 @@ const CreateMailContainer = (props) => {
                     multiline
                     rows="20"
                     fullWidth
-                    onChange={setContent("body")}
+                    onChange={setContent("content")}
                 />
             </div>
             <div className="create-mail-footer">

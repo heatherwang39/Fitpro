@@ -7,10 +7,11 @@ const express = require("express");
 const router = express.Router();
 const ObjectId = require("mongodb").ObjectID;
 require("../models/mail");
+const User = require("../models/user");
 const Mail = require("../models/mail");
 
 // Create Mail
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
     if (!req.user) {
         res.status(401).send();
         return;
@@ -20,24 +21,33 @@ router.post("/", (req, res) => {
         return;
     }
 
-    const { title, receiverId, content } = req.body;
-    const mail = new Mail({ 
-        title,
-        receiverId,
-        content,
-        sentDate: (new Date()).getTime(),
-        ownerId: req.user._id
-    });
-    mail.save((err) => {
-        if (err) {
-            console.log("error in POST /mail", err);
-            res.status(err.name === "ValidationError" ? 400 : 500).send();
-            return;
-        }
-        mail.populate("mail.mail").execPopulate().then(
-            () => res.status(201).send(mail),
-        );
-    });
+    try {
+        const { title, receiver, content } = req.body;
+        const receiverId = (await User.findOne({
+            username: receiver,
+        }))._id
+        console.log(receiverId)
+        const mail = new Mail({ 
+            title,
+            receiver: receiverId,
+            content,
+            sentDate: (new Date()).getTime(),
+            owner: req.user._id
+        });
+        mail.save((err) => {
+            if (err) {
+                console.log("error in POST /mail", err);
+                res.status(err.name === "ValidationError" ? 400 : 500).send();
+                return;
+            }
+            mail.populate("mail.mail").execPopulate().then(
+                () => res.status(201).send(mail),
+            );
+        });
+    } catch(e) {
+        res.status(400).send();
+        return;
+    }
 });
 
 // Get Mail
@@ -46,18 +56,10 @@ router.get("/", (req, res) => {
         res.status(401).send();
         return;
     }
-    if (!req.query || !req.query.id) {
-        res.status(400).send();
-        return;
-    }
-    if (req.query.id.length !== 24) { // default length of _id
-        res.status(400).send("Invalid ID");
-        return;
-    }
     const { page } = req.query;
     Mail.paginate({ 
-        ownerId: ObjectId(req.user._id) 
-    }, { populate: { path: "mail.mail", limit: 3 }, page }).then((mail) => {
+        receiver: ObjectId(req.user._id) 
+    }, { populate: ["owner", "receiver"], page }).then((mail) => {
         res.setHeader("Content-Type", "application/json");
         res.status(200);
         res.json(mail);

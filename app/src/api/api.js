@@ -38,7 +38,7 @@ export const API = {
     async getWorkout(id) {
         return (await apiFetch(`workouts?id=${id}`)).json();
     },
-    async getWorkouts(filters, page) {
+    async getWorkouts(filters) {
         let endpoint = "workouts";
         let addedParam = false;
         if (filters.myWorkouts) {
@@ -60,7 +60,12 @@ export const API = {
     async updateWorkout(newWorkout) {
         const res = await apiFetch("workouts", { method: "PATCH", body: newWorkout });
         if (res.status !== 200) return { status: res.status };
-        return res.json();
+        return { success: true, workout: await res.json() };
+    },
+    async createWorkout(newWorkout) {
+        const res = await apiFetch("workouts", { method: "POST", body: newWorkout });
+        if (res.status !== 201) return { status: res.status };
+        return { success: true, workout: await res.json() };
     },
     async login(username, password) {
         const res = await apiFetch("auth/login", {
@@ -117,6 +122,32 @@ export const API = {
         }
         return { success: true, event: new CalendarEvent(parseJsonWithDates(await res.text())) };
     },
+    async searchExercises({ name, page }) {
+        if (!name || page < 1) return { success: false };
+        const res = await apiFetch(`exercises?name=${name}&page=${page}`);
+        if (res.status !== 200) {
+            return { success: false };
+        }
+        return { success: true, exercises: await res.json() };
+    },
+    async getMail() {
+        const res = await apiFetch('mail');
+        if (res.status !== 200) {
+            return { success: false };
+        }
+        return { success: true, mail: (await res.json()).docs };
+    },
+    async sendMail(content) {
+        const res = await apiFetch("mail", {
+            method: "POST",
+            body: content,
+        });
+        console.log(content)
+        if (res.status !== 200) {
+            return { success: false };
+        }
+        return { success: true };
+    }
 };
 
 export default API;
