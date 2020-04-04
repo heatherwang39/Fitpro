@@ -6,12 +6,12 @@ const schema = mongoose.Schema({
         type: String,
         required: true,
     },
-    ownerId: {
+    owner: {
         type: mongoose.ObjectId,
         ref: "user",
     },
     sentDate: Number,
-    receiverId: {
+    receiver: {
         type: mongoose.ObjectId,
         ref: "user",
     },

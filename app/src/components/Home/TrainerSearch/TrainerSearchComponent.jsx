@@ -25,7 +25,7 @@ const TrainerSearchComponent = (props) => {
                     name="location"
                     ref={register({})}
                 />
-                <button type="submit">Submit</button>
+                <button type="submit">Search</button>
             </form>
         </div>
     );

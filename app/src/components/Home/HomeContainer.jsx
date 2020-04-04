@@ -18,7 +18,6 @@ const _Home = (props) => {
                 )
             }
             <TrainerSearchComponent isAuth={user !== null} />
-            <NewsFeedContainer />
         </div>
     );
 };

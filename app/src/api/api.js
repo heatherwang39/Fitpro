@@ -144,6 +144,24 @@ export const API = {
         }
         return { success: true, exercises: await res.json() };
     },
+    async getMail() {
+        const res = await apiFetch('mail');
+        if (res.status !== 200) {
+            return { success: false };
+        }
+        return { success: true, mail: (await res.json()).docs };
+    },
+    async sendMail(content) {
+        const res = await apiFetch("mail", {
+            method: "POST",
+            body: content,
+        });
+        console.log(content)
+        if (res.status !== 200) {
+            return { success: false };
+        }
+        return { success: true };
+    }
 };
 
 export default API;

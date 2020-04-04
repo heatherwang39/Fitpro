@@ -32,7 +32,7 @@ const ClientCardComponent = (props) => {
                     {`${firstname} ${lastname}`}
                 </h1>
                 <h2>
-                    {`${goalType}`}
+                    {`${goalType ? goalType: "No goals"}`}
                 </h2>
                 <h2>
                     {location}

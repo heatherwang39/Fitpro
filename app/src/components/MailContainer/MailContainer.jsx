@@ -7,6 +7,7 @@ import MailCompactView from "./MailCompactView";
 import MailExpandedView from "./MailExpandedView";
 import CreateMailContainer from "./CreateMailContainer";
 import "./MailContainer.css";
+import API from "../../api/api"
 
 const _styles = {
     mailView: {
@@ -36,43 +37,14 @@ const _styles = {
 
 // Delete initialState and list of mail in phase 2
 const initialState = {
-    mailID: 1,
-    title: "Reminder of our training sessions",
-    from: "Josh A",
-    content: "TEST CONTENT 1",
+    _id: "",
+    title: "",
+    owner: {
+        username: ""
+    },
+    content: "",
     date: Date.now(),
 };
-
-const listOfMail = [
-    {
-        mailID: 1,
-        title: "Reminder of our training sessions",
-        from: "Josh A",
-        date: Date.now(),
-        content: "TEST CONTENT 1",
-    },
-    {
-        mailID: 2,
-        title: "I have a special promotion for you",
-        from: "Josh B",
-        date: Date.now(),
-        content: "TEST CONTENT 2",
-    },
-    {
-        mailID: 3,
-        title: "Do you want to set up an appointment for next week",
-        from: "Josh C",
-        date: Date.now(),
-        content: "TEST CONTENT 3",
-    },
-    {
-        mailID: 4,
-        title: "I watched your workout videos and have some comments",
-        from: "Josh D",
-        date: Date.now(),
-        content: "TEST CONTENT 4",
-    },
-];
 
 const MailContainer = (props) => {
     const [currentMail, setCurrentMail] = useState(initialState);
@@ -88,20 +60,12 @@ const MailContainer = (props) => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const res = await fetchMail(1);
-            setMail(res);
+            const res = await API.getMail();
+            setMail(res.mail);
         };
-
+        
         fetchData();
     }, [setMail]);
-
-
-    const deleteMail = (mailID) => () => {
-        // call api to delete mail
-        const newMailData = mail.filter((m) => m.mailID !== mailID);
-        setCurrentMail(newMailData[0]);
-        setMail(newMailData);
-    };
 
     const toggleCreateMail = () => {
         setIsCreatingMail(true);
@@ -109,6 +73,7 @@ const MailContainer = (props) => {
 
     const sendMail = (mailContent) => () => {
         setIsCreatingMail(false);
+        API.sendMail(mailContent);
         return mailContent;
     };
 
@@ -129,7 +94,7 @@ const MailContainer = (props) => {
                                 date={m.date}
                                 content={m.content}
                                 from={m.from}
-                                isHighlighted={currentMail.mailID === m.mailID}
+                                isHighlighted={currentMail._id === m._id}
                                 isPlaceholder={false}
                             />
                         </li>
@@ -138,10 +103,9 @@ const MailContainer = (props) => {
             </div>
             <MailExpandedView
                 title={currentMail.title}
-                date={currentMail.date}
+                sentDate={currentMail.sentDate}
                 content={currentMail.content}
-                from={currentMail.from}
-                deleteMail={deleteMail(currentMail.mailID)}
+                owner={currentMail.owner}
             />
             { isCreatingMail && (
                 <CreateMailContainer onSubmit={sendMail} closeContainer={() => { setIsCreatingMail(false); }} />
