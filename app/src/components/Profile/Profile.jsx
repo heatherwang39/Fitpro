@@ -27,44 +27,30 @@ const errorComponent = (errorMessage) => (
 );
 
 
-const reviewsColumn = () => (
-    <Grid.Column>
+const reviewsSegment = (reviews) => (
+    <Segment>
         <Container id="profile-reviews">
             <h4 id="profile-reviews-header">Reviews</h4>
-            {testReviews.map((review) => (
+            {reviews && reviews.length ? reviews.map((review) => (
                 <Segment className="profile-review">
-                    <div className="review-body">
-                        {review.review}
-                        <br />
-                        <Rating
-                            className="review-rating"
-                            disabled
-                            icon="star"
-                            maxRating={review.rating}
-                            defaultRating={review.rating}
-                        />
-                    </div>
-                    <div className="review-name">{`— ${review.name}`}</div>
+                    <Grid centered>
+                        <div className="review-body">
+                            {review.review}
+                            <br />
+                            <Rating
+                                className="review-rating"
+                                disabled
+                                icon="star"
+                                maxRating={review.rating}
+                                defaultRating={review.rating}
+                            />
+                        </div>
+                        <div className="review-name">{`— ${review.user.firstname} ${review.user.lastname}`}</div>
+                    </Grid>
                 </Segment>
-            ))}
+            )) : <Grid centered>This trainer has no reviews</Grid>}
         </Container>
-    </Grid.Column>
-);
-
-const offersColumn = () => (
-    <Grid.Column>
-        <Container id="profile-offers">
-            <h4 id="profile-offers-header">Specials</h4>
-            {testOffers.map((offer) => (
-                <Segment className="profile-offer">
-                    <div className="offer-title"><h5>{offer.title}</h5></div>
-                    <div className="offer-body">{offer.details}</div>
-                    <div className="offer-price">{offer.price}</div>
-                </Segment>
-            ))}
-        </Container>
-    </Grid.Column>
-
+    </Segment>
 );
 
 const reviewForm = (onSubmit, setRating) => (
@@ -91,6 +77,8 @@ const _Profile = ({
     const [uneditedProfile, setUneditedProfile] = React.useState(null);
     const [myRating, setMyRating] = React.useState(0);
     const [showReviewForm, setShowReviewForm] = React.useState(null);
+    const [reviews, setReviews] = React.useState(null);
+    const [gotReviews, setGotReviews] = React.useState(false);
 
     if (!match.params.id || match.params.id.length !== 24) {
         setError("Invalid user id");
@@ -118,6 +106,20 @@ const _Profile = ({
         }
         if (error != null) return errorComponent();
         return errorComponent("Invalid user");
+    }
+
+    if (reviews === null) {
+        if (!gotReviews) {
+            setGotReviews(true);
+            API.getReviews(match.params.id).then((r) => {
+                if (!r.success) {
+                    console.log("Error getting reviews");
+                    setReviews([]);
+                } else {
+                    setReviews(r.reviews);
+                }
+            });
+        }
     }
 
     // Loading profile from server
@@ -375,12 +377,25 @@ const _Profile = ({
                         <p>{profile.location}</p>
                     </Grid.Row>
                     <Grid.Row>
-                        {user != null && profile._id != user.id && profile.isTrainer && (
+                        {user != null && profile._id !== user.id && profile.isTrainer && (
                             <Button id="submit-review-btn" onClick={() => API.requestTraining(profile.username, user)}>Request training</Button>
                         )}
                     </Grid.Row>
                     <Grid.Row>
-                        <Rating icon="star" disabled maxRating={profile.rating} defaultRating={profile.rating} />
+                        { profile.numRatings
+                            ? (
+                                <span id="profile-ratings">
+                                    <Rating icon="star" disabled maxRating={profile.rating} defaultRating={profile.rating} />
+                                    <br />
+                                    (
+                                    {profile.numRatings}
+                                    {" "}
+                                    review
+                                    {profile.numRatings === 1 ? "" : "s"}
+                                    )
+                                </span>
+                            )
+                            : <span />}
                         {showReviewForm && reviewForm(submitReview, setMyRating)}
                     </Grid.Row>
                     <Grid.Row>
@@ -396,9 +411,8 @@ const _Profile = ({
             </Grid>
             {profile.isTrainer && (
                 <Grid>
-                    <Grid.Row columns={2}>
-                        {offersColumn()}
-                        {reviewsColumn()}
+                    <Grid.Row columns={1}>
+                        {reviews ? reviewsSegment(reviews) : (<Segment loading />)}
                     </Grid.Row>
                 </Grid>
             )}

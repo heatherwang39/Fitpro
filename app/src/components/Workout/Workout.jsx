@@ -151,7 +151,7 @@ const WorkoutComponent = ({
             </Grid.Row>
             <Grid.Row id="workout-rating">
                 {workout.rating || workout.rating === 0 ? (
-                    <Rating rating={workout.rating} maxRating={10} />
+                    `${~~(workout.rating * 10 / workout.numRatings)}% liked`
                 ) : "No Ratings Yet"}
             </Grid.Row>
             <Grid.Row id="workout-level">
