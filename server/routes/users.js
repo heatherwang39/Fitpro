@@ -98,10 +98,13 @@ router.patch("/:id", async (req, res) => {
 router.post("/client", async (req, res) => {
     try {
         const { clientId } = req.body;
-        console.log(req.user)
         const user = await User.findById(req.user._id);
         if (!user.clients.includes(clientId)) user.clients.push(clientId)
         const result = await User.findByIdAndUpdate(req.user._id, user, { new: true });
+
+        const client = await User.findById(clientId);
+        if (!client.trainers.includes(req.user._id)) client.trainers.push(req.user._id)
+        await User.findByIdAndUpdate(clientId, client, { new: true });
         const { password, tokens, ...resUser } = result._doc;
         res.status(200).send(resUser);
     } catch (err) {
