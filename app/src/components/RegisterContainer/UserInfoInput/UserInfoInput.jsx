@@ -100,6 +100,14 @@ const UserInfoInput = (props) => {
             />
             <TextField
                 className={classes.input}
+                label="Price per hour"
+                variant="outlined"
+                onKeyDown={onKeyDown}
+                size="small"
+                onChange={updateUserInfo("price")}
+            />
+            <TextField
+                className={classes.input}
                 label="Who are you?"
                 variant="outlined"
                 value={userInfo.accountType}

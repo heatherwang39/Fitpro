@@ -9,8 +9,7 @@ import { gotUserInfo } from "../../../actions/userActions";
 
 const styles = {
     container: {
-        borderLeftWidth: 2,
-        borderLeftColor: "grey",
+        borderLeft: "1px solid grey",
         width: "100%",
     },
     contentContainer: {
