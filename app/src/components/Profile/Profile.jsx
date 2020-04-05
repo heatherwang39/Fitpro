@@ -130,7 +130,7 @@ const _Profile = ({
     }
 
     if (showReviewForm === null) {
-        if (user === null || match.params.id === user._id) setShowReviewForm(false);
+        if (user === null || match.params.id === user._id || !user.trainers.some((e) => e._id === profile._id)) setShowReviewForm(false);
         else {
             API.getRating({ trainer: profile._id }).then((r) => {
                 setShowReviewForm(r.rating === undefined);
