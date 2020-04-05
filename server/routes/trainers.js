@@ -29,7 +29,7 @@ router.get("/", (req, res) => {
     const rating = rangeQuery(req.query.minRating, req.query.maxRating);
     if (rating) query.rating = rating;
     
-    User.paginate(query, { select: "_id username firstname lastname isTrainer rating gender phone height weight price goalType imageUrl clients trainers" }).then((trainers) => {
+    User.paginate(query, { select: "_id username firstname lastname isTrainer rating gender phone height weight price goalType imageUrl clients trainers numRatings" }).then((trainers) => {
         res.setHeader("Content-Type", "application/json");
         res.status(200);
         res.json(trainers);

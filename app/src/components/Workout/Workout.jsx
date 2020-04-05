@@ -229,6 +229,23 @@ const WorkoutComponent = ({
                             <Segment.Group id="exercises-list-container">
                                 {(!workout.exercises || !workout.exercises.length) && (<Segment>No Exercises</Segment>)}
                                 {
+                                    <Segment key="heading">
+                                        <Grid>
+                                            <Grid.Column width={3}>
+                                                <Grid.Row>
+                                                    <h3>Exercise</h3>
+                                                </Grid.Row>
+                                            </Grid.Column>
+                                            <Grid.Column width={3}>
+                                            </Grid.Column>
+                                            <Grid.Column width={4}>
+                                                <h3>Instructions</h3>
+                                            </Grid.Column>
+                                        </Grid>
+                                    </Segment>
+
+                                }
+                                {
                                     workout.exercises.map(
                                         (e) => exerciseListItem(
                                             e,

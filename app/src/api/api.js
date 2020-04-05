@@ -2,7 +2,7 @@ import { store } from "../store";
 import { loggedOut } from "../actions/userActions";
 import { CalendarEvent, User } from "../types";
 
-const BASE_API_URL = "http://localhost:3333";
+const BASE_API_URL = "http://localhost:3333/api";
 const apiUrl = (l) => `${BASE_API_URL + (!l || !l.length ? "" : (l[0] === "/" ? l : `/${l}`))}`;
 
 /*
@@ -135,8 +135,8 @@ export const API = {
         return { success: true, event: new CalendarEvent(parseJsonWithDates(await res.text())) };
     },
     async searchExercises({ name, page }) {
-        if (!name || page < 1) return { success: false };
-        const res = await apiFetch(`exercises?name=${name}&page=${page}`);
+        if (!name) return { success: false };
+        const res = await apiFetch(`exercises?name=${name}`);
         if (res.status !== 200) {
             return { success: false };
         }
@@ -261,7 +261,6 @@ export const API = {
         return { success: true, imageUrl: await res.text() };
     },
     async updateProfile(profile) {
-        console.log(profile);
         const res = await apiFetch(`users/${profile._id}`, { method: "PATCH", body: profile });
         if (res.status !== 200) return {};
         return { success: true, profile: res.json() };

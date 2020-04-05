@@ -32,7 +32,7 @@ router.get("/:name?/:group?", (req, res) => {
     const group = req.query.group;
 
     if (name) {
-        Exercise.find({ name }).then((exercise) => {
+        Exercise.find({ name: new RegExp(req.query.name, "i") }).then((exercise) => {
             if (!exercise) {
                 res.status(404).send();
             } else {
