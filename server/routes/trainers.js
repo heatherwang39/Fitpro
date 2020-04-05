@@ -7,33 +7,29 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
 
-// Valid query attributes for searching with that can be queried directly on the db
-const DB_SEARCH_PARAMS = ["gender"];
 
 const rangeQuery = (min, max) => {
     if (!min) {
         if (!max) return undefined;
-        return { $lt: max };
+        return { $lte: max };
     }
     if (!max) {
         if (!min) return undefined;
-        return { $gt: min };
+        return { $gte: min };
     }
-    return { $lt: max, $gt: min };
+    return { $lte: max, $gte: min };
 };
 
 router.get("/", (req, res) => {
-    console.log(req.query)
     const query = { isTrainer: true, searchable: true };
-    DB_SEARCH_PARAMS.forEach((p) => {
-        if (req.query[p]) query[p] = req.query[p];
-    });
+    if(req.query.gender) query.gender = req.query.gender
     if (req.query.firstname) query.firstname = {$regex: req.query.firstname, $options: "i"}
     const price = rangeQuery(req.query.minPrice, req.query.maxPrice);
     if (price) query.price = price;
     const rating = rangeQuery(req.query.minRating, req.query.maxRating);
     if (rating) query.rating = rating;
-    User.paginate(query, { select: "_id username firstname lastname isTrainer rating gender phone height weight price goalType imageUrl clients trainers" }).then((trainers) => {
+    
+    User.paginate(query, { select: "_id username firstname lastname isTrainer rating gender phone height weight price goalType imageUrl clients trainers numRatings" }).then((trainers) => {
         res.setHeader("Content-Type", "application/json");
         res.status(200);
         res.json(trainers);

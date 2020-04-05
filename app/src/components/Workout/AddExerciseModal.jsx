@@ -25,21 +25,21 @@ const exerciseListItem = (e, addExercise) => (
 const AddExerciseModal = ({ visible, setVisible, addExercise }) => {
     if (!visible) return <span />;
 
-    const [page, setPage] = React.useState(1);
-    const [morePages, setMorePages] = React.useState(false);
+    // const [page, setPage] = React.useState(1);
+    // const [morePages, setMorePages] = React.useState(false);
     const [searchResults, setSearchResults] = React.useState([]);
 
     const searchName = (n) => {
-        setPage(1);
+        // setPage(1);
         if (n.length < 1) return;
-        API.searchExercises({ name: n, page }).then((response) => {
-            if (!response.success || response.exercises.docs.length === 0) {
+        API.searchExercises({ name: n }).then((response) => {
+            if (!response.success || response.exercises.length === 0) {
                 setSearchResults([]);
                 return;
             }
-            setSearchResults(response.exercises.docs);
-            setPage(response.exercises.page);
-            setMorePages(response.exercises.totalPages > response.exercises.page);
+            setSearchResults(response.exercises);
+            // setPage(response.exercises.page);
+            // setMorePages(response.exercises.totalPages > response.exercises.page);
         });
     };
 
@@ -65,11 +65,11 @@ const AddExerciseModal = ({ visible, setVisible, addExercise }) => {
                         : (
                             <Segment.Group id="exercise-results">
                                 {searchResults.map((e) => exerciseListItem(e, addExercise))}
-                                {morePages && (
+                                {/* morePages && (
                                     <Segment key="nextPage">
                                         <Button fluid>More</Button>
                                     </Segment>
-                                )}
+                                ) */}
                             </Segment.Group>
                         )}
                 </div>

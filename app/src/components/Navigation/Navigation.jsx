@@ -16,8 +16,6 @@ import { loggedOut as loggedOutAction } from "../../actions/userActions";
 import "./style.css";
 import API from "../../api/api";
 
-// const userMenuOptions = [{ key: 1, value: "profile", text: "Me" }, { key: 2, value: "logout", text: "Log Out" }];
-
 function _Navigation({ user, loggedOut, location }) {
     const currentPage = location.pathname;
     const history = useHistory();
@@ -26,7 +24,6 @@ function _Navigation({ user, loggedOut, location }) {
         const options = [];
         if (user.isTrainer) {
             options.push({ key: 2, value: "clients", text: "My Clients" });
-            options.push({ key: 3, value: "templates", text: "My Templates" });
         } else {
             options.push({ key: 4, value: "my_trainers", text: "My Trainers" });
         }

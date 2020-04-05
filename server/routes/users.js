@@ -57,32 +57,34 @@ router.patch("/:id", async (req, res) => {
     if (req.params.id.length !== 24) { // default length of _id
         return res.status(404).send();
     }
-
-    const updates = Object.keys(req.body);
-    const allowedUpdates = {
-        email: true,
-        password: true,
-        username: true,
-        firstname: true,
-        lastname: true,
-        gender: true,
-        isTrainer: true,
-        phone: true,
-        height: true,
-        weight: true,
-        rating: true,
-        price: true,
-        goalType: true,
-        imageUrl: true,
-        trainers: true,
-        clients: true,
-    };
-
-    const isValidOperation = updates.every((update) => allowedUpdates[update]);
-    if (!isValidOperation) {
-        return res.status(403).send({ error: "Invalid updates!" });
+    if (!req.user || req.user._id !== req.params.id) {
+        return res.status(401).send();
     }
 
+    // const updates = Object.keys(req.body);
+    // const allowedUpdates = {
+    // email: true,
+    // password: true,
+    // username: true,
+    // firstname: true,
+    // lastname: true,
+    // gender: true,
+    // isTrainer: true,
+    // phone: true,
+    // height: true,
+    // weight: true,
+    // price: true,
+    // goalType: true,
+    // imageUrl: true,
+    // trainers: true,
+    // clients: true,
+    // location: true,
+    // };
+    //
+    // const isValidOperation = updates.every((update) => allowedUpdates[update]);
+    // if (!isValidOperation) {
+    // return res.status(403).send({ error: "Invalid updates!" });
+    // }
     try {
         const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
         const { password, tokens, ...resUser } = user._doc;
@@ -99,11 +101,11 @@ router.post("/client", async (req, res) => {
     try {
         const { clientId } = req.body;
         const user = await User.findById(req.user._id);
-        if (!user.clients.includes(clientId)) user.clients.push(clientId)
+        if (!user.clients.includes(clientId)) user.clients.push(clientId);
         const result = await User.findByIdAndUpdate(req.user._id, user, { new: true });
 
         const client = await User.findById(clientId);
-        if (!client.trainers.includes(req.user._id)) client.trainers.push(req.user._id)
+        if (!client.trainers.includes(req.user._id)) client.trainers.push(req.user._id);
         await User.findByIdAndUpdate(clientId, client, { new: true });
         const { password, tokens, ...resUser } = result._doc;
         res.status(200).send(resUser);
