@@ -14,7 +14,7 @@ Note that user and user2 represent the authorization levels of "Client" and "Tra
 Or to run the app and the server in the same terminal, use `./run.sh`. If `npm install` hasn't already been run in `app/` and `server/`, use `./run.sh i` to install modules before starting.
 
 ## Express routes
-
+All requests should be prepended with /api/
 - Get /user/:id 
   - Retrieve the user with :id
 - Post /user
@@ -62,19 +62,19 @@ Or to run the app and the server in the same terminal, use `./run.sh`. If `npm i
 - Post /users/:id/client
   - Add a user :id to the client list of a user.
   - The user token should be provided in the header.
-- Post /rating
+- Post /ratings
   - Create a rating for a trainer.
   - The information related to the rating such as for which workout and review should be in the body.
-- Delete /rating
+- Delete /ratings
   - Delete a rating with the information in query.
-- Get /rating/workout/:id
+- Get /ratings/workout/:id
   - Get a rating on a workout with :id by user
   - The user token should be provided in the header.
-- Get /rating/exercise/:id
+- Get /ratings/exercise/:id
   - Get a rating on an exercise with :id by user 
   - The user token should be provided in the header. 
-- Get /rating/trainer/:id
+- Get /ratings/trainer/:id
   - Get a rating on an trainer with :id by user
   - The user token should be provided in the header. 
-- Get /rating/user/:id
+- Get /ratings/user/:id
   - Get all ratings on user :id.
