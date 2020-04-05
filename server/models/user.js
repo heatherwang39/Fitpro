@@ -50,7 +50,14 @@ const schema = new mongoose.Schema({
     phone: String,
     height: Number,
     weight: Number,
-    rating: Number,
+    rating: {
+        type: Number,
+        default: 0,
+    },
+    numRatings: {
+        type: Number,
+        default: 0,
+    },
     price: Number,
     goalType: String,
     imageUrl: String,

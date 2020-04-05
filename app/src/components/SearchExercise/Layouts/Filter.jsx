@@ -1,31 +1,34 @@
-import React,{Component} from 'react';
-import {connect} from 'react-redux';
-import { Paper, Tabs } from '@material-ui/core';
-import { Tab } from '@material-ui/core';
+import React from "react";
+import { Paper, Tabs, Tab } from "@material-ui/core";
+import PropTypes from "prop-types";
 
 
-export default ({ muscles, category, onSelect }) => {
-    const index = category ? muscles.findIndex(group => group === category) + 1
-    : 0
+const Filter = ({ muscles, category, onSelect }) => {
+    const index = category ? muscles.findIndex((group) => group === category) + 1
+        : 0;
 
-    const onIndexSelect = (e, index) => {
-        onSelect(index === 0 ? '' : muscles[index - 1])}
+    const onIndexSelect = (e, i) => {
+        onSelect(i === 0 ? "" : muscles[i - 1]);
+    };
 
-    return <Paper>
-        <Tabs
-            value={index}
-            onChange={onIndexSelect}
-            indicatorColor="primary"
-            textColor="primary"
-            centered
-        >
-            <Tab label="All" />
-            {muscles.map(group => 
-                <Tab key={group} label={group} />
-            )}
-        </Tabs>
-    </Paper>
-}
+    return (
+        <Paper>
+            <Tabs
+                value={index}
+                onChange={onIndexSelect}
+                indicatorColor="primary"
+                textColor="primary"
+                variant="scrollable"
+                scrollButtons="auto"
+            >
+                <Tab label="All" />
+                {muscles.map((group) => <Tab key={group} label={group} />)}
+            </Tabs>
+        </Paper>
+    );
+};
+
+export default Filter;
 // const Filter=()=>{
 //     return (
 //             <div className="ui vertical menu">

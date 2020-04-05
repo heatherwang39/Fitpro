@@ -78,7 +78,11 @@ router.get("/", (req, res) => {
             req.query.name = { $regex: req.query.name, $options: "i" };
         }
     }
-    Workout.paginate(req.query, { populate: { path: "exercises.exercise", limit: 3 } }).then((workouts) => {
+    Workout.find(req.query).populate({ path: "exercises.exercise", limit: 3 }).exec((err, workouts) => {
+        if (err) {
+            res.status(500).send();
+            return;
+        }
         res.setHeader("Content-Type", "application/json");
         res.status(200);
         res.json(workouts);
@@ -102,7 +106,6 @@ router.patch("/", async (req, res) => {
             (e) => ({ instructions: e.instructions, exercise: ObjectId(e.exercise._id) }),
         );
     }
-    console.log(updated.exercises);
     let workout;
     try {
         workout = await Workout.findOneAndUpdate({

@@ -56,7 +56,7 @@ const WorkoutListComponent = ({
     const [workouts, setWorkouts] = React.useState(null);
 
     const gotWorkouts = (res) => {
-        setWorkouts(res.status ? [] : res.docs);
+        setWorkouts(res.status ? [] : res);
         setLoading(false);
     };
 

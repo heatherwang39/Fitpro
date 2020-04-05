@@ -12,6 +12,7 @@ const Mail = require("../models/mail");
 
 // Create Mail
 router.post("/", async (req, res) => {
+    console.log(req.body)
     if (!req.user) {
         res.status(401).send();
         return;
@@ -45,6 +46,7 @@ router.post("/", async (req, res) => {
             );
         });
     } catch(e) {
+        console.log(e)
         res.status(400).send();
         return;
     }

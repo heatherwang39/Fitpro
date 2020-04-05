@@ -8,26 +8,25 @@ import ViewClientsComponent from "./ViewClientsComponent";
 import { addClient } from "../../actions/relationshipActions";
 
 const ViewClientsContainer = (props) => {
-    const { relationships, user } = props;
-    const { clients } = relationships;
-    const [filteredClients, updateFilteredClients] = useState(user.clients);
+    const { user } = props;
+    let users = user.clients
     const history = useHistory();
+    if (history.location.pathname == '/my_trainers') {
+        users = user.trainers
+    }
+    const [filteredClients, updateFilteredClients] = useState(users);
+    
     const onChangeSearchValue = (e) => {
         const { value } = e.target;
         updateFilteredClients(clients.filter((client) => client.firstname.toLowerCase().includes(value)));
     };
 
     const onClickExpand = (userObject) => () => {
-        if (user.isTrainer) {
-            history.push({
-                pathname: "/client",
-                state: { user: userObject },
-            });
-        } else {
-            history.push({
-                pathname: `/user/${userObject.id}`,
-            });
-        }
+        console.log(userObject)
+        history.push({
+            pathname: `/user/${userObject._id}`,
+            state: { user: userObject },
+        });
     };
 
     const onClickCalendar = (userObject) => () => {
@@ -36,7 +35,6 @@ const ViewClientsContainer = (props) => {
             state: { userId: userObject.id },
         });
     };
-
     return (
         <ViewClientsComponent
             clients={filteredClients}
@@ -48,7 +46,6 @@ const ViewClientsContainer = (props) => {
 };
 
 const mapStateToProps = (state) => ({
-    relationships: state.relationshipReducer,
     user: state.userReducer,
 });
 
@@ -57,8 +54,6 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 ViewClientsContainer.propTypes = {
-    addClient: PropTypes.func.isRequired,
-    relationships: PropTypes.objectOf(PropTypes.array).isRequired,
     user: PropTypes.objectOf(PropTypes.any).isRequired,
 };
 
