@@ -242,6 +242,30 @@ export const API = {
         if (res.status !== 200) return {};
         return { success: true, reviews: await res.json() };
     },
+    // A function to send a POST request with a new image
+    async uploadImage(form) {
+        // the URL for the request
+        const url = apiUrl("images");
+        // The data we are going to send in our request
+        const imageData = new FormData(form);
+        // Create our request constructor with all the parameters we need
+        const request = new Request(url, {
+            method: "POST",
+            body: imageData,
+        });
+        // Send the request with fetch()
+        const res = await fetch(request);
+        if (res.status !== 200) {
+            return {};
+        }
+        return { success: true, imageUrl: await res.text() };
+    },
+    async updateProfile(profile) {
+        console.log(profile);
+        const res = await apiFetch(`users/${profile._id}`, { method: "PATCH", body: profile });
+        if (res.status !== 200) return {};
+        return { success: true, profile: res.json() };
+    },
 };
 
 export default API;
