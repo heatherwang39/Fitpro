@@ -30,7 +30,7 @@ app.use(bodyParser.json());
 app.use(auth);
 
 // app.use(express.static(path.join(__dirname, "../app/dist")));
-//app.use(express.static(path.join(__dirname, "../public")));
+app.use(express.static(path.join(__dirname, "./public")));
 
 // Database
 const dbUrl = process.env.DB_URL || "mongodb://localhost/fitpro";
