@@ -2,7 +2,7 @@ import { store } from "../store";
 import { loggedOut } from "../actions/userActions";
 import { CalendarEvent, User } from "../types";
 
-const BASE_API_URL = "http://localhost:3333/api";
+const BASE_API_URL = "/api";
 const apiUrl = (l) => `${BASE_API_URL + (!l || !l.length ? "" : (l[0] === "/" ? l : `/${l}`))}`;
 
 /*
