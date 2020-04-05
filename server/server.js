@@ -15,6 +15,7 @@ const trainersRouter = require("./routes/trainers");
 const mailRouter = require("./routes/mail");
 const exercisesRouter = require("./routes/exercises");
 const ratingsRouter = require("./routes/ratings");
+const imagesRouter = require("./routes/images");
 
 const app = express();
 
@@ -52,6 +53,7 @@ app.use("/trainers", trainersRouter);
 app.use("/mail", mailRouter);
 app.use("/exercises", exercisesRouter);
 app.use("/ratings", ratingsRouter);
+app.use("/images", imagesRouter);
 
 const port = process.env.PORT || 3333;
 app.listen(port, () => console.log(`Started on port ${port}`));
