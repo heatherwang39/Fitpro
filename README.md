@@ -15,7 +15,7 @@ Or to run the app and the server in the same terminal, use `./run.sh`. If `npm i
 
 # Phase 2
 
-http://fitpro-team35.heroku.com
+http://fitpro-team35.herokuapp.com
 
 ## Usage
 There are two kinds of user, trainer and client. All users can access the trainer, exercise, and workout list and search through them with the links in the navigation bar. Any logged in user can add a workout from the workouts list. Clients can request to become a client of a trainer from the trainer's profile page (which can be found by clicking their name in the trainer search).
