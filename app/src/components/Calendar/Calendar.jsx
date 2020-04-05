@@ -242,12 +242,12 @@ const _Calendar = ({
                                     label="My Calendar"
                                     onChange={() => setCalendarType("me")}
                                 />
-                                <Form.Field
+                                {/* <Form.Field
                                     control={Radio}
                                     checked={calendarType === "availability"}
                                     label="Availability"
                                     onChange={() => setCalendarType("availability")}
-                                />
+                                /> */}
                                 <Form.Field>
                                     <Radio
                                         checked={calendarType === "client"}
