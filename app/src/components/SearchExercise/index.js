@@ -1,3 +1,3 @@
-import SearchExercise  from "./SearchExercise";
+import SearchExercise from "./SearchExercise";
 
 export default SearchExercise;
