@@ -12,6 +12,7 @@ import Calendar from "./Calendar";
 import ViewClientsContainer from "./ViewClientsContainer";
 import SearchTrainer from "./SearchTrainer";
 import SearchExercise from "./SearchExercise";
+import ExerciseByName from "./SearchExercise/ExerciseByName";
 import WorkoutList from "./WorkoutList";
 import Workout from "./Workout";
 
@@ -51,6 +52,10 @@ const Main = () => (
                 <Route
                     path="/exercises"
                     component={SearchExercise}
+                />
+                <Route
+                    path="/exercise/:name"
+                    component={ExerciseByName}
                 />
                 <Route
                     path="/register"

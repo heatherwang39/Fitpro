@@ -161,7 +161,6 @@ export const API = {
     },
     async getExercises() {
         const url = 'http://localhost:3333/exercises';
-    
         // Since this is a GET request, simply call fetch on the URL
         fetch(url).then((res) => {
             if (res.status === 200) {
@@ -173,7 +172,7 @@ export const API = {
         }).catch((error) => {
             console.log(error);
         })
-    }
+    },
     async getRating({ exercise, trainer, workout }) {
         let path;
         if (exercise) {

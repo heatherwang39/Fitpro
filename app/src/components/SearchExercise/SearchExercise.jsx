@@ -28,15 +28,16 @@ class SearchExercise extends Component {
     state={
         exercises: [],
         exercise: [],
+        paramData: [],
         search: "",
     }
 
     componentDidMount() {
-        axios.get("http://localhost:3333/exercises").then((res) => {
-            this.setState( { exercises: res.data });
+        axios.get("/api/exercises").then((res) => {
+            this.setState({ exercises: res.data });
         }).catch((error) => {
             console.log(error);
-        })
+        });
     }
 
     getExercisesByMuscles() {
