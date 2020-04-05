@@ -23,6 +23,14 @@ const TrainerSearchComponent = (props) => {
                         pathname: "/trainers",
                     })
                 }>Find a Trainer</button>
+                <button onClick={ () => history.push({
+                        pathname: "/exercises",
+                    })
+                }>Find exercises</button>
+                <button onClick={ () => history.push({
+                        pathname: "/workouts",
+                    })
+                }>Create workouts</button>
             </form>
         </div>
     );
