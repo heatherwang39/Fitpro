@@ -51,6 +51,8 @@ class TrainerList extends Component {
                     <Item.Description>
                         {`${trainer.height} ${trainer.weight}`}
                         <br />
+                        {`${trainer.gender}`}
+                        <br />
                         <Rating disabled icon="star" maxRating={trainer.rating} defaultRating={trainer.rating} />
                     </Item.Description>
                     <Item.Extra>

@@ -42,6 +42,7 @@ const schema = new mongoose.Schema({
     gender: {
         type: String,
         required: true,
+        lowercase:true,
     },
     isTrainer: {
         type: Boolean,
