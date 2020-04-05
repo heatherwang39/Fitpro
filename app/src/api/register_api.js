@@ -17,7 +17,7 @@ export default async (userInfo) => {
             height: userInfo.height,
             price: userInfo.price,
         }
-        const res = await api.post('http://localhost:3333/api/users', _user)
+        const res = await api.post('/api/users', _user)
         const user = res.data;
         return {
             status: res.status,
