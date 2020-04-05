@@ -130,7 +130,7 @@ const _Profile = ({
     }
 
     if (showReviewForm === null) {
-        if (match.params.id === user._id) setShowReviewForm(false);
+        if (user === null || match.params.id === user._id) setShowReviewForm(false);
         else {
             API.getRating({ trainer: profile._id }).then((r) => {
                 setShowReviewForm(r.rating === undefined);
@@ -361,7 +361,7 @@ const _Profile = ({
                     )}
                     <Grid.Row>
                         <p>
-                            {user.metric
+                            {user === null || user.metric
                                 ? `${profile.height} cm ${profile.weight} kg`
                                 : `${~~(profile.height * 2.54 / 12)}'${~~(profile.height * 2.54 % 12) ? `${~~(profile.height * 2.54 % 12)}"` : ""}\
                                 ${Math.round(profile.weight * 2.204)} lb`}

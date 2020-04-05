@@ -160,20 +160,18 @@ export const API = {
         return { success: true };
     },
     async getExercises() {
-        const url = 'http://localhost:3333/exercises';
-    
+        const url = apiUrl("exercises");
         // Since this is a GET request, simply call fetch on the URL
         fetch(url).then((res) => {
             if (res.status === 200) {
                 // return a promise that resolves with the JSON body
                 return res.json();
-           } else {
-                alert('Could not get exercises');
-           }
+            }
+            console.log("Could not get exercises");
         }).catch((error) => {
             console.log(error);
-        })
-    }
+        });
+    },
     async getRating({ exercise, trainer, workout }) {
         let path;
         if (exercise) {
