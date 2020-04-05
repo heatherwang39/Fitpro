@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const mongoosePaginate = require("mongoose-paginate-v2");
 
 // Returns most common element in l in O(n) or null if l is empty
 const mode = (l) => {
@@ -35,7 +34,14 @@ const schema = mongoose.Schema({
     ],
     description: String,
     level: String,
-    rating: Number,
+    rating: {
+        type: Number,
+        default: 0,
+    },
+    numRatings: {
+        type: Number,
+        default: 0,
+    },
     avgExerciseRating: Number,
     numExercises: Number,
 });
@@ -56,7 +62,5 @@ schema.pre("save", function (next) { /* eslint-disable-line func-names */
         });
     } else next();
 });
-
-schema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model("workout", schema);

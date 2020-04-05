@@ -38,13 +38,15 @@ router.post("/", (req, res) => {
         res.status(400).send();
         return;
     }
-    Rating.findOneAndUpdate(query, { ...query, rating: req.body.rating }, { new: true }, (err, rating) => {
+    Rating.findOne(query, async (err, rating) => {
         if (err) {
             res.status(500).send();
             return;
         }
         if (rating) {
-            res.status(200).send();
+            const old = await Rating.findById(rating._id);
+            old.rating = req.body.rating;
+            old.save(() => res.status(200).send());
             return;
         }
         const newRating = new Rating({ ...query, rating: req.body.rating });
@@ -57,7 +59,7 @@ router.post("/", (req, res) => {
     });
 });
 
-router.delete("/", (req, res) => {
+router.delete("/", async (req, res) => {
     if (!req.user) {
         res.status(401).send();
         return;
@@ -77,7 +79,13 @@ router.delete("/", (req, res) => {
         res.status(400).send();
         return;
     }
-    Rating.deleteOne(query, (e) => res.status(e ? 500 : 200).send());
+    const rating = await Rating.findOne(query);
+    if (!rating) {
+        res.status(400).send();
+        return;
+    }
+    rating.remove((e) => res.status(e ? 500 : 200).send());
+    // Rating.deleteOne(query, (e) => res.status(e ? 500 : 200).send());
 });
 
 // Returns 200 if user rated workout with id
@@ -132,6 +140,10 @@ router.get("/trainer/:id", (req, res) => {
         res.status(401).send();
         return;
     }
+    if (req.user._id === req.params.id) {
+        res.status(200).send();
+        return;
+    }
     Rating.findOne({ user: ObjectID(req.user._id), trainer: ObjectID(req.params.id) }, (err, rating) => {
         if (err) {
             res.status(500).send();
@@ -139,6 +151,24 @@ router.get("/trainer/:id", (req, res) => {
             res.status(200).send(rating);
         } else {
             res.status(400).send();
+        }
+    });
+});
+
+router.get("/user/:id", (req, res) => {
+    if (!req.params || !req.params.id) {
+        res.status(400).send();
+        return;
+    }
+    if (!req.user) {
+        res.status(401).send();
+        return;
+    }
+    Rating.find({ trainer: ObjectID(req.params.id) }).populate("user").exec((err, ratings) => {
+        if (err) {
+            res.status(500).send();
+        } else {
+            res.status(200).send(ratings || []);
         }
     });
 });

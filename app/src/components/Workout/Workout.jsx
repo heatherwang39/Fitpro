@@ -150,8 +150,8 @@ const WorkoutComponent = ({
                 {workout.description}
             </Grid.Row>
             <Grid.Row id="workout-rating">
-                {workout.rating || workout.rating === 0 ? (
-                    <Rating rating={workout.rating} maxRating={10} />
+                {workout.numRatings > 0 ? (
+                    `${~~(workout.rating * 10 / workout.numRatings)}% liked (of ${workout.numRatings})`
                 ) : "No Ratings Yet"}
             </Grid.Row>
             <Grid.Row id="workout-level">
@@ -188,7 +188,7 @@ const WorkoutComponent = ({
             setNewExercises({});
             setWorkout(res.workout);
             if (isNew) {
-                // TODO go to new url
+                location.href = `/workout/${res.workout._id}`;
             }
         };
         if (isNew) {

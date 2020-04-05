@@ -28,17 +28,34 @@ const schema = mongoose.Schema({
     review: String,
 });
 
-schema.pre("save", function (next) { /* eslint-disable-line func-names */
+schema.pre("save", async function (next) { /* eslint-disable-line func-names */
+    const old = await mongoose.models.rating.findById(this._id);
     if (this.isNew || this.isModified("rating")) {
-        // TODO update average rating
-    }
-    next();
+        let doc;
+        if (this.workout) doc = await Workout.findById(this.workout);
+        else if (this.exercise) doc = await Exercise.findById(this.exercise);
+        else doc = await User.findById(this.trainer);
+        if (this.isNew) {
+            doc.numRatings++;
+            doc.rating += (this.rating - doc.rating) / doc.numRatings;
+            doc.save((e) => {
+                next();
+            });
+        } else {
+            doc.rating = (doc.numRatings * doc.rating - old.rating + this.rating) / doc.numRatings;
+            doc.save(() => next());
+        }
+    } else next();
 });
 
-schema.pre("remove", function (next) { /* eslint-disable-line func-names */
-    // TODO update average rating
-    (() => {})(this);
-    next();
+schema.pre("remove", async function (next) { /* eslint-disable-line func-names */
+    let doc;
+    if (this.workout) doc = await Workout.findById(this.workout);
+    else if (this.exercise) doc = await Exercise.findById(this.exercise);
+    else doc = await User.findById(this.trainer);
+    doc.rating = (doc.numRatings * doc.rating - this.rating) / (doc.numRatings - 1);
+    doc.numRatings--;
+    doc.save(() => next());
 });
 
 module.exports = mongoose.model("rating", schema);

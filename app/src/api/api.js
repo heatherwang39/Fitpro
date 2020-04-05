@@ -48,7 +48,6 @@ export const API = {
         if (res.status !== 200) return { status: res.status };
         return { success: true, results: await res.json() };
     },
-
     async getWorkout(id) {
         return (await apiFetch(`workouts?id=${id}`)).json();
     },
@@ -160,6 +159,19 @@ export const API = {
         }
         return { success: true };
     },
+    async getExercises() {
+        const url = apiUrl("exercises");
+        // Since this is a GET request, simply call fetch on the URL
+        fetch(url).then((res) => {
+            if (res.status === 200) {
+                // return a promise that resolves with the JSON body
+                return res.json();
+            }
+            console.log("Could not get exercises");
+        }).catch((error) => {
+            console.log(error);
+        });
+    },
     async getRating({ exercise, trainer, workout }) {
         let path;
         if (exercise) {
@@ -199,26 +211,37 @@ export const API = {
         return {};
     },
     async requestTraining(trainerId, user) {
-        const res = await apiFetch("mail", { method: "POST", body: {
-            title: `${user.firstname} has requested to be your client.`,
-            receiver: trainerId,
-            content: `What is your response?\nTrainingRequest`
-        } });
+        const res = await apiFetch("mail", {
+            method: "POST",
+            body: {
+                title: `${user.firstname} has requested to be your client.`,
+                receiver: trainerId,
+                content: "What is your response?\nTrainingRequest",
+            },
+        });
     },
-    async addClient(clientId, userId){
-        const res = await apiFetch(`/users/client`, { method: "POST", body: {
-            clientId
-        }});
+    async addClient(clientId, userId) {
+        const res = await apiFetch("/users/client", {
+            method: "POST",
+            body: {
+                clientId,
+            },
+        });
 
         if (res.status === 200) return { success: true };
-        return {success: true};
+        return { success: true };
     },
-    async getUser(userId){
+    async getUser(userId) {
         const res = await apiFetch(`users/${userId}`);
         if (res.status != 200) return { success: false };
-        const user = await res.json()
-        return {success: true, user: new User({ id: user._id, ...user })};
-    }
+        const user = await res.json();
+        return { success: true, user: new User({ id: user._id, ...user }) };
+    },
+    async getReviews(id) {
+        const res = await apiFetch(`ratings/user/${id}`);
+        if (res.status !== 200) return {};
+        return { success: true, reviews: await res.json() };
+    },
 };
 
 export default API;

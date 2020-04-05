@@ -15,7 +15,10 @@ const schema = mongoose.Schema({
     level: String,
     benefits: [String],
     muscle: String,
-    rating: Number,
+    rating: {
+        type: Number,
+        default: 0,
+    },
     images: [String],
 });
 
