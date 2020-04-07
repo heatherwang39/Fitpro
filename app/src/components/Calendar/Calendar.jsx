@@ -216,8 +216,8 @@ const _Calendar = ({
         if (calendarType === "default") {
             setCalendarType("overview");
         }
-    } else if (calendarType !== "me") {
-        setCalendarType("me");
+    } else if (calendarType !== "overview") {
+        setCalendarType("overview");
     }
 
     return (

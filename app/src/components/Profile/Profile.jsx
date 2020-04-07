@@ -420,12 +420,9 @@ const _Profile = ({
                     )}
                     <Grid.Row>
                         <p>
-                            {user === null || user.metric
-                                ? `${profile.height} cm ${profile.weight} kg`
-                                : `${~~(profile.height * 2.54 / 12)}'${~~(profile.height * 2.54 % 12) ? `${~~(profile.height * 2.54 % 12)}"` : ""}\
-                                ${Math.round(profile.weight * 2.204)} lb`}
+                            {`${profile.height} cm ${profile.weight} kg`}
                         </p>
-                    </Grid.Row>
+                    </Grid.Row>                    
                     <Grid.Row>
                         <p>{profile.email}</p>
                     </Grid.Row>
