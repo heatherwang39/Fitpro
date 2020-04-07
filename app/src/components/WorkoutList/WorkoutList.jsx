@@ -21,13 +21,13 @@ const workoutListItem = (w) => (
                 </Grid.Row>
             </Grid.Column>
             <Grid.Column>
-                {w.numExercises
+                {w.exercises && w.numExercises
                     ? (
                         <List bulleted>
                             {
                                 // Might have more than 3 exercises if another workout on this page has repeats
                                 w.exercises.slice(0, 3).map(
-                                    (e) => (<List.Item key={e.exercise._id}>{e.exercise.name}</List.Item>),
+                                    (e) => (e.exercise ? (<List.Item key={e.exercise._id}>{e.exercise.name}</List.Item>) : <span />),
                                 )
                             }
                         </List>
