@@ -100,9 +100,12 @@ const WorkoutListComponent = ({
                                         value={filters.name}
                                         onChange={(_, v) => setFilters({ ...filters, name: v.value })}
                                     />
-                                    <Link to="/workout/new">
-                                        <Form.Button icon="add" id="add-workout" />
-                                    </Link>
+                                    {user
+                                    && (
+                                        <Link to="/workout/new">
+                                            <Form.Button icon="add" id="add-workout" />
+                                        </Link>
+                                    )}
                                 </Form.Group>
                             </Form>
                         </Segment>

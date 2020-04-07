@@ -33,7 +33,7 @@ const ExerciseList = ({
     exercise: {
         _id,
         name = "Welcome!",
-        description = "Please seelect an exercise from the list on the left!",
+        description = "Please select an exercise from the list on the left!",
         benefits = [],
         type,
         muscle,
