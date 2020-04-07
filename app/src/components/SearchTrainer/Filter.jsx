@@ -49,37 +49,37 @@ class Filter extends Component {
                         <label className="filter-label">Min Rating</label>
                         <Form.Field>
                             <Radio
-                                checked={filters.minRating === 5}
-                                label="5"
-                                onClick={() => setFilters({ ...filters, minRating: filters.minRating === 5 ? 0 : 5 })}
+                                checked={filters.minRating === 10}
+                                label="10"
+                                onClick={() => setFilters({ ...filters, minRating: filters.minRating === 10 ? 0 : 10 })}
                             />
                         </Form.Field>
                         <Form.Field>
                             <Radio
-                                checked={filters.minRating === 4}
-                                label="4"
-                                onClick={() => setFilters({ ...filters, minRating: filters.minRating === 4 ? 0 : 4 })}
+                                checked={filters.minRating === 9}
+                                label="9"
+                                onClick={() => setFilters({ ...filters, minRating: filters.minRating === 9 ? 0 : 9 })}
                             />
                         </Form.Field>
                         <Form.Field>
                             <Radio
-                                checked={filters.minRating === 3}
-                                label="3"
-                                onClick={() => setFilters({ ...filters, minRating: filters.minRating === 3 ? 0 : 3 })}
+                                checked={filters.minRating === 8}
+                                label="8"
+                                onClick={() => setFilters({ ...filters, minRating: filters.minRating === 8 ? 0 : 8 })}
                             />
                         </Form.Field>
                         <Form.Field>
                             <Radio
-                                checked={filters.minRating === 2}
-                                label="2"
-                                onClick={() => setFilters({ ...filters, minRating: filters.minRating === 2 ? 0 : 2 })}
+                                checked={filters.minRating === 7}
+                                label="7"
+                                onClick={() => setFilters({ ...filters, minRating: filters.minRating === 7 ? 0 : 7 })}
                             />
                         </Form.Field>
                         <Form.Field>
                             <Radio
-                                checked={filters.minRating === 1}
-                                label="1"
-                                onClick={() => setFilters({ ...filters, minRating: filters.minRating === 1 ? 0 : 1 })}
+                                checked={filters.minRating === 6}
+                                label="6"
+                                onClick={() => setFilters({ ...filters, minRating: filters.minRating === 6 ? 0 : 6 })}
                             />
                         </Form.Field>
                     </Form.Group>
