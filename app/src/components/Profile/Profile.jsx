@@ -130,7 +130,7 @@ const _Profile = ({
     }
 
     if (showReviewForm === null) {
-        if (match.params.id === user._id) setShowReviewForm(false);
+        if (user === null || match.params.id === user._id || !user.trainers.some((e) => e._id === profile._id)) setShowReviewForm(false);
         else {
             API.getRating({ trainer: profile._id }).then((r) => {
                 setShowReviewForm(r.rating === undefined);
@@ -139,7 +139,9 @@ const _Profile = ({
     }
 
     const validProfileAttr = (attr) => {
+        if (attr === "location") return true;
         if (typeof profile[attr] === "undefined" || profile[attr].length === 0) return false;
+        console.log(attr, profile[attr]);
         switch (attr) {
         case "phone":
             if (profile[attr].match(/\D?(\d{3})\D?\D?(\d{3})\D?(\d{4})/) == null) return false;
@@ -148,10 +150,12 @@ const _Profile = ({
             if (profile[attr].match(/[\w\-.]+@{1}([A-Za-z0-9-]+)+\.[A-Za-z]+/) == null) return false;
             break;
         case "height":
-            if (profile[attr].match(/^[\d"' (cm)(ft)(in)m.]+$/m) === null) return false;
+            // if (profile[attr].toString().match(/^[\d"' (cm)(ft)(in)m.]+$/m) === null) return false;
+            return !isNaN(parseInt(profile[attr]));
             break;
         case "weight":
-            if (profile[attr].match(/^\d+\s?((lb)|(kg)|(pounds)|(kilos)|(kilograms)|(lbs))?$/m) === null) return false;
+            // if (profile[attr].toString().match(/^\d+\s?((lb)|(kg)|(pounds)|(kilos)|(kilograms)|(lbs))?$/m) === null) return false;
+            return !isNaN(parseInt(profile[attr]));
             break;
         // no default
         }
@@ -159,7 +163,7 @@ const _Profile = ({
     };
 
     const updateUserReducerWithProfile = (p) => {
-        gotUserInfo(User.fromJSON({ ...user, ...p }));
+        gotUserInfo(new User({ ...user, ...p }));
     };
 
     const saveEdits = () => {
@@ -171,8 +175,9 @@ const _Profile = ({
                 // TODO show error to user
                 console.log("Error updating profile, got response ", response);
             } else {
-                setProfile(response.profile);
-                updateUserReducerWithProfile(response.profile);
+                window.location.href = `/user/${match.params.id}`;
+                // setProfile(response.profile);
+                // updateUserReducerWithProfile(response.profile);
             }
             setEditing(false);
         });
@@ -196,6 +201,19 @@ const _Profile = ({
         );
     };
 
+    const clearProfilePicture = () => {
+        API.updateProfile({ ...profile, imageUrl: "" }).then((response) => {
+            if (!response.success) {
+                // TODO show error to user
+                console.log("Error updating profile, got response ", response);
+            } else {
+                window.location.href = `/user/${match.params.id}`;
+                // setProfile(response.profile);
+                // updateUserReducerWithProfile(response.profile);
+            }
+        });
+    };
+
     // Got profile and currently editing
     if (editing) {
         return (
@@ -203,9 +221,46 @@ const _Profile = ({
                 <Grid className="profile-editing aligned" stackable>
                     <Grid.Column width={6} textAlign="center">
                         <Grid.Row>
-                            {
-                                // TODO allow editing profile picture
-                            }
+                            <form
+                                className="image-form"
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    API.uploadImage(e.target).then((r) => {
+                                        if (!r.success) return;
+                                        console.log(r);
+                                        API.updateProfile({ _id: profile._id, imageUrl: r.imageUrl }).then((response) => {
+                                            if (!response.success) {
+                                                // TODO show error to user
+                                                console.log("Error updating profile, got response ", response);
+                                            } else {
+                                                window.location.href = `/user/${match.params.id}`;
+                                            }
+                                            // setEditing(false);
+                                        });
+                                    });
+                                }}
+                            >
+                                <div className="image-form__field">
+                                    <label>Image:</label>
+                                    <input name="image" type="file" />
+                                </div>
+                                <Button
+                                    // variant="contained"
+                                    // color="primary"
+                                    type="submit"
+                                    className="image-form__submit-button"
+                                >
+                                    Upload
+                                </Button>
+                                <Button
+                                    negative
+                                    type="button"
+                                    className="image-form__submit-button"
+                                    onClick={clearProfilePicture}
+                                >
+                                    Clear
+                                </Button>
+                            </form>
                             <img
                                 alt={`${profile.firstname} ${profile.lastname}`}
                                 src={typeof profile.imageUrl === "undefined" || profile.imageUrl == null
@@ -271,7 +326,7 @@ const _Profile = ({
                                 error={!validProfileAttr("weight")}
                                 labelPosition="left"
                             >
-                                <Label>Height</Label>
+                                <Label>Weight</Label>
                                 <input />
                                 {!validProfileAttr("weight") && (
                                     <Label pointing="left">
@@ -326,6 +381,10 @@ const _Profile = ({
                                 )}
                             </Input>
                         </Grid.Row>
+                        <Grid.Row>
+                            <Button onClick={cancelEdits}>Cancel</Button>
+                            <Button onClick={saveEdits}>Save</Button>
+                        </Grid.Row>
                     </Grid.Column>
                 </Grid>
             </Container>
@@ -346,7 +405,7 @@ const _Profile = ({
                             className="profile-avatar"
                         />
                     </Grid.Row>
-                    {user !== null && profile.id === user.id && (
+                    {user !== null && profile._id === user.id && (
                         <Grid.Row>
                             <p><Button onClick={() => setEditing(true)}>Edit</Button></p>
                         </Grid.Row>
@@ -361,12 +420,9 @@ const _Profile = ({
                     )}
                     <Grid.Row>
                         <p>
-                            {user.metric
-                                ? `${profile.height} cm ${profile.weight} kg`
-                                : `${~~(profile.height * 2.54 / 12)}'${~~(profile.height * 2.54 % 12) ? `${~~(profile.height * 2.54 % 12)}"` : ""}\
-                                ${Math.round(profile.weight * 2.204)} lb`}
+                            {`${profile.height} cm ${profile.weight} kg`}
                         </p>
-                    </Grid.Row>
+                    </Grid.Row>                    
                     <Grid.Row>
                         <p>{profile.email}</p>
                     </Grid.Row>
@@ -399,7 +455,7 @@ const _Profile = ({
                         {showReviewForm && reviewForm(submitReview, setMyRating)}
                     </Grid.Row>
                     <Grid.Row>
-                        {user != null && profile.trainers.includes(user.id) && (
+                        {user != null && user.trainers.includes(user.id) && (
                             <p>
                                 <Link to={{ pathname: "/calendar", state: { userId: profile.id } }}>
                                     <Button>Calendar</Button>

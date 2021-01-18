@@ -2,7 +2,7 @@ import { store } from "../store";
 import { loggedOut } from "../actions/userActions";
 import { CalendarEvent, User } from "../types";
 
-const BASE_API_URL = "http://localhost:3333";
+const BASE_API_URL = "/api";
 const apiUrl = (l) => `${BASE_API_URL + (!l || !l.length ? "" : (l[0] === "/" ? l : `/${l}`))}`;
 
 /*
@@ -135,8 +135,8 @@ export const API = {
         return { success: true, event: new CalendarEvent(parseJsonWithDates(await res.text())) };
     },
     async searchExercises({ name, page }) {
-        if (!name || page < 1) return { success: false };
-        const res = await apiFetch(`exercises?name=${name}&page=${page}`);
+        if (!name) return { success: false };
+        const res = await apiFetch(`exercises?name=${name}`);
         if (res.status !== 200) {
             return { success: false };
         }
@@ -160,20 +160,18 @@ export const API = {
         return { success: true };
     },
     async getExercises() {
-        const url = 'http://localhost:3333/exercises';
-    
+        const url = apiUrl("exercises");
         // Since this is a GET request, simply call fetch on the URL
         fetch(url).then((res) => {
             if (res.status === 200) {
                 // return a promise that resolves with the JSON body
                 return res.json();
-           } else {
-                alert('Could not get exercises');
-           }
+            }
+            console.log("Could not get exercises");
         }).catch((error) => {
             console.log(error);
-        })
-    }
+        });
+    },
     async getRating({ exercise, trainer, workout }) {
         let path;
         if (exercise) {
@@ -243,6 +241,29 @@ export const API = {
         const res = await apiFetch(`ratings/user/${id}`);
         if (res.status !== 200) return {};
         return { success: true, reviews: await res.json() };
+    },
+    // A function to send a POST request with a new image
+    async uploadImage(form) {
+        // the URL for the request
+        const url = apiUrl("images");
+        // The data we are going to send in our request
+        const imageData = new FormData(form);
+        // Create our request constructor with all the parameters we need
+        const request = new Request(url, {
+            method: "POST",
+            body: imageData,
+        });
+        // Send the request with fetch()
+        const res = await fetch(request);
+        if (res.status !== 200) {
+            return {};
+        }
+        return { success: true, imageUrl: await res.text() };
+    },
+    async updateProfile(profile) {
+        const res = await apiFetch(`users/${profile._id}`, { method: "PATCH", body: profile });
+        if (res.status !== 200) return {};
+        return { success: true, profile: res.json() };
     },
 };
 

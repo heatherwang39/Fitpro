@@ -21,13 +21,13 @@ const workoutListItem = (w) => (
                 </Grid.Row>
             </Grid.Column>
             <Grid.Column>
-                {w.numExercises
+                {w.exercises && w.numExercises
                     ? (
                         <List bulleted>
                             {
                                 // Might have more than 3 exercises if another workout on this page has repeats
                                 w.exercises.slice(0, 3).map(
-                                    (e) => (<List.Item key={e.exercise._id}>{e.exercise.name}</List.Item>),
+                                    (e) => (e.exercise ? (<List.Item key={e.exercise._id}>{e.exercise.name}</List.Item>) : <span />),
                                 )
                             }
                         </List>
@@ -56,7 +56,7 @@ const WorkoutListComponent = ({
     const [workouts, setWorkouts] = React.useState(null);
 
     const gotWorkouts = (res) => {
-        setWorkouts(res.status ? [] : res.docs);
+        setWorkouts(res.status ? [] : res);
         setLoading(false);
     };
 
@@ -100,9 +100,12 @@ const WorkoutListComponent = ({
                                         value={filters.name}
                                         onChange={(_, v) => setFilters({ ...filters, name: v.value })}
                                     />
-                                    <Link to="/workout/new">
-                                        <Form.Button icon="add" id="add-workout" />
-                                    </Link>
+                                    {user
+                                    && (
+                                        <Link to="/workout/new">
+                                            <Form.Button icon="add" id="add-workout" />
+                                        </Link>
+                                    )}
                                 </Form.Group>
                             </Form>
                         </Segment>

@@ -15,6 +15,7 @@ const trainersRouter = require("./routes/trainers");
 const mailRouter = require("./routes/mail");
 const exercisesRouter = require("./routes/exercises");
 const ratingsRouter = require("./routes/ratings");
+const imagesRouter = require("./routes/images");
 
 const app = express();
 
@@ -29,7 +30,7 @@ app.use(bodyParser.json());
 app.use(auth);
 
 // app.use(express.static(path.join(__dirname, "../app/dist")));
-//app.use(express.static(path.join(__dirname, "../public")));
+app.use(express.static(path.join(__dirname, "./public")));
 
 // Database
 const dbUrl = process.env.DB_URL || "mongodb://localhost/fitpro";
@@ -44,14 +45,15 @@ db.on("error", (e) => {
 db.on("open", () => console.log(`Connected to database at ${dbUrl}`));
 
 // Routes
-app.use("/users", usersRouter);
-app.use("/auth", authRouter);
-app.use("/workouts", workoutsRouter);
-app.use("/events", eventsRouter);
-app.use("/trainers", trainersRouter);
-app.use("/mail", mailRouter);
-app.use("/exercises", exercisesRouter);
-app.use("/ratings", ratingsRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/workouts", workoutsRouter);
+app.use("/api/events", eventsRouter);
+app.use("/api/trainers", trainersRouter);
+app.use("/api/mail", mailRouter);
+app.use("/api/exercises", exercisesRouter);
+app.use("/api/ratings", ratingsRouter);
+app.use("/api/images", imagesRouter);
 
 const port = process.env.PORT || 3333;
 app.listen(port, () => console.log(`Started on port ${port}`));

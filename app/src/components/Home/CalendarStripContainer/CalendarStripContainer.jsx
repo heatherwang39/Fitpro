@@ -21,6 +21,7 @@ const CalendarStripContainer = ({
         oneWeekFromNow.setDate((new Date()).getDate() + 7);
         const eventsList = events.filter((event) => {
             const { start } = event;
+            if(!start) return false;
             const newDate = start.toLocaleDateString();
             if (start.getTime() > oneWeekFromNow.getTime() || start.getTime() < (new Date()).getTime()) return false;
             // Remove the following line if you want events that occur for the next week

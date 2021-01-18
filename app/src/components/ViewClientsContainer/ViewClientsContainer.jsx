@@ -8,8 +8,7 @@ import ViewClientsComponent from "./ViewClientsComponent";
 import { addClient } from "../../actions/relationshipActions";
 
 const ViewClientsContainer = (props) => {
-    const { relationships, user } = props;
-    const { clients } = relationships;
+    const { user } = props;
     let users = user.clients
     const history = useHistory();
     if (history.location.pathname == '/my_trainers') {
@@ -47,7 +46,6 @@ const ViewClientsContainer = (props) => {
 };
 
 const mapStateToProps = (state) => ({
-    relationships: state.relationshipReducer,
     user: state.userReducer,
 });
 
@@ -56,8 +54,6 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 ViewClientsContainer.propTypes = {
-    addClient: PropTypes.func.isRequired,
-    relationships: PropTypes.objectOf(PropTypes.array).isRequired,
     user: PropTypes.objectOf(PropTypes.any).isRequired,
 };
 
